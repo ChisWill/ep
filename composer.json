@@ -1,0 +1,15 @@
+{
+    "name": "chiswill/ep",
+    "description": "Elastic PHP Framework",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ep\\": "src"
+        }
+    }
+}

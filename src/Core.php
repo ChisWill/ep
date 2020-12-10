@@ -2,7 +2,7 @@
 
 namespace ep;
 
-class App
+class Core
 {
     public function e()
     {
