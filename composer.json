@@ -5,11 +5,13 @@
     "license": "MIT",
     "minimum-stability": "dev",
     "require": {
-        "php": ">=7.0"
+        "php": ">=7.4",
+        "yiisoft/di": "^3.0@dev"
     },
     "autoload": {
         "psr-4": {
-            "ep\\": "src"
+            "ep\\": "src",
+            "webapp\\": "tests/web-app"
         }
     }
 }
