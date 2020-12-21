@@ -1,3 +1,5 @@
 <?php
 
-return [];
+return [
+    'test/<ctrl:.+>/<act:.+>' => '<ctrl>/<act>'
+];

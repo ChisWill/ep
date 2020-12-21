@@ -2,30 +2,21 @@
 
 namespace webapp\controller;
 
+use ep\Core;
 use ep\web\Request;
 
 class IndexController extends \ep\web\Controller
 {
     public function index(Request $request)
     {
-        $r = $request->getQueryParams();
-        tes($r);
+        tes(Core::getInstance()->getConfig());
+        // $url = $request->createUrl('site/index', ['a' => 1]);
+
+        // return $this->render();
+        // return $this->render('index', compact('url'));
     }
 
-    public function cat(Request $request)
+    public function test(Request $request)
     {
-        $r = $request->getQueryParams();
-        tes($r);
-    }
-
-    public function login(Request $request)
-    {
-        tes($request->getQueryParams()['ids']);
-        test('i login');
-    }
-
-    public function single()
-    {
-        test('i single');
     }
 }
