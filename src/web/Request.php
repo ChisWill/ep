@@ -3,24 +3,25 @@
 namespace ep\web;
 
 use ep\base\Request as BaseRequest;
+use ep\helper\Ep;
 
 class Request extends BaseRequest
 {
-    private $_config;
+    private Config $_config;
 
-    public function __construct(Config $config)
+    public function __construct()
     {
-        $this->_config = $config;
+        $this->_config = Ep::getConfig();
     }
 
-    public function createUrl(string $action, $params = [])
+    public function createUrl(string $action, $params = []): string
     {
         return sprintf('%s/%s%s%s', $this->getHostInfo(), $action, $params ? '?' : '', http_build_query($params));
     }
 
-    private $_queryParams = [];
+    private array $_queryParams = [];
 
-    public function solveRouteRules(array $rules, string $requestPath)
+    public function solveRouteRules(array $rules, string $requestPath): string
     {
         foreach ($rules as $rule => $route) {
             $keys = [];
@@ -42,7 +43,7 @@ class Request extends BaseRequest
         return $requestPath;
     }
 
-    public function solvePath(string $path)
+    public function solvePath(string $path): array
     {
         $pieces = explode('/', ltrim($path, '/'));
         $actionName = array_pop($pieces);
@@ -53,7 +54,7 @@ class Request extends BaseRequest
         if (!$controllerName) {
             $controllerName = $this->_config->defaultController;
         }
-        $controllerName = $this->_config->controllerNamespace . '\\' . $controllerName . 'Controller';
+        $controllerName = Ep::createControllerName($this->_config->controllerNamespace, $controllerName);
         return [$controllerName, $actionName];
     }
 
@@ -85,7 +86,7 @@ class Request extends BaseRequest
         return 'GET';
     }
 
-    public function getIsSecureConnection()
+    public function isSecureConnection(): bool
     {
         return isset($_SERVER['HTTPS']) && (strcasecmp($_SERVER['HTTPS'], 'on') === 0 || $_SERVER['HTTPS'] == 1)
             || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strcasecmp($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') === 0;
@@ -93,10 +94,10 @@ class Request extends BaseRequest
 
     private $_hostInfo;
 
-    public function getHostInfo()
+    public function getHostInfo(): string
     {
         if ($this->_hostInfo === null) {
-            $secure = $this->getIsSecureConnection();
+            $secure = $this->isSecureConnection();
             $http = $secure ? 'https' : 'http';
             if (isset($_SERVER['HTTP_HOST'])) {
                 $this->_hostInfo = $http . '://' . $_SERVER['HTTP_HOST'];
@@ -114,31 +115,51 @@ class Request extends BaseRequest
 
     private $_port;
 
-    public function getPort()
+    public function getPort(): int
     {
         if ($this->_port === null) {
-            $this->_port = !$this->getIsSecureConnection() && isset($_SERVER['SERVER_PORT']) ? (int) $_SERVER['SERVER_PORT'] : 80;
+            $this->_port = !$this->isSecureConnection() && isset($_SERVER['SERVER_PORT']) ? (int) $_SERVER['SERVER_PORT'] : 80;
         }
 
         return $this->_port;
     }
 
-    public function getSecurePort()
+    public function getSecurePort(): int
     {
         if ($this->_securePort === null) {
-            $this->_securePort = $this->getIsSecureConnection() && isset($_SERVER['SERVER_PORT']) ? (int) $_SERVER['SERVER_PORT'] : 443;
+            $this->_securePort = $this->isSecureConnection() && isset($_SERVER['SERVER_PORT']) ? (int) $_SERVER['SERVER_PORT'] : 443;
         }
 
         return $this->_securePort;
     }
 
-    public function getHost()
+    public function getHost(): string
     {
         return $_SERVER['HTTP_HOST'];
     }
 
-    public function getQueryParams()
+    public function getQueryParams(): array
     {
         return $_GET + $this->_queryParams;
+    }
+
+    public function isAjax(): bool
+    {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
+    }
+
+    public function isPost(): bool
+    {
+        return $this->getMethod() === 'POST';
+    }
+
+    public function isGet(): bool
+    {
+        return $this->getMethod() === 'GET';
+    }
+
+    public function getRawBody(): string
+    {
+        return file_get_contents('php://input');
     }
 }

@@ -2,25 +2,45 @@
 
 namespace ep\base;
 
-use ep\Core;
+use ep\Exception;
+use ep\helper\Ep;
 
 class View
 {
     public $title = '';
+    public $layout = 'layouts/main';
 
-    public $context;
+    public function render(string $view, array $params = []): string
+    {
+        if ($this->layout === null) {
+            return $this->renderContentFile($view, $params);
+        } else {
+            return $this->renderLayoutFile($view, $params);
+        }
+    }
 
-    public function render($view, $params = [])
+    protected function renderContentFile(string $view, array $params = []): string
     {
         return $this->renderPhpFile($this->findViewFile($view), $params);
     }
 
-    public function findViewFile($view)
+    protected function renderLayoutFile(string $view, array $params = []): string
     {
-        return Core::getAlias(Core::$config->viewFilePath) . '/' . $view . '.php';
+        try {
+            return $this->renderContentFile($this->layout, [
+                'content' => $this->renderContentFile($view, $params)
+            ]);
+        } catch (Exception $e) {
+            throw new Exception(Exception::NOT_FOUND_LAYOUT, $e->getMessage());
+        }
     }
 
-    public function renderPhpFile($_file_, $_params_ = [])
+    protected function findViewFile(string $view): string
+    {
+        return Ep::getAlias($this->getViewFilePath() . '/' . $view . '.php');
+    }
+
+    protected function renderPhpFile(string $_file_, array $_params_ = []): string
     {
         ob_start();
         ob_implicit_flush(false);
@@ -28,5 +48,15 @@ class View
         require($_file_);
 
         return ob_get_clean();
+    }
+
+    private $_viewFilePath;
+
+    private function getViewFilePath()
+    {
+        if ($this->_viewFilePath === null) {
+            $this->_viewFilePath = Ep::getConfig()->viewFilePath ?: Ep::getAlias('@root/view');
+        }
+        return $this->_viewFilePath;
     }
 }
