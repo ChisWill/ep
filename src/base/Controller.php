@@ -2,6 +2,9 @@
 
 namespace ep\base;
 
-class Controller
+abstract class Controller
 {
+    public abstract function beforeAction(): bool;
+
+    public abstract function afterAction(Response $response): void;
 }

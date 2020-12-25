@@ -9,7 +9,6 @@ use ep\web\Controller;
 use ep\Exception;
 use ep\web\Request;
 use ep\web\Response;
-use Yiisoft\Di\Container;
 
 final class Core
 {
@@ -30,37 +29,48 @@ final class Core
         }, E_ALL);
     }
 
-    public function run(?Config $config = null, ?Container $container = null): void
+    public function run(?Config $config = null): void
     {
-        Ep::init($config, $container);
+        Ep::init($config);
 
         switch (get_parent_class($config)) {
             case 'ep\web\Config':
                 $response = $this->handleWebRoute($config);
-                $response->sendContent();
+                if ($response) {
+                    $response->sendContent();
+                }
                 break;
             case 'ep\console\Config':
                 break;
         }
     }
 
-    private function handleWebRoute(WebConfig $config): Response
+    private function handleWebRoute(WebConfig $config): ?Response
     {
         /** @var Request $request */
-        $request = Ep::getDi()->get('webRequest');
+        $request = Ep::getDi()->get('request');
         $requestPath = $request->getRequestPath();
         if (count($config->routeRules) > 0) {
             $requestPath = $request->solveRouteRules($config->routeRules, $requestPath);
         }
         [$controllerName, $actionName] = $request->solvePath($requestPath);
         if (!class_exists($controllerName)) {
-            throw new Exception('NOT FOUND', 404);
+            throw new Exception(Exception::NOT_FOUND_CTRL);
         }
         /** @var Controller $controller */
         $controller = new $controllerName;
         if (!method_exists($controller, $actionName)) {
-            throw new Exception('NOT FOUND', 404);
+            throw new Exception(Exception::NOT_FOUND_ACTION);
         }
-        return $controller->$actionName($request, Ep::getDi()->get('webResponse'));
+        if (in_array($actionName, ['beforeAction', 'afterAction'])) {
+            throw new Exception(Exception::NOT_FOUND_ACTION);
+        }
+        if ($controller->beforeAction()) {
+            $response = $controller->$actionName($request, Ep::getDi()->get('response'));
+            $controller->afterAction($response);
+            return $response;
+        } else {
+            return null;
+        }
     }
 }

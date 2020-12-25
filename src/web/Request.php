@@ -19,7 +19,7 @@ class Request extends BaseRequest
         return sprintf('%s/%s%s%s', $this->getHostInfo(), $action, $params ? '?' : '', http_build_query($params));
     }
 
-    private array $_queryParams = [];
+    private array $_ruleParams = [];
 
     public function solveRouteRules(array $rules, string $requestPath): string
     {
@@ -36,7 +36,7 @@ class Request extends BaseRequest
             $r = preg_match(sprintf('#^/%s$#', $pattern), $requestPath, $match);
             if ($r) {
                 unset($match[0]);
-                $this->_queryParams = array_combine($keys, $match);
+                $this->_ruleParams = array_combine($keys, $match);
                 return str_replace(array_map(fn ($v) => sprintf('<%s>', $v), $keys), $match, $route);
             }
         }
@@ -138,11 +138,6 @@ class Request extends BaseRequest
         return $_SERVER['HTTP_HOST'];
     }
 
-    public function getQueryParams(): array
-    {
-        return $_GET + $this->_queryParams;
-    }
-
     public function isAjax(): bool
     {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
@@ -161,5 +156,53 @@ class Request extends BaseRequest
     public function getRawBody(): string
     {
         return file_get_contents('php://input');
+    }
+
+    private $_queryParams;
+
+    public function getQueryParams(): array
+    {
+        if ($this->_queryParams === null) {
+            $this->_queryParams = $_GET + $this->_ruleParams;
+        }
+        return $this->_queryParams;
+    }
+
+    public function getQueryParam(string $name, $defaultValue = null)
+    {
+        return $this->getQueryParams()[$name] ?? $defaultValue;
+    }
+
+    private $_bodyParams;
+
+    public function getBodyParams()
+    {
+        if ($this->_bodyParams === null) {
+            $this->_bodyParams = $_POST;
+        }
+        return $this->_bodyParams;
+    }
+
+    public function getBodyParam(string $name, $defaultValue = null)
+    {
+        return $this->getBodyParams()[$name] ?? $defaultValue;
+    }
+
+    public function get($name = null, $defaultValue = null)
+    {
+        if ($name === null) {
+            return $this->getQueryParams();
+        } else {
+            return $this->getQueryParam($name, $defaultValue);
+        }
+    }
+
+    public function post($name = null, $defaultValue = null)
+    {
+        if ($name === null) {
+            return $this->getBodyParams();
+        } else {
+            return $this->getBodyParam($name, $defaultValue);
+        }
     }
 }

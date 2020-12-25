@@ -5,7 +5,7 @@ namespace ep\base;
 use ep\Exception;
 use ep\helper\Ep;
 
-class View
+abstract class View
 {
     public $title = '';
     public $layout = 'layouts/main';
@@ -50,13 +50,8 @@ class View
         return ob_get_clean();
     }
 
-    private $_viewFilePath;
-
     private function getViewFilePath()
     {
-        if ($this->_viewFilePath === null) {
-            $this->_viewFilePath = Ep::getConfig()->viewFilePath ?: Ep::getAlias('@root/view');
-        }
-        return $this->_viewFilePath;
+        return Ep::getConfig()->viewFilePath;
     }
 }

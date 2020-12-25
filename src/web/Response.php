@@ -19,6 +19,13 @@ class Response extends BaseResponse
         return $this->string($this->view->render($path, $params));
     }
 
+    public function redirect(string $url, $code = 302)
+    {
+        $this->_statusCode = $code;
+        $this->setHeader('Location', $url);
+        return $this->string('');
+    }
+
     public function json(array $data = []): Response
     {
         $this->setHeader('Content-type', 'application/json');
@@ -43,15 +50,37 @@ class Response extends BaseResponse
         ]);
     }
 
+    private $_statusCode = 200;
+
+    protected function setStatusCode()
+    {
+        http_response_code($this->_statusCode);
+    }
+
+    public function sendContent()
+    {
+        $this->setStatusCode();
+        $this->sendHeaders();
+
+        parent::sendContent();
+    }
+
+    private array $_headers = [];
+
     public function setHeader(string $name, string $value): void
     {
-        header(sprintf('%s: %s', $name, $value));
+        $this->_headers[$name] = $value;
     }
 
     public function setHeaders(array $headers = []): void
     {
-        foreach ($headers as $name => $value) {
-            $this->setHeader($name, $value);
+        $this->_headers += $headers;
+    }
+
+    protected function sendHeaders()
+    {
+        foreach ($this->_headers as $name => $value) {
+            header(sprintf('%s: %s', $name, $value));
         }
     }
 }

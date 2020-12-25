@@ -6,8 +6,9 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=7.4",
-        "yiisoft/di": "^3.0",
-        "phpunit/phpunit": "10.0.x-dev"
+        "yiisoft/di": "3.0.x-dev",
+        "yiisoft/db-mysql": "3.0.x-dev",
+        "yiisoft/active-record": "3.0.x-dev"
     },
     "autoload": {
         "psr-4": {

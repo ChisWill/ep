@@ -7,6 +7,7 @@ class Exception extends \Exception
     const NOT_FOUND_CTRL = 40401;
     const NOT_FOUND_ACTION = 40402;
     const NOT_FOUND_LAYOUT = 40403;
+    const NOT_FOUND_DATA = 40404;
 
     const ERROR = 50000;
 

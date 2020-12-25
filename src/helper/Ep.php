@@ -2,8 +2,8 @@
 
 namespace ep\helper;
 
-use ep\base\Config;
 use Exception;
+use ep\base\Config;
 use Yiisoft\Di\CompositeContainer;
 use Yiisoft\Di\Container;
 
@@ -12,7 +12,7 @@ class Ep
     private static Config $_config;
     private static CompositeContainer $_di;
 
-    public static function init(?Config $config, ?Container $container): void
+    public static function init(?Config $config): void
     {
         if ($config === null) {
             $config = new Config;
@@ -20,10 +20,7 @@ class Ep
         static::$_config = $config;
 
         static::$_di = new CompositeContainer();
-        static::$_di->attach(new Container(require(self::getAlias('@ep/config/definitions.php'))));
-        if ($container !== null) {
-            static::$_di->attach($container);
-        }
+        static::$_di->attach(new Container($config->getDi()));
     }
 
     public static function getConfig(): Config
