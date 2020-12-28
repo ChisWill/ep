@@ -6,12 +6,45 @@ use ep\Exception;
 use ep\helper\Ep;
 use ep\web\Request;
 use Yiisoft\ActiveRecord\ActiveQuery;
+use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Validator\DataSetInterface;
+use Yiisoft\Validator\Validator;
 
-class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord
+abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implements DataSetInterface
 {
-    public function __construct()
+    public function __construct(?ConnectionInterface $db = null)
     {
-        parent::__construct(Ep::getDi()->get('db'));
+        if ($db === null) {
+            $db = Ep::getDi()->get('db');
+        }
+        parent::__construct($db);
+    }
+
+    protected abstract function rules(): array;
+
+    private $_errors = [];
+
+    public function validate(): bool
+    {
+        $validator = new Validator($this->rules());
+        $results = $validator->validate($this);
+        $this->_errors = [];
+        foreach ($results as $attribute => $result) {
+            if (!$result->isValid()) {
+                $this->_errors[$attribute] = current($result->getErrors());
+            }
+        }
+        return empty($this->_errors);
+    }
+
+    public function getErrors(): array
+    {
+        return $this->_errors;
+    }
+
+    public function getAttributeValue(string $attribute)
+    {
+        return $this->getAttribute($attribute);
     }
 
     public static function find(): ActiveQuery

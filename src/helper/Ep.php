@@ -12,11 +12,8 @@ class Ep
     private static Config $_config;
     private static CompositeContainer $_di;
 
-    public static function init(?Config $config): void
+    public static function init(Config $config): void
     {
-        if ($config === null) {
-            $config = new Config;
-        }
         static::$_config = $config;
 
         static::$_di = new CompositeContainer();

@@ -29,7 +29,7 @@ final class Core
         }, E_ALL);
     }
 
-    public function run(?Config $config = null): void
+    public function run(Config $config): void
     {
         Ep::init($config);
 
