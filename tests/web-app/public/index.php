@@ -1,6 +1,6 @@
 <?php
 
-use webapp\config\WebConfig;
+use tests\webapp\config\WebConfig;
 use ep\Core;
 
 require(__DIR__ . '/../../../vendor/autoload.php');

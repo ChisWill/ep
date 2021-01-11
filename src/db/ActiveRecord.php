@@ -5,7 +5,6 @@ namespace ep\db;
 use ep\Exception;
 use ep\helper\Ep;
 use ep\web\Request;
-use Yiisoft\ActiveRecord\ActiveQuery;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Validator\Validator;

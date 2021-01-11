@@ -7,8 +7,10 @@ use ep\helper\Ep;
 use ep\web\Config as WebConfig;
 use ep\web\Controller;
 use ep\Exception;
+use ep\helper\Alias;
 use ep\web\Request;
 use ep\web\Response;
+use tests\webapp\config\ConsoleConfig;
 
 final class Core
 {
@@ -16,10 +18,14 @@ final class Core
     {
         require_once 'functions.php';
 
-        Ep::setAlias('@root', $rootPath);
-        Ep::setAlias('@ep', __DIR__);
-
+        $this->setDefaultAlias($rootPath);
         $this->setExceptionHandler();
+    }
+
+    private function setDefaultAlias(string $rootPath)
+    {
+        Alias::set('@root', $rootPath);
+        Alias::set('@ep', __DIR__);
     }
 
     private function setExceptionHandler()
@@ -41,8 +47,13 @@ final class Core
                 }
                 break;
             case 'ep\console\Config':
+                $r = $this->handleConsoleRoute($config);
                 break;
         }
+    }
+
+    private function handleConsoleRoute(ConsoleConfig $config)
+    {
     }
 
     private function handleWebRoute(WebConfig $config): ?Response

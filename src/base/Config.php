@@ -2,6 +2,8 @@
 
 namespace ep\base;
 
+use ep\Exception;
+use ep\web\Request;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Cache\ArrayCache;
@@ -28,16 +30,23 @@ abstract class Config
         'password' => '',
     ];
 
-    private array $definitions;
+    private array $definitions = [];
+
+    private array $params = [];
 
     public function __construct()
     {
         $this->setDefaultDi();
     }
 
+    public function __set($name, $value)
+    {
+        throw new Exception(Exception::ERROR_INVALID_PARAMS);
+    }
+
     private function setDefaultDi(): void
     {
-        $this->definitions = [
+        $this->setDi([
             LoggerInterface::class => [
                 '__class' => Logger::class,
             ],
@@ -59,16 +68,21 @@ abstract class Config
 
                 return $connection;
             }
-        ];
+        ]);
     }
 
     protected function setDi(array $definitions = []): void
     {
-        $this->definitions += $definitions;
+        $this->definitions = $definitions + $this->definitions;
     }
 
     public function getDi()
     {
         return $this->definitions;
+    }
+
+    public function setParams(array $params)
+    {
+        $this->params = $params;
     }
 }

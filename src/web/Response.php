@@ -41,7 +41,7 @@ class Response extends BaseResponse
         ]);
     }
 
-    public function jsonError(string $msg, $code = 500): Response
+    public function jsonError($msg, $code = 500): Response
     {
         return $this->json([
             'code' => $code,
@@ -74,7 +74,9 @@ class Response extends BaseResponse
 
     public function setHeaders(array $headers = []): void
     {
-        $this->_headers += $headers;
+        foreach ($headers as $name => $value) {
+            $this->setHeader($name, $value);
+        }
     }
 
     protected function sendHeaders()

@@ -1,6 +1,6 @@
 <?php
 
-namespace webapp\model;
+namespace tests\webapp\model;
 
 use ep\db\ActiveRecord;
 use Yiisoft\Validator\Rule\HasLength;
@@ -9,6 +9,11 @@ use Yiisoft\Validator\Rule\Number;
 
 class User extends ActiveRecord
 {
+    public function tableName(): string
+    {
+        return 'user';
+    }
+
     public function rules(): array
     {
         return [

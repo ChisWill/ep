@@ -1,22 +1,38 @@
 <?php
 
-namespace webapp\controller;
+namespace tests\webapp\controller;
 
+use ep\helper\Alias;
+use ep\helper\Ep;
 use ep\web\Request;
 use ep\web\Response;
-use webapp\model\User;
-use Yiisoft\Db\Query\Query;
-use Yiisoft\Validator\Result;
-use Yiisoft\Validator\Rule\Number;
-use Yiisoft\Validator\Rule\Required;
-use Yiisoft\Validator\Rules;
-use Yiisoft\Validator\Validator;
+use tests\webapp\model\User;
+use Yiisoft\Log\Logger;
+use Yiisoft\Log\Message;
+use Yiisoft\Log\Target\File\FileRotator;
+use Yiisoft\Log\Target\File\FileTarget;
 
 class IndexController extends \ep\web\Controller
 {
     public function index(Request $request, Response $response)
     {
+        $r = Ep::getDi()->get('req');
+        test($r);
         return $response->render();
+    }
+
+    public function log($req, Response $res)
+    {
+        $targets = [];
+        $rotator = new FileRotator(1, 2);
+        $filePath = Alias::get('@root/runtime/logs/tmp.log');
+        $target = new FileTarget($filePath, $rotator);
+        $target->setFormat(function (Message $message, array $commonContext): string {
+            return 'ergerg';
+        });
+        $targets[] = $target;
+        $logger = new Logger($targets);
+        $logger->info('oh no ', ['lala' => 'wefij']);
     }
 
     public function validate()
@@ -30,12 +46,24 @@ class IndexController extends \ep\web\Controller
         }
     }
 
+    public function redirect($req, Response $res)
+    {
+        $act = $req->get('act');
+        if (!$act) {
+            return $res->string('act is required.');
+        }
+        return $res->redirect($req->createUrl('index/' . $act));
+    }
+
     public function form(Request $request, Response $response)
     {
         $user = User::findModel($request->get('id'));
         if ($user->load($request)) {
+            if (!$user->validate()) {
+                return $response->jsonError($user->getErrors());
+            }
             if ($user->save()) {
-                return $response->redirect($request->createUrl('index/form'));
+                return $response->jsonSuccess();
             } else {
                 return $response->jsonError('wrong');
             }
@@ -54,6 +82,23 @@ class IndexController extends \ep\web\Controller
         $user = $query->where(['id' => 11])->one();
         $user->username = mt_rand();
         $r = $user->save();
-        dump($r);
+        var_dump($r);
+
+        $subQuery = User::find();
+        $subQuery->where(['state' => 1]);
+        $query = User::find();
+        $query->from(['s' => $subQuery])->where(['>', 'age', 0]);
+        $sql = $query->getRawSql();
+        $result = $query->asArray()->all();
+        tes($sql);
+        test($result);
+    }
+
+    public function yaml()
+    {
+        $path = '';
+        $yaml = file_get_contents($path);
+        $r = yaml_parse($yaml);
+        test($r);
     }
 }
