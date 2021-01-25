@@ -1,6 +1,6 @@
 <?php
 
-namespace ep;
+namespace Ep;
 
 class Exception extends \Exception
 {
@@ -15,13 +15,13 @@ class Exception extends \Exception
     public function __construct($code, $message = null)
     {
         if (is_int($code)) {
-            parent::__construct($message ?: $this->mapper()[$code], $code);
+            parent::__construct($message ?: $this->descMap()[$code], $code);
         } else {
             parent::__construct($code, self::ERROR);
         }
     }
 
-    private function mapper(): array
+    private function descMap(): array
     {
         return [
             self::NOT_FOUND_CTRL => 'Controller is not found.',

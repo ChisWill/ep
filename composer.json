@@ -17,7 +17,7 @@
     "autoload": {
         "psr-4": {
             "Ep\\": "src",
-            "Tests\\App\\": "tests/app"
+            "Tests\\App\\": "tests/app/src"
         }
     }
 }

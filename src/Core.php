@@ -1,42 +1,44 @@
 <?php
 
-namespace ep;
+declare(strict_types=1);
+
+namespace Ep;
 
 use Ep\base\Config;
 use Ep\console\Config as ConsoleConfig;
-use Ep\helper\Ep;
+use Ep\Helper\Ep;
 use Ep\web\Config as WebConfig;
 use Ep\web\Controller;
 use Ep\Exception;
-use Ep\helper\Alias;
+use Ep\Helper\Alias;
 use Ep\web\Request;
 use Ep\web\Response;
 
-final class Core
+class Core
 {
-    public function __construct(string $rootPath)
+    public function __construct(string $rootAbsolutePath, string $configRelativePath = 'configs')
     {
         require_once 'functions.php';
 
-        $this->setDefaultAlias($rootPath);
-        $this->setExceptionHandler();
+        $this->setDefaultAlias($rootAbsolutePath);
     }
 
-    private function setDefaultAlias(string $rootPath)
+    private function setDefaultAlias(string $rootAbsolutePath)
     {
-        Alias::set('@root', $rootPath);
+        Alias::set('@root', $rootAbsolutePath);
         Alias::set('@ep', __DIR__);
     }
 
     private function setExceptionHandler()
     {
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-            throw new Exception(sprintf('%s, in %s:%d', $errstr, $errfile, $errline));
+            throw new Exception(Exception::ERROR, sprintf('%s, in %s:%d', $errstr, $errfile, $errline));
         }, E_ALL);
     }
 
-    public function run(Config $config): void
+    public function run(Config $config = null): void
     {
+        $this->setExceptionHandler();
         Ep::init($config);
 
         switch (get_parent_class($config)) {

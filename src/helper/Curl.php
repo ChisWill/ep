@@ -1,6 +1,6 @@
 <?php
 
-namespace Ep\helper;
+namespace Ep\Helper;
 
 use Ep\Helper\Arr;
 
@@ -18,6 +18,14 @@ use Ep\Helper\Arr;
  */
 class Curl
 {
+    /**
+     * 模拟 get 请求
+     * 
+     * @param  string       $url     地址
+     * @param  string|array $data    字符串格式为请求体数据，数组格式为curl选项
+     * @param  array        $options curl选项
+     * @return string                响应结果
+     */
     public static function get($url, $data = '', $options = [])
     {
         if (is_array($data)) {
@@ -40,7 +48,15 @@ class Curl
         return $result;
     }
 
-    public static function post($url, $data, $options = [])
+    /**
+     * 模拟 post 请求
+     * 
+     * @param  string       $url     地址
+     * @param  string|array $data    请求体数据
+     * @param  array        $options curl选项
+     * @return string                响应结果
+     */
+    public static function post($url, $data = [], $options = [])
     {
         $handle = new CurlHandle($options);
 
@@ -55,7 +71,15 @@ class Curl
         return $result;
     }
 
-    public static function put($url, $data, $options = [])
+    /**
+     * 模拟 put 请求
+     * 
+     * @param  string       $url     地址
+     * @param  string|array $data    请求体数据
+     * @param  array        $options curl选项
+     * @return string                响应结果
+     */
+    public static function put($url, $data = [], $options = [])
     {
         $handle = new CurlHandle($options);
 
@@ -70,6 +94,13 @@ class Curl
         return $result;
     }
 
+    /**
+     * 模拟 delete 请求
+     * 
+     * @param  string       $url     地址
+     * @param  array        $options curl选项
+     * @return string                响应结果
+     */
     public static function delete($url, $options = [])
     {
         $handle = new CurlHandle($options);
@@ -84,7 +115,7 @@ class Curl
         return $result;
     }
 
-    protected static function initParams($urls, $data, $options, $batch, $callback)
+    private static function initParams($urls, $data, $options, $batch, $callback)
     {
         $params = [];
         $multiUrl = is_array($urls);
@@ -113,7 +144,7 @@ class Curl
     }
 
     /**
-     * 并发PostCurl，支持一次执行多批次任务
+     * 模拟并发 post，支持一次执行多批次任务
      *
      * @param  array|string $urls     一维数组时，表示请求多个地址
      * @param  array        $data     二维数组时，表示使用多个请求参数
@@ -142,7 +173,7 @@ class Curl
     }
 
     /**
-     * 并发GetCurl，支持一次执行多批次任务
+     * 模拟并发 get，支持一次执行多批次任务
      *
      * @param  array|string $urls     一维数组时，表示请求多个地址
      * @param  array        $options  二维数组时，表示使用多个选项

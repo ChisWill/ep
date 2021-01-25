@@ -3,7 +3,7 @@
 namespace Ep\web;
 
 use Ep\base\Response as BaseResponse;
-use Ep\helper\Ep;
+use Ep\Helper\Ep;
 
 class Response extends BaseResponse
 {

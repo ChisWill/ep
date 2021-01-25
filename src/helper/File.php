@@ -1,6 +1,8 @@
 <?php
 
-namespace Ep\helper;
+declare(strict_types=1);
+
+namespace Ep\Helper;
 
 use Exception;
 
@@ -12,7 +14,7 @@ class File
      * @param  string $dir 文件路径
      * @return array       包含文件夹的数组
      */
-    public static function getDirs($dir)
+    public static function getDirs(string $dir): array
     {
         $handle = opendir($dir);
         if ($handle === false) {
@@ -83,7 +85,7 @@ class File
      *
      * @throws Exception in case of failure
      */
-    public static function rmdir($dir, $options = [])
+    public static function rmdir(string $dir, array $options = []): void
     {
         if (!is_dir($dir)) {
             return;

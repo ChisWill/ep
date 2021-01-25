@@ -2,8 +2,8 @@
 
 namespace Tests\App\controller;
 
-use ep\helper\Alias;
-use ep\helper\Ep;
+use Ep\Helper\Alias;
+use Ep\Helper\Ep;
 use ep\web\Request;
 use ep\web\Response;
 use Tests\App\model\User;

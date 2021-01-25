@@ -3,7 +3,7 @@
 namespace Ep\base;
 
 use Ep\Exception;
-use Ep\helper\Ep;
+use Ep\Helper\Ep;
 
 abstract class View
 {

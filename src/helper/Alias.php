@@ -1,11 +1,19 @@
 <?php
 
-namespace Ep\helper;
+declare(strict_types=1);
+
+namespace Ep\Helper;
 
 class Alias
 {
     protected static $aliases = [];
 
+    /**
+     * 设置别名
+     * 
+     * @param  string $alias 别名
+     * @param  string $path  路径或别名
+     */
     public static function set(string $alias, string $path): void
     {
         if (!static::isAlias($alias)) {
@@ -36,6 +44,12 @@ class Alias
         }
     }
 
+    /**
+     * 根据别名获取路径
+     * 
+     * @param  string $alias 别名
+     * @return string        路径
+     */
     public static function get(string $alias): string
     {
         if (!static::isAlias($alias)) {
@@ -56,6 +70,11 @@ class Alias
         return static::get($foundSubAlias);
     }
 
+    /**
+     * 删除别名
+     * 
+     * @param  string $alias 别名
+     */
     public static function remove(string $alias): void
     {
         if (!static::isAlias($alias)) {
@@ -93,6 +112,12 @@ class Alias
         return null;
     }
 
+    /**
+     * 判断是否是别名
+     * 
+     * @param  string $alias 别名
+     * @return bool
+     */
     public static function isAlias(string $alias): bool
     {
         return !strncmp($alias, '@', 1);

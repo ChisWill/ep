@@ -3,7 +3,7 @@
 namespace Ep\db;
 
 use Ep\Exception;
-use Ep\helper\Ep;
+use Ep\Helper\Ep;
 use Ep\web\Request;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Validator\DataSetInterface;

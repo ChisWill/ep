@@ -1,6 +1,8 @@
 <?php
 
-namespace Ep\helper;
+declare(strict_types=1);
+
+namespace Ep\Helper;
 
 /**
  * 数组操作助手类
@@ -11,15 +13,21 @@ class Arr
 {
     /**
      * ```php
-     * $street = \pay\Helper\Arr::getValue($users, 'address.street', 'defaultValue);
+     * $user = [
+     *     'id' => 1,
+     *     'address' => [
+     *         'street' => 'home'
+     *     ]
+     * ];
+     * $street = \Ep\Helper\Arr::getValue($user, 'address.street', 'defaultValue'); // $street is 'home'
      * ```
      *
-     * @param array  $array
-     * @param string $key
-     * @param mixed  $default
-     * @return mixed the value of the element if found, default value otherwise
+     * @param  array  $array   待操作数组
+     * @param  string $key     获取的键
+     * @param  mixed  $default 默认值
+     * @return mixed           获取到的值
      */
-    public static function getValue($array, $key, $default = null)
+    public static function getValue(array $array, string $key, $default = null)
     {
         if (is_array($array) && array_key_exists($key, $array)) {
             return $array[$key];
@@ -45,12 +53,11 @@ class Arr
      *
      * Note that an empty array will be considered indexed.
      *
-     * @param array $array the array being checked
-     * @param boolean $consecutive whether the array keys must be a consecutive sequence
-     * in order for the array to be treated as indexed.
-     * @return boolean whether the array is associative
+     * @param  array   $array       the array being checked
+     * @param  boolean $consecutive whether the array keys must be a consecutive sequence in order for the array to be treated as indexed.
+     * @return boolean              whether the array is associative
      */
-    public static function isIndexed($array, $consecutive = false)
+    public static function isIndexed(array $array, bool $consecutive = false): bool
     {
         if (!is_array($array)) {
             return false;
@@ -86,12 +93,12 @@ class Arr
      * // $array = ['options' => [1, 2]];
      * ```
      *
-     * @param array $array the array to extract value from
-     * @param string $key key name of the array element
-     * @param mixed $default the default value to be returned if the specified key does not exist
-     * @return mixed|null the value of the element if found, default value otherwise
+     * @param  array      $array    the array to extract value from
+     * @param  string     $key      key name of the array element
+     * @param  mixed      $default  the default value to be returned if the specified key does not exist
+     * @return mixed|null           the value of the element if found, default value otherwise
      */
-    public static function remove(&$array, $key, $default = null)
+    public static function remove(array &$array, string $key, $default = null)
     {
         if (is_array($array) && (isset($array[$key]) || array_key_exists($key, $array))) {
             $value = $array[$key];
@@ -138,13 +145,13 @@ class Arr
      * // ]
      * ```
      *
-     * @param array  $array
-     * @param string $from
-     * @param string $to
-     * @param string $group
+     * @param  array       $array
+     * @param  string      $from
+     * @param  string      $to
+     * @param  string|null $group
      * @return array
      */
-    public static function map($array, $from, $to, $group = null)
+    public static function map(array $array, string $from, string $to, ?string $group = null): array
     {
         $result = [];
         foreach ($array as $element) {
@@ -160,7 +167,13 @@ class Arr
         return $result;
     }
 
-    public static function toXml($array)
+    /**
+     * 数组转 xml
+     * 
+     * @param  array  $array 待转换数组
+     * @return string        xml
+     */
+    public static function toXml(array $array): string
     {
         $xml = '<xml>';
         foreach ($array as $key => $val) {
@@ -174,7 +187,13 @@ class Arr
         return $xml;
     }
 
-    public static function fromXml($xml)
+    /**
+     * xml 转数组
+     * 
+     * @param  string $xml 待转换 xml 字符串
+     * @return array       数组
+     */
+    public static function fromXml(string $xml): array
     {
         return json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
     }

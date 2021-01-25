@@ -3,7 +3,7 @@
 namespace Ep\web;
 
 use Ep\base\Request as BaseRequest;
-use Ep\helper\Ep;
+use Ep\Helper\Ep;
 
 class Request extends BaseRequest
 {

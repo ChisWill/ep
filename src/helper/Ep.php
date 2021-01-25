@@ -1,6 +1,6 @@
 <?php
 
-namespace Ep\helper;
+namespace Ep\Helper;
 
 use Ep\base\Config;
 use Yiisoft\Di\CompositeContainer;
