@@ -1,8 +1,8 @@
 <?php
 
-namespace ep\web;
+namespace Ep\web;
 
-use ep\base\View as BaseView;
+use Ep\base\View as BaseView;
 
 class View extends BaseView
 {

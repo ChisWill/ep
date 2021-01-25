@@ -1,9 +1,9 @@
 <?php
 
-namespace ep\web;
+namespace Ep\web;
 
-use ep\base\Request as BaseRequest;
-use ep\helper\Ep;
+use Ep\base\Request as BaseRequest;
+use Ep\helper\Ep;
 
 class Request extends BaseRequest
 {

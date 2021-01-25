@@ -2,7 +2,7 @@
 <?php
 
 use ep\Core;
-use tests\webapp\config\ConsoleConfig;
+use Tests\App\config\ConsoleConfig;
 
 require(__DIR__ . '/../../../vendor/autoload.php');
 

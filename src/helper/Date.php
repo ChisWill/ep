@@ -1,6 +1,6 @@
 <?php
 
-namespace ep\helper;
+namespace Ep\helper;
 
 /**
  * 时间、日期操作助手类

@@ -1,6 +1,6 @@
 <?php
 
-namespace ep\helper;
+namespace Ep\helper;
 
 /**
  * 字符串操作助手类

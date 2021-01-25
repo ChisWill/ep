@@ -1,8 +1,8 @@
 <?php
 
-namespace ep\helper;
+namespace Ep\helper;
 
-use ep\Helper\Arr;
+use Ep\Helper\Arr;
 
 /**
  * RESTful Api 的快捷调用助手类

@@ -1,6 +1,6 @@
 <?php
 
-namespace ep\helper;
+namespace Ep\helper;
 
 class Alias
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace ep\helper;
+namespace Ep\helper;
 
-use ep\base\Config;
+use Ep\base\Config;
 use Yiisoft\Di\CompositeContainer;
 use Yiisoft\Di\Container;
 

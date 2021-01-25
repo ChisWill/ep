@@ -1,9 +1,9 @@
 <?php
 
-namespace ep\base;
+namespace Ep\base;
 
-use ep\Exception;
-use ep\helper\Ep;
+use Ep\Exception;
+use Ep\helper\Ep;
 
 abstract class View
 {

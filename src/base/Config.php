@@ -1,9 +1,9 @@
 <?php
 
-namespace ep\base;
+namespace Ep\base;
 
-use ep\Exception;
-use ep\web\Request;
+use Ep\Exception;
+use Ep\web\Request;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Cache\ArrayCache;

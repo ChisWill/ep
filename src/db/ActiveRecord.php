@@ -1,10 +1,10 @@
 <?php
 
-namespace ep\db;
+namespace Ep\db;
 
-use ep\Exception;
-use ep\helper\Ep;
-use ep\web\Request;
+use Ep\Exception;
+use Ep\helper\Ep;
+use Ep\web\Request;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Validator\Validator;

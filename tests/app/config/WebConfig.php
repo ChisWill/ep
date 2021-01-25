@@ -1,6 +1,6 @@
 <?php
 
-namespace tests\webapp\config;
+namespace Tests\App\config;
 
 use ep\web\Config;
 

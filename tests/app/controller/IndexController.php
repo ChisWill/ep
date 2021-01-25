@@ -1,12 +1,12 @@
 <?php
 
-namespace tests\webapp\controller;
+namespace Tests\App\controller;
 
 use ep\helper\Alias;
 use ep\helper\Ep;
 use ep\web\Request;
 use ep\web\Response;
-use tests\webapp\model\User;
+use Tests\App\model\User;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Message;
 use Yiisoft\Log\Target\File\FileRotator;

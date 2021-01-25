@@ -1,9 +1,9 @@
 <?php
 
-namespace ep\web;
+namespace Ep\web;
 
-use ep\base\Response as BaseResponse;
-use ep\helper\Ep;
+use Ep\base\Response as BaseResponse;
+use Ep\helper\Ep;
 
 class Response extends BaseResponse
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace ep\console;
+namespace Ep\console;
 
-use ep\base\Config as BaseConfig;
+use Ep\base\Config as BaseConfig;
 
 class Config extends BaseConfig
 {

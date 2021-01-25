@@ -1,8 +1,8 @@
 <?php
 
-namespace ep\web;
+namespace Ep\web;
 
-use ep\base\Controller as BaseController;
+use Ep\base\Controller as BaseController;
 
 class Controller extends BaseController
 {

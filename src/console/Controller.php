@@ -1,8 +1,8 @@
 <?php
 
-namespace ep\console;
+namespace Ep\console;
 
-use ep\base\Controller as BaseController;
+use Ep\base\Controller as BaseController;
 
 class Controller extends BaseController
 {

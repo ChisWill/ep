@@ -2,15 +2,15 @@
 
 namespace ep;
 
-use ep\base\Config;
-use ep\helper\Ep;
-use ep\web\Config as WebConfig;
-use ep\web\Controller;
-use ep\Exception;
-use ep\helper\Alias;
-use ep\web\Request;
-use ep\web\Response;
-use tests\webapp\config\ConsoleConfig;
+use Ep\base\Config;
+use Ep\console\Config as ConsoleConfig;
+use Ep\helper\Ep;
+use Ep\web\Config as WebConfig;
+use Ep\web\Controller;
+use Ep\Exception;
+use Ep\helper\Alias;
+use Ep\web\Request;
+use Ep\web\Response;
 
 final class Core
 {
@@ -40,13 +40,13 @@ final class Core
         Ep::init($config);
 
         switch (get_parent_class($config)) {
-            case 'ep\web\Config':
+            case 'Ep\web\Config':
                 $response = $this->handleWebRoute($config);
                 if ($response) {
                     $response->sendContent();
                 }
                 break;
-            case 'ep\console\Config':
+            case 'Ep\console\Config':
                 $r = $this->handleConsoleRoute($config);
                 break;
         }

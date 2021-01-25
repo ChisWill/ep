@@ -1,6 +1,6 @@
 <?php
 
-namespace ep\base;
+namespace Ep\base;
 
 abstract class Controller
 {
