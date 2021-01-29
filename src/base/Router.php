@@ -5,37 +5,78 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
+use Ep\Helper\Alias;
+use FastRoute\Dispatcher;
+use FastRoute\RouteCollector;
+use RuntimeException;
+
+use function FastRoute\cachedDispatcher;
 
 class Router
 {
-    private array $rules;
-    private array $ruleParams = [];
+    private string $path;
+    private string $method;
+    private Config $config;
 
-    public function __construct(array $rules)
+    public function __construct(string $path, string $method = 'GET')
     {
-        $this->rules = $rules;
+        $this->path = $path;
+        $this->method = $method;
+        $this->config = Ep::getConfig();
     }
 
-    public function match(string $path): string
+    public function match(): array
     {
-        foreach ($this->rules as $rule => $route) {
-            $keys = [];
-            $pattern = preg_replace_callback(
-                '/\<(.+)\:(.+)\>/U',
-                function ($match) use (&$keys) {
-                    $keys[] = $match[1];
-                    return sprintf('(%s)', $match[2]);
-                },
-                $rule
-            );
-            $hit = preg_match(sprintf('#^/%s$#', $pattern), $path, $match);
-            if ($hit) {
-                unset($match[0]);
-                $this->ruleParams = array_combine($keys, $match);
-                return str_replace(array_map(fn ($v) => sprintf('<%s>', $v), $keys), $match, $route);
+        $dispatcher = cachedDispatcher(function (RouteCollector $route) {
+            $callback = $this->config->getRouter();
+            if (is_callable($callback)) {
+                call_user_func($callback, $route);
+            }
+            $route->addRoute(['GET', 'POST'], '/{__ctrl:[a-zA-Z]\w*}/{__action:[a-zA-Z]\w*}', 'defaultRule');
+        }, [
+            'cacheFile' => Alias::get('@root/runtime/routeRules.cache'),
+            'cacheDisabled' => $this->config->env !== 'prod'
+        ]);
+        return $dispatcher->dispatch($this->method, $this->path);
+    }
+
+    public function solveRouteInfo($routeInfo)
+    {
+        switch ($routeInfo[0]) {
+            case Dispatcher::NOT_FOUND:
+                $params = [];
+                $handler = Ep::getConfig()->errorHandler;
+                break;
+            case Dispatcher::METHOD_NOT_ALLOWED:
+                $params = [];
+                $handler = Ep::getConfig()->errorHandler;
+                break;
+            case Dispatcher::FOUND:
+                $handler = $routeInfo[1];
+                $params = $routeInfo[2];
+                break;
+        }
+        return [$handler, $params];
+    }
+
+    public function createController($handler, $params)
+    {
+        if ($handler === 'defaultRule') {
+            ['__ctrl' => $ctrl, '__action' => $action] = $params;
+            if (!class_exists($controllerName)) {
+                throw new RuntimeException("{$controllerName} is not found.");
+            }
+            $controller = new $controllerName;
+            if (!method_exists($controller, $actionName)) {
+                throw new RuntimeException("{$actionName} is not found.");
+            }
+            return call_user_func([$controller, $actionName], $request);
+        } else {
+            if (is_callable($handler)) {
+            } else {
+                throw new RuntimeException('Page is not found.');
             }
         }
-        return $path;
     }
 
     public function getControllerActionName(string $path): array
@@ -60,34 +101,5 @@ class Router
         }
         $controllerName = sprintf('%s\\%s%s\\%sController', $config->appNamespace, $prefix, $config->controllerDirname, ucfirst($controllerName));
         return [$controllerName, $actionName];
-    }
-
-    public function tmp()
-    {
-        $request = Ep::getDi()->get('request');
-        $requestPath = $request->getRequestPath();
-        if (count($config->routeRules) > 0) {
-            $requestPath = $request->solveRouteRules($config->routeRules, $requestPath);
-        }
-        [$controllerName, $actionName] = $request->solvePath($requestPath);
-        if (!class_exists($controllerName)) {
-            throw new RuntimeException("{$controllerName} is no");
-        }
-        /** @var Controller $controller */
-        $controller = new $controllerName;
-        if (!method_exists($controller, $actionName)) {
-            throw new RuntimeException(Exception::NOT_FOUND_ACTION);
-        }
-        if (in_array($actionName, ['beforeAction', 'afterAction'])) {
-            throw new Exception(Exception::NOT_FOUND_ACTION);
-        }
-        if ($controller->beforeAction()) {
-            $response = $controller->$actionName($request, Ep::getDi()->get('response'));
-            $controller->afterAction($response);
-            return $response;
-        } else {
-            return null;
-        }
-        return Ep::getDi()->get(ResponseFactoryInterface::class)->createResponse();
     }
 }

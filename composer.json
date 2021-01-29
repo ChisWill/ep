@@ -7,6 +7,7 @@
     "require": {
         "php": ">=7.4",
         "httpsoft/http-message": "^1.0.5",
+        "nikic/fast-route": "2.0.x-dev",
         "yiisoft/di": "^3.0",
         "yiisoft/log": "^3.0",
         "yiisoft/log-target-file": "^3.0",

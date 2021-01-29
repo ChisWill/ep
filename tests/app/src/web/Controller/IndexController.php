@@ -25,6 +25,11 @@ class IndexController extends \Ep\Web\Controller
         return $response->render();
     }
 
+    public function error(RequestInterface $request)
+    {
+        test(123, $request->getUri());
+    }
+
     public function log($req, Response $res)
     {
         $targets = [];

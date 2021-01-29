@@ -4,9 +4,8 @@ return [
     'appNamespace' => 'Ep\Tests\App',
     'controllerDirname' => 'Controller',
     'basePath' => dirname(__DIR__),
-    'routeRules' => [
-        'test/<ctrl:.+>/<act:.+>' => '<ctrl>/<act>',
-        'test/<ctrl:.+>/<act:.+>/<id:\d+>' => '<ctrl>/<act>',
-    ],
+    'env' => 'test',
+    'debug' => true,
+    'router' => require('router.php'),
     'params' => require('params.php')
 ];

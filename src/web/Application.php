@@ -8,10 +8,17 @@ use Ep;
 use RuntimeException;
 use Ep\Base\Application as BaseApplication;
 use Ep\Base\Router;
+use Ep\Helper\Alias;
+use Ep\Tests\App\web\Controller\IndexController;
+use FastRoute\Dispatcher;
+use FastRoute\RouteCollector;
 use HttpSoft\Message\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Yiisoft\Injector\Injector;
+
+use function FastRoute\cachedDispatcher;
+use function FastRoute\simpleDispatcher;
 
 class Application extends BaseApplication
 {
@@ -33,17 +40,8 @@ class Application extends BaseApplication
 
     protected function handleRequest(ServerRequestInterface $request): ResponseInterface
     {
-        $uri = $request->getUri();
-        $router = new Router(Ep::getConfig()->getRouteRules());
-        $path = $router->match($uri->getPath());
-        [$controllerName, $actionName] = $router->getControllerActionName($path);
-        if (!class_exists($controllerName)) {
-            throw new RuntimeException("{$controllerName} is not found.");
-        }
-        $controller = new $controllerName;
-        if (!method_exists($controller, $actionName)) {
-            throw new RuntimeException("{$actionName} is not found.");
-        }
-        return call_user_func([$controller, $actionName], $request);
+        $router = new Router(rtrim($request->getUri()->getPath(), '/'), $request->getMethod());
+        [$handler, $params] = $router->solveRouteInfo($router->match());
+        $controller = $router->createController($handler, $params);
     }
 }

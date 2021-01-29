@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
+use Closure;
 use InvalidArgumentException;
 
 final class Config
@@ -29,6 +30,20 @@ final class Config
      */
     public string $defaultAction = 'index';
     /**
+     * 调试模式
+     */
+    public bool $debug = false;
+    /**
+     * 当前环境
+     */
+    public string $env = 'prod';
+    /**
+     * 公共错误处理
+     * 
+     * @var mixed $errorHandler
+     */
+    public $errorHandler = ['error/index'];
+    /**
      * 当前语言
      */
     public string $language = 'zh-CN';
@@ -37,9 +52,21 @@ final class Config
      */
     public string $viewFilePath = '@root/view';
     /**
-     * 路由规则
+     * 路由规则匿名函数
+     * 
+     * For example:
+     * ```php
+     * 
+     * use FastRoute\RouteCollector;
+     *
+     * $config->router = function (RouteCollector $route) {
+     *     $route->addGroup('/api', function (RouteCollector $r) {
+     *         $r->get('/error/index', [ErrorController::class => 'index']);
+     *     });
+     * };
+     * ```
      */
-    private array $routeRules = [];
+    public Closure $router;
     /**
      * 组件配置
      */
@@ -68,9 +95,9 @@ final class Config
         throw new InvalidArgumentException("{$name} is invalid.");
     }
 
-    public function getRouteRules(): array
+    public function getRouter(): Closure
     {
-        return $this->routeRules;
+        return $this->router;
     }
 
     public function getComponents(): array
