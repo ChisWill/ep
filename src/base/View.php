@@ -2,7 +2,7 @@
 
 namespace Ep\base;
 
-use Ep\Exception;
+use Ep\Base\Exception;
 use Ep\Helper\Ep;
 
 abstract class View

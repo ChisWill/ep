@@ -15,9 +15,18 @@
         "yiisoft/validator": "^3.0"
     },
     "autoload": {
+        "files": [
+            "src\\Ep.php",
+            "src\\Base\\function.php"
+        ],
         "psr-4": {
-            "Ep\\": "src",
-            "Tests\\App\\": "tests/app/src"
+            "Ep\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ep\\Tests\\App\\": "tests\\app\\src",
+            "Ep\\Tests\\Cls\\": "tests\\cls"
         }
     }
 }

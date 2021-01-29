@@ -1,6 +1,6 @@
 <?php
 
-namespace Ep\web;
+namespace Ep\Web;
 
 use Ep\base\Controller as BaseController;
 

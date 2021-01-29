@@ -2,7 +2,7 @@
 
 namespace Ep\db;
 
-use Ep\Exception;
+use Ep\Base\Exception;
 use Ep\Helper\Ep;
 use Ep\web\Request;
 use Yiisoft\Db\Connection\ConnectionInterface;

@@ -2,6 +2,6 @@
 
 require(__DIR__ . '/../../../vendor/autoload.php');
 
-$core = new Ep\Core(dirname(__DIR__));
+$application = new Ep\Web\Application(require(dirname(__DIR__) . '/config/main.php'));
 
-$core->run();
+$application->run();

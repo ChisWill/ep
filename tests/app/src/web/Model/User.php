@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\App\model;
+namespace Ep\Tests\app\web\Model;
 
 use ep\db\ActiveRecord;
 use Yiisoft\Validator\Rule\HasLength;

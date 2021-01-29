@@ -1,88 +1,90 @@
 <?php
 
-namespace Ep\base;
+declare(strict_types=1);
 
-use Ep\Exception;
-use Ep\web\Request;
-use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
-use Yiisoft\Cache\ArrayCache;
-use Yiisoft\Cache\Cache;
-use Yiisoft\Cache\CacheInterface;
-use Yiisoft\Db\Cache\QueryCache;
-use Yiisoft\Db\Cache\SchemaCache;
-use Yiisoft\Db\Mysql\Connection;
-use Yiisoft\Log\Logger;
-use Yiisoft\Profiler\Profiler;
+namespace Ep\Base;
 
-abstract class Config
+use InvalidArgumentException;
+
+final class Config
 {
+    /**
+     * 项目根命名空间
+     */
+    public string $appNamespace = 'src';
+    /**
+     * 项目根目录地址
+     */
+    public string $basePath = '';
+    /**
+     * 控制器文件夹名
+     */
+    public string $controllerDirname = 'controller';
+    /**
+     * 默认 Controller
+     */
     public string $defaultController = 'index';
+    /**
+     * 默认 Action
+     */
     public string $defaultAction = 'index';
-    public string $controllerNamespace = 'src\\controller';
+    /**
+     * 当前语言
+     */
+    public string $language = 'zh-CN';
+    /**
+     * 视图文件夹地址
+     */
     public string $viewFilePath = '@root/view';
-
-    public array $routeRules = [];
-
-    public array $mysql = [
-        'dsn' => '',
-        'username' => '',
-        'password' => '',
-    ];
-
+    /**
+     * 路由规则
+     */
+    private array $routeRules = [];
+    /**
+     * 组件配置
+     */
+    private array $components = [];
+    /**
+     * di 配置
+     */
     private array $definitions = [];
-
+    /**
+     * 常规配置项
+     */
     private array $params = [];
 
-    public function __construct()
+    public function __construct($config = [])
     {
-        $this->setDefaultDi();
+        foreach ($config as $key => $val) {
+            $this->$key = $val;
+        }
+        if ($this->basePath === '') {
+            throw new InvalidArgumentException('The "basePath" configuration is required.');
+        }
     }
 
     public function __set($name, $value)
     {
-        throw new Exception(Exception::ERROR_INVALID_PARAMS);
+        throw new InvalidArgumentException("{$name} is invalid.");
     }
 
-    private function setDefaultDi(): void
+    public function getRouteRules(): array
     {
-        $this->setDi([
-            LoggerInterface::class => [
-                '__class' => Logger::class,
-            ],
-            CacheInterface::class => [
-                '__class' => Cache::class,
-                '__construct()' => [new ArrayCache]
-            ],
-            'db' => function (ContainerInterface $container) {
-                $connection = new Connection(
-                    $container->get(LoggerInterface::class),
-                    $container->get(Profiler::class),
-                    $container->get(QueryCache::class),
-                    $container->get(SchemaCache::class),
-                    $this->mysql['dsn']
-                );
-
-                $connection->setUsername($this->mysql['username']);
-                $connection->setPassword($this->mysql['password']);
-
-                return $connection;
-            }
-        ]);
+        return $this->routeRules;
     }
 
-    protected function setDi(array $definitions = []): void
+    public function getComponents(): array
     {
-        $this->definitions = $definitions + $this->definitions;
+        return $this->components;
     }
 
-    public function getDi()
+    public function getDefinitions(): array
     {
         return $this->definitions;
     }
 
-    public function setParams(array $params)
+    public function getParams(): array
     {
-        $this->params = $params;
+        return $this->params;
     }
 }

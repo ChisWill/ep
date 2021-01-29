@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ep\Helper;
 
+use InvalidArgumentException;
+
 class Alias
 {
     protected static $aliases = [];
@@ -59,7 +61,7 @@ class Alias
         $foundAlias = static::findAlias($alias);
 
         if ($foundAlias === null) {
-            throw new \InvalidArgumentException("Invalid path alias: $alias");
+            throw new InvalidArgumentException("Invalid path alias: $alias");
         }
 
         $foundSubAlias = static::findAlias($foundAlias);

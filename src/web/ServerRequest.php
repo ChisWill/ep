@@ -1,19 +1,9 @@
 <?php
 
-namespace Ep\web;
+namespace Ep\Web;
 
-use Ep\base\Request as BaseRequest;
-use Ep\Helper\Ep;
-
-class Request extends BaseRequest
+class ServerRequest
 {
-    private Config $_config;
-
-    public function __construct()
-    {
-        $this->_config = Ep::getConfig();
-    }
-
     public function createUrl(string $action, $params = []): string
     {
         return sprintf('%s/%s%s%s', $this->getHostInfo(), $action, $params ? '?' : '', http_build_query($params));
@@ -54,6 +44,7 @@ class Request extends BaseRequest
         if (!$controllerName) {
             $controllerName = $this->_config->defaultController;
         }
+        $controllerName = '';
         $controllerName = Ep::createControllerName($this->_config->controllerNamespace, $controllerName);
         return [$controllerName, $actionName];
     }

@@ -168,6 +168,35 @@ class Arr
     }
 
     /**
+     * 合并多个数组，相同键的标量将覆盖，相同键的数组将合并
+     * 
+     * @param  array $args 要合并的数组们
+     * @return array       合并后的数组
+     */
+    public static function merge(...$args)
+    {
+        $res = array_shift($args);
+        while (!empty($args)) {
+            $next = array_shift($args);
+            foreach ($next as $k => $v) {
+                if (is_int($k)) {
+                    if (isset($res[$k])) {
+                        $res[] = $v;
+                    } else {
+                        $res[$k] = $v;
+                    }
+                } elseif (is_array($v) && isset($res[$k]) && is_array($res[$k])) {
+                    $res[$k] = self::merge($res[$k], $v);
+                } else {
+                    $res[$k] = $v;
+                }
+            }
+        }
+
+        return $res;
+    }
+
+    /**
      * 数组转 xml
      * 
      * @param  array  $array 待转换数组

@@ -1,23 +1,27 @@
 <?php
 
-namespace Tests\App\controller;
+namespace Ep\Tests\App\web\Controller;
 
 use Ep\Helper\Alias;
 use Ep\Helper\Ep;
+use Ep\Tests\Cls\Car;
 use ep\web\Request;
 use ep\web\Response;
+use HttpSoft\Message\Request as MessageRequest;
+use HttpSoft\Message\Response as MessageResponse;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Tests\App\model\User;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Message;
 use Yiisoft\Log\Target\File\FileRotator;
 use Yiisoft\Log\Target\File\FileTarget;
 
-class IndexController extends \ep\web\Controller
+class IndexController extends \Ep\Web\Controller
 {
-    public function index(Request $request, Response $response)
+    public function index(RequestInterface $request)
     {
-        $r = Ep::getDi()->get('req');
-        test($r);
+        test($request);
         return $response->render();
     }
 

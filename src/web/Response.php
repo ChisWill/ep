@@ -1,13 +1,28 @@
 <?php
 
-namespace Ep\web;
+namespace Ep\Web;
 
-use Ep\base\Response as BaseResponse;
-use Ep\Helper\Ep;
-
-class Response extends BaseResponse
+class Response
 {
     public View $view;
+
+    private $_content;
+    private $_stream;
+
+    public function sendContent()
+    {
+        echo $this->_content;
+    }
+
+    public function string(String $string): Response
+    {
+        $this->_content = $string;
+        return $this;
+    }
+
+    public function stream()
+    {
+    }
 
     public function render($path = [], $params = []): Response
     {
