@@ -12,15 +12,19 @@ final class Config
     /**
      * 项目根命名空间
      */
-    public string $appNamespace = 'src';
+    public string $appNamespace = 'Src';
     /**
      * 项目根目录地址
      */
     public string $basePath = '';
     /**
-     * 控制器文件夹名
+     * 项目根 URL，必须以 / 开头
      */
-    public string $controllerDirname = 'controller';
+    public string $baseUrl = '/';
+    /**
+     * 控制器所在文件夹名
+     */
+    public string $controllerDirname = 'Controller';
     /**
      * 默认 Controller
      */
@@ -30,19 +34,17 @@ final class Config
      */
     public string $defaultAction = 'index';
     /**
-     * 调试模式
+     * 是否开启调试模式
      */
     public bool $debug = false;
     /**
-     * 当前环境
+     * 项目运行的当前环境
      */
     public string $env = 'prod';
     /**
-     * 公共错误处理
-     * 
-     * @var mixed $errorHandler
+     * 默认的错误处理器
      */
-    public $errorHandler = ['error/index'];
+    public string $errorHandler = 'error/index';
     /**
      * 当前语言
      */
@@ -50,23 +52,7 @@ final class Config
     /**
      * 视图文件夹地址
      */
-    public string $viewFilePath = '@root/view';
-    /**
-     * 路由规则匿名函数
-     * 
-     * For example:
-     * ```php
-     * 
-     * use FastRoute\RouteCollector;
-     *
-     * $config->router = function (RouteCollector $route) {
-     *     $route->addGroup('/api', function (RouteCollector $r) {
-     *         $r->get('/error/index', [ErrorController::class => 'index']);
-     *     });
-     * };
-     * ```
-     */
-    public Closure $router;
+    public string $viewFilePath = '@root/View';
     /**
      * 组件配置
      */
@@ -75,6 +61,22 @@ final class Config
      * di 配置
      */
     private array $definitions = [];
+    /**
+     * 以匿名函数方式设置路由规则，具体方式参看示例
+     * 
+     * For example:
+     * ```php
+     * 
+     * use FastRoute\RouteCollector;
+     *
+     * $config->router = function (RouteCollector $route) {
+     *     $route->addGroup('/api', function (RouteCollector $r) {
+     *         $r->get('/error/index', 'error/index');
+     *     });
+     * };
+     * ```
+     */
+    private Closure $router;
     /**
      * 常规配置项
      */

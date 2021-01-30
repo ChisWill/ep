@@ -24,7 +24,8 @@ class Application extends BaseApplication
 {
     protected function handle(): int
     {
-        $response = $this->handleRequest($this->createRequest());
+        $request = $this->createRequest();
+        $response = $this->handleRequest($request);
         $this->send($response);
         return 0;
     }
@@ -38,10 +39,12 @@ class Application extends BaseApplication
         return Ep::getDi()->get(ServerRequestFactory::class)->createFromGlobals();
     }
 
-    protected function handleRequest(ServerRequestInterface $request): ResponseInterface
+    protected function handleRequest(ServerRequestInterface &$request)
     {
-        $router = new Router(rtrim($request->getUri()->getPath(), '/'), $request->getMethod());
-        [$handler, $params] = $router->solveRouteInfo($router->match());
-        $controller = $router->createController($handler, $params);
+        $router = new Router($request->getUri()->getPath(), $request->getMethod());
+        [$handler, $params] = $router->match();
+        $request = $request->withQueryParams($params);
+        test($handler);
+        // $controller = $router->createController($handler, $params);
     }
 }

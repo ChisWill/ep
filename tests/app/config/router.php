@@ -5,7 +5,9 @@ use FastRoute\RouteCollector;
 
 return function (RouteCollector $route) {
     $route->addGroup('/api', function (RouteCollector $r) {
-        $r->get('/index/error', [IndexController::class => 'error']);
+        $r->get('/user/list', 'api/user/list');
     });
-    $route->get('/index/do', [IndexController::class => 'do']);
+    $route->addGroup('/shop{sid:\d+}', function (RouteCollector $r) {
+        $r->get('/{ctrl:\w+}/{act:\w+}', 'shop/<ctrl>/<act>');
+    });
 };

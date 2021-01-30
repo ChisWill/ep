@@ -100,7 +100,7 @@ class Arr
      */
     public static function remove(array &$array, string $key, $default = null)
     {
-        if (is_array($array) && (isset($array[$key]) || array_key_exists($key, $array))) {
+        if (array_key_exists($key, $array)) {
             $value = $array[$key];
             unset($array[$key]);
 

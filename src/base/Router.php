@@ -6,6 +6,7 @@ namespace Ep\Base;
 
 use Ep;
 use Ep\Helper\Alias;
+use Ep\Helper\Arr;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use RuntimeException;
@@ -32,28 +33,36 @@ class Router
             if (is_callable($callback)) {
                 call_user_func($callback, $route);
             }
-            $route->addRoute(['GET', 'POST'], '/{__ctrl:[a-zA-Z]\w*}/{__action:[a-zA-Z]\w*}', 'defaultRule');
+            $route->addGroup($this->config->baseUrl, function (RouteCollector $r) {
+            $r->addRoute(['GET', 'POST'], '{controller:/?[a-zA-Z]\w*|}{action:/?[a-zA-Z]\w*|}[/]', '<controller>/<action>');
+            });
         }, [
             'cacheFile' => Alias::get('@root/runtime/routeRules.cache'),
             'cacheDisabled' => $this->config->env !== 'prod'
         ]);
-        return $dispatcher->dispatch($this->method, $this->path);
+        return $this->solveRouteInfo($dispatcher->dispatch($this->method, $this->path));
     }
 
-    public function solveRouteInfo($routeInfo)
+    private function solveRouteInfo(array $routeInfo)
     {
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
                 $params = [];
-                $handler = Ep::getConfig()->errorHandler;
+                $handler = $this->config->errorHandler;
                 break;
             case Dispatcher::METHOD_NOT_ALLOWED:
                 $params = [];
-                $handler = Ep::getConfig()->errorHandler;
+                $handler = $this->config->errorHandler;
                 break;
             case Dispatcher::FOUND:
-                $handler = $routeInfo[1];
                 $params = $routeInfo[2];
+                test($routeInfo);
+                if ($routeInfo[1] === 'defaultRule') {
+                    unset($params['slash']);
+                    $ctrl = Arr::remove($params, 'controller') ?: $this->config->defaultController;
+                    $action = Arr::remove($params, 'action') ?: '/' . $this->config->defaultAction;
+                    $handler = $ctrl . $action;
+                }
                 break;
         }
         return [$handler, $params];
@@ -62,7 +71,7 @@ class Router
     public function createController($handler, $params)
     {
         if ($handler === 'defaultRule') {
-            ['__ctrl' => $ctrl, '__action' => $action] = $params;
+            ['controller' => $ctrl, 'action' => $action] = $params;
             if (!class_exists($controllerName)) {
                 throw new RuntimeException("{$controllerName} is not found.");
             }
