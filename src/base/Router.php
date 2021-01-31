@@ -15,35 +15,32 @@ use function FastRoute\cachedDispatcher;
 
 class Router
 {
-    private string $path;
-    private string $method;
     private Config $config;
 
-    public function __construct(string $path, string $method = 'GET')
+    public function __construct()
     {
-        $this->path = $path;
-        $this->method = $method;
         $this->config = Ep::getConfig();
     }
 
-    public function match(): array
+    public function match(string $path, string $method = 'GET'): array
     {
+        $path = rtrim($path, '/') ?: '/';
         $dispatcher = cachedDispatcher(function (RouteCollector $route) {
             $callback = $this->config->getRouter();
             if (is_callable($callback)) {
                 call_user_func($callback, $route);
             }
             $route->addGroup($this->config->baseUrl, function (RouteCollector $r) {
-            $r->addRoute(['GET', 'POST'], '{controller:/?[a-zA-Z]\w*|}{action:/?[a-zA-Z]\w*|}[/]', '<controller>/<action>');
+                $r->addRoute(['GET', 'POST'], '{prefix:[\w/]*?}{controller:/?[a-zA-Z]\w*|}{action:/?[a-zA-Z]\w*|}', '<prefix>/<controller>/<action>');
             });
         }, [
             'cacheFile' => Alias::get('@root/runtime/routeRules.cache'),
-            'cacheDisabled' => $this->config->env !== 'prod'
+            'cacheDisabled' => $this->config->debug
         ]);
-        return $this->solveRouteInfo($dispatcher->dispatch($this->method, $this->path));
+        return $dispatcher->dispatch($method, $path);
     }
 
-    private function solveRouteInfo(array $routeInfo)
+    public function solveRouteInfo(array $routeInfo)
     {
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
@@ -55,60 +52,46 @@ class Router
                 $handler = $this->config->errorHandler;
                 break;
             case Dispatcher::FOUND:
-                $params = $routeInfo[2];
-                test($routeInfo);
-                if ($routeInfo[1] === 'defaultRule') {
-                    unset($params['slash']);
-                    $ctrl = Arr::remove($params, 'controller') ?: $this->config->defaultController;
-                    $action = Arr::remove($params, 'action') ?: '/' . $this->config->defaultAction;
-                    $handler = $ctrl . $action;
-                }
+                [$handler, $params] = $this->replaceHandler($routeInfo[1], $routeInfo[2]);
                 break;
         }
         return [$handler, $params];
     }
 
-    public function createController($handler, $params)
+    private function replaceHandler($handler, $params)
     {
-        if ($handler === 'defaultRule') {
-            ['controller' => $ctrl, 'action' => $action] = $params;
-            if (!class_exists($controllerName)) {
-                throw new RuntimeException("{$controllerName} is not found.");
-            }
-            $controller = new $controllerName;
-            if (!method_exists($controller, $actionName)) {
-                throw new RuntimeException("{$actionName} is not found.");
-            }
-            return call_user_func([$controller, $actionName], $request);
-        } else {
-            if (is_callable($handler)) {
-            } else {
-                throw new RuntimeException('Page is not found.');
-            }
+        preg_match_all('/<(\w+)>/', $handler, $matches);
+        $match = array_flip($matches[1]);
+        $intersect = array_intersect_key($params, $match);
+        $params = array_diff_key($params, $match);
+        $replace = [];
+        foreach ($intersect as $key => $value) {
+            $replace['<' . $key . '>'] = trim($value, '/');
         }
+        $handler = strtr($handler, $replace);
+        return [$handler, $params];
     }
 
-    public function getControllerActionName(string $path): array
+    public function parseHandler(string $handler): array
     {
-        $config = Ep::getConfig();
-        $pieces = explode('/', ltrim($path, '/'));
+        $pieces = explode('/', $handler);
         $prefix = '';
         switch (count($pieces)) {
             case 0:
-                $controllerName = $config->defaultController;
-                $actionName = $config->defaultAction;
+                $controllerName = $this->config->defaultController;
+                $actionName = $this->config->defaultAction;
                 break;
             case 1:
                 $controllerName = $pieces[0];
-                $actionName = $config->defaultAction;
+                $actionName = $this->config->defaultAction;
                 break;
             default:
-                $actionName = array_pop($pieces);
-                $controllerName = array_pop($pieces);
-                $prefix = implode('\\', $pieces) . '\\';
+                $actionName = array_pop($pieces) ?: $this->config->defaultAction;
+                $controllerName = array_pop($pieces) ?: $this->config->defaultController;
+                $prefix = implode('\\', $pieces);
                 break;
         }
-        $controllerName = sprintf('%s\\%s%s\\%sController', $config->appNamespace, $prefix, $config->controllerDirname, ucfirst($controllerName));
+        $controllerName = sprintf('%s\\%s%s\\%sController', $this->config->appNamespace, $prefix ? $prefix . '\\' : '', $this->config->controllerDirname, ucfirst($controllerName));
         return [$controllerName, $actionName];
     }
 }

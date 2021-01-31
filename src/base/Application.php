@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
+use Ep\base\Controller;
 use Exception;
 use RuntimeException;
 use Ep\Helper\Alias;
@@ -39,6 +40,22 @@ abstract class Application
         } catch (Exception $e) {
             throw new RuntimeException($e->getMessage(), $e->getCode(), $e->getPrevious());
         }
+    }
+
+    protected function createController(string $controllerName): Controller
+    {
+        if (!class_exists($controllerName)) {
+            throw new RuntimeException("{$controllerName} is not found.");
+        }
+        return new $controllerName;
+    }
+
+    protected function runAction(string $controllerName, string $actionName)
+    {
+        if (!method_exists($controller, $actionName)) {
+            throw new RuntimeException("{$actionName} is not found.");
+        }
+        return call_user_func([$controller, $actionName], $request);
     }
 
     protected abstract function handle(): int;

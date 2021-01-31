@@ -1,11 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-use ep\Core;
-use Tests\App\config\ConsoleConfig;
-
 require(__DIR__ . '/../../../vendor/autoload.php');
 
-$core = new Core(__DIR__);
+$application = new Ep\Console\Application(require(dirname(__DIR__) . '/config/main.php'));
 
-$core->run(new ConsoleConfig);
+$application->run();

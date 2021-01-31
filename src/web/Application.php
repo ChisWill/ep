@@ -41,10 +41,13 @@ class Application extends BaseApplication
 
     protected function handleRequest(ServerRequestInterface &$request)
     {
-        $router = new Router($request->getUri()->getPath(), $request->getMethod());
-        [$handler, $params] = $router->match();
-        $request = $request->withQueryParams($params);
-        test($handler);
-        // $controller = $router->createController($handler, $params);
+        $router = new Router();
+        [$handler, $params] = $router->solveRouteInfo($router->match($request->getUri()->getPath(), $request->getMethod()));
+        if ($params) {
+            $request = $request->withQueryParams($params);
+        }
+        [$controllerClass, $actionName] = $router->parseHandler($handler);
+        $controller = $this->createController($controllerClass);
+        return $this->runAction($controllerClass, $actionName);
     }
 }
