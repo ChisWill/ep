@@ -1,22 +1,56 @@
 <?php
 
-namespace Ep\base;
+namespace Ep\Base;
 
-use Ep\Base\Exception;
-use Ep\Helper\Ep;
+use Ep;
+use Ep\Helper\Alias;
 
-abstract class View
+class View implements ResponseHandlerInterface
 {
-    public $title = '';
-    public $layout = 'layouts/main';
+    public string $title = '';
+    public string $layout = 'layouts/main';
 
-    public function render(string $view, array $params = []): string
+    private string $content;
+
+    private Controller $controller;
+    private string $viewFilePath;
+
+    public function __construct(Controller $controller)
     {
-        if ($this->layout === null) {
-            return $this->renderContentFile($view, $params);
-        } else {
-            return $this->renderLayoutFile($view, $params);
-        }
+        $this->controller = $controller;
+
+        $this->initViewFilePath();
+    }
+
+    private function initViewFilePath()
+    {
+        $viewFilePath = strtr(Ep::getConfig()->viewFilePath, Ep::getDi()->get(Route::class)->getCapture());
+        $viewFilePath = preg_replace('#<\w*>#', '', $viewFilePath);
+        $this->viewFilePath = str_replace('//', '/', $viewFilePath);
+    }
+
+    public function send(): void
+    {
+        echo $this->content;
+    }
+
+    public function render(string $view, array $params = []): ResponseHandlerInterface
+    {
+        $this->content = $this->renderLayoutFile($view, $params);
+        return $this;
+    }
+
+    public function renderPartial(string $view, array $params = []): ResponseHandlerInterface
+    {
+        $this->content = $this->renderContentFile($view, $params);
+        return $this;
+    }
+
+    protected function renderLayoutFile(string $view, array $params = []): string
+    {
+        return $this->renderContentFile($this->layout, [
+            'content' => $this->renderContentFile($view, $params)
+        ]);
     }
 
     protected function renderContentFile(string $view, array $params = []): string
@@ -24,20 +58,9 @@ abstract class View
         return $this->renderPhpFile($this->findViewFile($view), $params);
     }
 
-    protected function renderLayoutFile(string $view, array $params = []): string
-    {
-        try {
-            return $this->renderContentFile($this->layout, [
-                'content' => $this->renderContentFile($view, $params)
-            ]);
-        } catch (Exception $e) {
-            throw new Exception(Exception::NOT_FOUND_LAYOUT, $e->getMessage());
-        }
-    }
-
     protected function findViewFile(string $view): string
     {
-        return Ep::getAlias($this->getViewFilePath() . '/' . $view . '.php');
+        return Alias::get($this->viewFilePath . '/' . $view . '.php');
     }
 
     protected function renderPhpFile(string $_file_, array $_params_ = []): string
@@ -48,10 +71,5 @@ abstract class View
         require($_file_);
 
         return ob_get_clean();
-    }
-
-    private function getViewFilePath()
-    {
-        return Ep::getConfig()->viewFilePath;
     }
 }

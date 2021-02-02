@@ -3,50 +3,46 @@
 declare(strict_types=1);
 
 use Ep\Base\Config;
-use Ep\Helper\Arr;
 use Yiisoft\Di\Container;
 use Yiisoft\Di\CompositeContainer;
 use Psr\Container\ContainerInterface;
 
 final class Ep
 {
-    private static ?ContainerInterface $_di = null;
+    private static ContainerInterface $di;
+
+    private static Config $config;
+
+    private static array $params;
+
+    public static function init(array $config = [])
+    {
+        self::$di = new CompositeContainer;
+        self::$config = new Config($config);
+        self::$params = self::$config->getParams();
+    }
 
     public static function setDi(array $definitions, array $providers = []): void
     {
-        if (self::$_di === null) {
-            $parent = new CompositeContainer();
-            $parent->attach(new Container($definitions, $providers));
-            self::$_di = $parent;
-        } else {
-            self::$_di->attach(new Container($definitions, $providers));
-        }
+        self::$di->attach(new Container($definitions, $providers));
     }
 
     public static function getDi(): ContainerInterface
     {
-        return self::$_di;
+        return self::$di;
     }
-
-    private static ?Config $_config = null;
 
     public static function setConfig(array $config): void
     {
-        if (self::$_config === null) {
-            self::$_config = new Config($config);
-        } else {
-            foreach ($config as $name => $value) {
-                self::$_config->$name = $value;
-            }
+        foreach ($config as $name => $value) {
+            self::$config->$name = $value;
         }
     }
 
     public static function getConfig(): Config
     {
-        return self::$_config;
+        return self::$config;
     }
-
-    private static ?array $_params = null;
 
     /**
      * Get all parameters.
@@ -55,10 +51,7 @@ final class Ep
      */
     public static function getParams(): array
     {
-        if (self::$_params === null) {
-            self::$_params = self::$_config->getParams();
-        }
-        return self::$_params;
+        return self::$params;
     }
 
     /**
@@ -70,6 +63,6 @@ final class Ep
      */
     public static function getParam(string $name, $default = null)
     {
-        return self::$_params[$name] ?? $default;
+        return self::$params[$name] ?? $default;
     }
 }

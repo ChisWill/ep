@@ -6,16 +6,15 @@ namespace Ep\Base;
 
 use Ep;
 use Ep\Helper\Alias;
-use Ep\Helper\Arr;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
-use RuntimeException;
 
 use function FastRoute\cachedDispatcher;
 
-class Router
+class Route
 {
     private Config $config;
+    private array $capture = [];
 
     public function __construct()
     {
@@ -24,20 +23,16 @@ class Router
 
     public function match(string $path, string $method = 'GET'): array
     {
-        $path = rtrim($path, '/') ?: '/';
-        $dispatcher = cachedDispatcher(function (RouteCollector $route) {
-            $callback = $this->config->getRouter();
+        return cachedDispatcher(function (RouteCollector $route) {
+            $callback = $this->config->getRoute();
             if (is_callable($callback)) {
                 call_user_func($callback, $route);
             }
-            $route->addGroup($this->config->baseUrl, function (RouteCollector $r) {
-                $r->addRoute(['GET', 'POST'], '{prefix:[\w/]*?}{controller:/?[a-zA-Z]\w*|}{action:/?[a-zA-Z]\w*|}', '<prefix>/<controller>/<action>');
-            });
+            $route->addGroup($this->config->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
         }, [
             'cacheFile' => Alias::get('@root/runtime/routeRules.cache'),
             'cacheDisabled' => $this->config->debug
-        ]);
-        return $dispatcher->dispatch($method, $path);
+        ])->dispatch($method, rtrim($path, '/') ?: '/');
     }
 
     public function solveRouteInfo(array $routeInfo)
@@ -64,11 +59,10 @@ class Router
         $match = array_flip($matches[1]);
         $intersect = array_intersect_key($params, $match);
         $params = array_diff_key($params, $match);
-        $replace = [];
         foreach ($intersect as $key => $value) {
-            $replace['<' . $key . '>'] = trim($value, '/');
+            $this->capture['<' . $key . '>'] = trim($value, '/');
         }
-        $handler = strtr($handler, $replace);
+        $handler = strtr($handler, $this->capture);
         return [$handler, $params];
     }
 
@@ -91,7 +85,13 @@ class Router
                 $prefix = implode('\\', $pieces);
                 break;
         }
-        $controllerName = sprintf('%s\\%s%s\\%sController', $this->config->appNamespace, $prefix ? $prefix . '\\' : '', $this->config->controllerDirname, ucfirst($controllerName));
+        $controllerName = sprintf('%s\\%s%s\\%s%s', $this->config->appNamespace, $prefix ? $prefix . '\\' : '', $this->config->controllerDirAndSuffix, ucfirst($controllerName), $this->config->controllerDirAndSuffix);
+        $actionName .= $this->config->actionSuffix;
         return [$controllerName, $actionName];
+    }
+
+    public function getCapture(): array
+    {
+        return $this->capture;
     }
 }

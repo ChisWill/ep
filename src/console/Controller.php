@@ -1,9 +1,23 @@
 <?php
 
-namespace Ep\console;
+namespace Ep\Console;
 
 use Ep\base\Controller as BaseController;
+use Ep\Base\ResponseHandlerInterface;
 
 class Controller extends BaseController
 {
+    public function createResponseHandler(): ResponseHandlerInterface
+    {
+        return new ResponseHandler;
+    }
+
+    public function beforeAction(): bool
+    {
+        return true;
+    }
+
+    public function afterAction(ResponseHandlerInterface $responseHandler): void
+    {
+    }
 }

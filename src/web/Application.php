@@ -5,33 +5,16 @@ declare(strict_types=1);
 namespace Ep\Web;
 
 use Ep;
-use RuntimeException;
 use Ep\Base\Application as BaseApplication;
-use Ep\Base\Router;
-use Ep\Helper\Alias;
-use Ep\Tests\App\web\Controller\IndexController;
-use FastRoute\Dispatcher;
-use FastRoute\RouteCollector;
-use HttpSoft\Message\Response;
-use Psr\Http\Message\ResponseInterface;
+use Ep\Base\ResponseHandlerInterface;
+use Ep\Base\Route;
 use Psr\Http\Message\ServerRequestInterface;
-use Yiisoft\Injector\Injector;
-
-use function FastRoute\cachedDispatcher;
-use function FastRoute\simpleDispatcher;
 
 class Application extends BaseApplication
 {
-    protected function handle(): int
+    protected function handle(): void
     {
-        $request = $this->createRequest();
-        $response = $this->handleRequest($request);
-        $this->send($response);
-        return 0;
-    }
-
-    protected function send(ResponseInterface $response): void
-    {
+        $this->handleRequest($this->createRequest())->send();
     }
 
     protected function createRequest(): ServerRequestInterface
@@ -39,15 +22,14 @@ class Application extends BaseApplication
         return Ep::getDi()->get(ServerRequestFactory::class)->createFromGlobals();
     }
 
-    protected function handleRequest(ServerRequestInterface &$request)
+    protected function handleRequest(ServerRequestInterface $request): ResponseHandlerInterface
     {
-        $router = new Router();
-        [$handler, $params] = $router->solveRouteInfo($router->match($request->getUri()->getPath(), $request->getMethod()));
+        $route = Ep::getDi()->get(Route::class);
+        [$handler, $params] = $route->solveRouteInfo($route->match($request->getUri()->getPath(), $request->getMethod()));
         if ($params) {
             $request = $request->withQueryParams($params);
         }
-        [$controllerClass, $actionName] = $router->parseHandler($handler);
-        $controller = $this->createController($controllerClass);
-        return $this->runAction($controllerClass, $actionName);
+        [$controllerClass, $actionName] = $route->parseHandler($handler);
+        return $this->createController($controllerClass)->run($actionName, $request);
     }
 }

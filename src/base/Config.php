@@ -12,7 +12,11 @@ final class Config
     /**
      * 项目根命名空间
      */
-    public string $appNamespace = 'Src';
+    public string $appNamespace = 'App';
+    /**
+     * Action 后缀
+     */
+    public string $actionSuffix = 'Action';
     /**
      * 项目根目录地址
      */
@@ -22,9 +26,9 @@ final class Config
      */
     public string $baseUrl = '/';
     /**
-     * 控制器所在文件夹名
+     * 控制器所在文件夹名以及类名后缀，强制统一
      */
-    public string $controllerDirname = 'Controller';
+    public string $controllerDirAndSuffix = 'Controller';
     /**
      * 默认 Controller
      */
@@ -33,6 +37,10 @@ final class Config
      * 默认 Action
      */
     public string $defaultAction = 'index';
+    /**
+     * 默认路由规则
+     */
+    public array $defaultRoute = [['GET', 'POST'], '{prefix:[\w/]*?}{controller:/?[a-zA-Z]\w*|}{action:/?[a-zA-Z]\w*|}', '<prefix>/<controller>/<action>'];
     /**
      * 是否开启调试模式
      */
@@ -50,13 +58,13 @@ final class Config
      */
     public string $language = 'zh-CN';
     /**
-     * 视图文件夹地址
+     * 项目秘钥
      */
-    public string $viewFilePath = '@root/View';
+    public string $secretKey = '';
     /**
-     * 组件配置
+     * 视图文件夹地址，支持从路由中获取参数，获取不到时将自动忽略
      */
-    private array $components = [];
+    public string $viewFilePath = '@root/<prefix>/View';
     /**
      * di 配置
      */
@@ -69,14 +77,14 @@ final class Config
      * 
      * use FastRoute\RouteCollector;
      *
-     * $config->router = function (RouteCollector $route) {
+     * $config->route = function (RouteCollector $route) {
      *     $route->addGroup('/api', function (RouteCollector $r) {
      *         $r->get('/error/index', 'error/index');
      *     });
      * };
      * ```
      */
-    private Closure $router;
+    private Closure $route;
     /**
      * 常规配置项
      */
@@ -90,6 +98,9 @@ final class Config
         if ($this->basePath === '') {
             throw new InvalidArgumentException('The "basePath" configuration is required.');
         }
+        if ($this->secretKey === '') {
+            throw new InvalidArgumentException('The "secretKey" configuration is required.');
+        }
     }
 
     public function __set($name, $value)
@@ -97,14 +108,9 @@ final class Config
         throw new InvalidArgumentException("{$name} is invalid.");
     }
 
-    public function getRouter(): Closure
+    public function getRoute(): Closure
     {
-        return $this->router;
-    }
-
-    public function getComponents(): array
-    {
-        return $this->components;
+        return $this->route;
     }
 
     public function getDefinitions(): array

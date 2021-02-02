@@ -1,6 +1,6 @@
 <?php
 
-namespace Ep\db;
+namespace Ep\Db;
 
 class ActiveQuery extends \Yiisoft\ActiveRecord\ActiveQuery
 {

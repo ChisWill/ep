@@ -2,10 +2,10 @@
 
 return [
     'appNamespace' => 'Ep\Tests\App',
-    'controllerDirname' => 'Controller',
-    'basePath' => dirname(__DIR__),
+    'basePath' => dirname(__DIR__) . '/src',
     'env' => 'test',
     'debug' => true,
-    'router' => require('router.php'),
+    'secretKey' => '8FFA893E119A32D0C6A686863217A181',
+    'route' => require('route.php'),
     'params' => require('params.php')
 ];

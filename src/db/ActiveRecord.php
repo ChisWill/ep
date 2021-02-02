@@ -1,20 +1,20 @@
 <?php
 
-namespace Ep\db;
+namespace Ep\Db;
 
-use Ep\Base\Exception;
-use Ep\Helper\Ep;
-use Ep\web\Request;
-use Yiisoft\Db\Connection\ConnectionInterface;
+use Ep;
+use RuntimeException;
+use Psr\Http\Message\RequestInterface;
 use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Validator\Validator;
+use Yiisoft\Db\Connection\ConnectionInterface;
 
 abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implements DataSetInterface
 {
     public function __construct(?ConnectionInterface $db = null)
     {
         if ($db === null) {
-            $db = Ep::getDi()->get('db');
+            $db = Ep::getDi()->get(ConnectionInterface::class);
         }
         parent::__construct($db);
     }
@@ -25,8 +25,8 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
 
     public function validate(): bool
     {
-        $validator = new Validator($this->rules());
-        $results = $validator->validate($this);
+        $validator = new Validator();
+        $results = $validator->validate($this, $this->rules());
         $this->_errors = [];
         foreach ($results as $attribute => $result) {
             if (!$result->isValid()) {
@@ -48,7 +48,7 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
 
     public static function find(): ActiveQuery
     {
-        return new ActiveQuery(static::class, Ep::getDi()->get('db'));
+        return new ActiveQuery(static::class, Ep::getDi()->get(ConnectionInterface::class));
     }
 
     public static function findModel($condition): ActiveRecord
@@ -61,16 +61,17 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
             }
             $model = static::find()->where($condition)->one();
             if ($model === null) {
-                throw new Exception(Exception::NOT_FOUND_DATA);
+                throw new RuntimeException("Data is not found.");
             }
             return $model;
         }
     }
 
-    public function load(Request $request)
+    public function load(RequestInterface $request): bool
     {
-        $this->setAttributes($request->getBodyParams());
+        $this->setAttributes([]);
 
-        return $request->isPost();
+        // return $request->isPost;
+        return true;
     }
 }
