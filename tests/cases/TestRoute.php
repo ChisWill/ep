@@ -77,7 +77,7 @@ class TestRoute extends TestCase
     public function testRules($path, $found, $expect)
     {
         $route = new Route();
-        $routeInfo = $route->match($path);
+        $routeInfo = $route->matchRule($path);
         $this->assertRuleResult($routeInfo, $path, $found, $expect);
         [$handler, $params] = $route->solveRouteInfo($routeInfo);
         $this->assertEquals(trim($path, '/'), trim($handler, '/'));

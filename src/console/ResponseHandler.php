@@ -2,7 +2,7 @@
 
 namespace Ep\Console;
 
-use Ep\Base\ResponseHandlerInterface;
+use Ep\Standard\ResponseHandlerInterface;
 
 class ResponseHandler implements ResponseHandlerInterface
 {

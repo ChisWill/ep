@@ -6,8 +6,9 @@ namespace Ep\Web;
 
 use Ep;
 use Ep\Base\Application as BaseApplication;
-use Ep\Base\ResponseHandlerInterface;
 use Ep\Base\Route;
+use Ep\Standard\ResponseHandlerInterface;
+use Ep\Standard\RouteInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Application extends BaseApplication
@@ -24,8 +25,8 @@ class Application extends BaseApplication
 
     protected function handleRequest(ServerRequestInterface $request): ResponseHandlerInterface
     {
-        $route = Ep::getDi()->get(Route::class);
-        [$handler, $params] = $route->solveRouteInfo($route->match($request->getUri()->getPath(), $request->getMethod()));
+        $route = Ep::getDi()->get(RouteInterface::class);
+        [$handler, $params] = $route->solveRouteInfo($route->matchRule($request->getUri()->getPath(), $request->getMethod()));
         if ($params) {
             $request = $request->withQueryParams($params);
         }

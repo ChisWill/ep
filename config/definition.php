@@ -1,6 +1,7 @@
 <?php
 
-use Ep\Tests\Cls\Car;
+use Ep\Base\Route;
+use Ep\Standard\RouteInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
@@ -11,11 +12,13 @@ use HttpSoft\Message\UploadedFileFactory;
 use HttpSoft\Message\StreamFactory;
 
 return [
+    // ServerRequest
     ServerRequestFactoryInterface::class => ServerRequestFactory::class,
     UriFactoryInterface::class => UriFactory::class,
     UploadedFileFactoryInterface::class => UploadedFileFactory::class,
     StreamFactoryInterface::class => StreamFactory::class,
-    Car::class => Car::class
+    // Route
+    RouteInterface::class => Route::class
     // LoggerInterface::class => [
     //     '__class' => Logger::class,
     // ],

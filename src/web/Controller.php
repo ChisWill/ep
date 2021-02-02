@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ep\Web;
 
 use Ep\Base\Controller as BaseController;
-use Ep\Base\ResponseHandlerInterface;
+use Ep\Standard\ResponseHandlerInterface;
 
 class Controller extends BaseController
 {

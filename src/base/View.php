@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ep\Base;
 
 use Ep;
 use Ep\Helper\Alias;
+use Ep\Standard\ResponseHandlerInterface;
 
 class View implements ResponseHandlerInterface
 {
@@ -22,7 +25,7 @@ class View implements ResponseHandlerInterface
         $this->initViewFilePath();
     }
 
-    private function initViewFilePath()
+    private function initViewFilePath(): void
     {
         $viewFilePath = strtr(Ep::getConfig()->viewFilePath, Ep::getDi()->get(Route::class)->getCapture());
         $viewFilePath = preg_replace('#<\w*>#', '', $viewFilePath);

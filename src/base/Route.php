@@ -6,12 +6,13 @@ namespace Ep\Base;
 
 use Ep;
 use Ep\Helper\Alias;
+use Ep\Standard\RouteInterface;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 
 use function FastRoute\cachedDispatcher;
 
-class Route
+class Route implements RouteInterface
 {
     private Config $config;
     private array $capture = [];
@@ -21,7 +22,7 @@ class Route
         $this->config = Ep::getConfig();
     }
 
-    public function match(string $path, string $method = 'GET'): array
+    public function matchRule(string $path, string $method = 'GET'): array
     {
         return cachedDispatcher(function (RouteCollector $route) {
             $callback = $this->config->getRoute();
@@ -35,7 +36,7 @@ class Route
         ])->dispatch($method, rtrim($path, '/') ?: '/');
     }
 
-    public function solveRouteInfo(array $routeInfo)
+    public function solveRouteInfo(array $routeInfo): array
     {
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
@@ -53,7 +54,7 @@ class Route
         return [$handler, $params];
     }
 
-    private function replaceHandler($handler, $params)
+    private function replaceHandler(string $handler, array $params): array
     {
         preg_match_all('/<(\w+)>/', $handler, $matches);
         $match = array_flip($matches[1]);
@@ -76,7 +77,7 @@ class Route
                 $actionName = $this->config->defaultAction;
                 break;
             case 1:
-                $controllerName = $pieces[0];
+                $controllerName = strtolower($pieces[0]);
                 $actionName = $this->config->defaultAction;
                 break;
             default:
@@ -85,7 +86,7 @@ class Route
                 $prefix = implode('\\', $pieces);
                 break;
         }
-        $controllerName = sprintf('%s\\%s%s\\%s%s', $this->config->appNamespace, $prefix ? $prefix . '\\' : '', $this->config->controllerDirAndSuffix, ucfirst($controllerName), $this->config->controllerDirAndSuffix);
+        $controllerName = sprintf('%s\\%s%s\\%s%s', $this->config->appNamespace, $prefix ? $prefix . '\\' : '', $this->config->controllerDirAndSuffix, ucfirst(strtolower($controllerName)), $this->config->controllerDirAndSuffix);
         $actionName .= $this->config->actionSuffix;
         return [$controllerName, $actionName];
     }

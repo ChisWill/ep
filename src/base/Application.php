@@ -15,11 +15,6 @@ abstract class Application
 
     public function __construct(array $config)
     {
-        $this->init($config);
-    }
-
-    private function init(array $config): void
-    {
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
             throw new RuntimeException(sprintf('%s, in %s:%d', $errstr, $errfile, $errline));
         }, E_ALL);
@@ -37,7 +32,7 @@ abstract class Application
         try {
             $this->handle();
         } catch (Throwable $e) {
-            throw new RuntimeException($e->getMessage(), $e->getCode(), $e->getPrevious());
+            throw new RuntimeException($e->getMessage() . $e->getTraceAsString(), $e->getCode(), $e->getPrevious());
         }
     }
 

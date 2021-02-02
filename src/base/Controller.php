@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\base;
 
 use RuntimeException;
+use Ep\Standard\ResponseHandlerInterface;
 
 abstract class Controller
 {

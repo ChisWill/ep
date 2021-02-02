@@ -3,7 +3,7 @@
 namespace Ep\Console;
 
 use Ep\base\Controller as BaseController;
-use Ep\Base\ResponseHandlerInterface;
+use Ep\Standard\ResponseHandlerInterface;
 
 class Controller extends BaseController
 {
