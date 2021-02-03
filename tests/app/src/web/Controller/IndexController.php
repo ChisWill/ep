@@ -4,7 +4,6 @@ namespace Ep\Tests\App\web\Controller;
 
 use Ep\Helper\Alias;
 use Ep\Tests\App\web\Model\User;
-use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Message;
@@ -18,9 +17,24 @@ class IndexController extends \Ep\Web\Controller
         return $this->render('index/index');
     }
 
-    public function error(ServerRequestInterface $request)
+    public function requestAction(ServerRequestInterface $request)
     {
-        test(123, $request->getUri());
+        tes('Method：' . $request->getMethod());
+        tes('All GET：', $request->getQueryParams());
+        tes('POST String：' . $request->getBody()->getContents());
+        tes('Cookies：', $request->getCookieParams());
+        tes('Host：' . $request->getUri()->getHost());
+        tes('Path：' . $request->getUri()->getPath());
+        tes('Post Array：', $request->getParsedBody());
+    }
+
+    public function redirectAction(ServerRequestInterface $request)
+    {
+        $url = $request->getQueryParams()['url'] ?? '';
+        if (!$url) {
+            return $this->string("");
+        }
+        return $this->redirect($url);
     }
 
     public function log($req)
@@ -47,15 +61,6 @@ class IndexController extends \Ep\Web\Controller
         } else {
             test($user->getErrors());
         }
-    }
-
-    public function redirectAction(ServerRequestInterface $request)
-    {
-        $url = $request->getAttribute('url');
-        if (!$url) {
-            return $this->string("");
-        }
-        return $this->redirect();
     }
 
     public function form(ServerRequestInterface $request)

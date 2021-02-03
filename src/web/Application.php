@@ -13,7 +13,10 @@ class Application extends \Ep\Base\Application
 {
     protected function handle(): void
     {
-        $this->handleRequest($this->createRequest())->send();
+        $responseHandler = $this->handleRequest($this->createRequest());
+        if ($responseHandler !== null) {
+            $responseHandler->send();
+        }
     }
 
     protected function createRequest(): ServerRequestInterface
@@ -21,7 +24,7 @@ class Application extends \Ep\Base\Application
         return Ep::getDi()->get(ServerRequestFactory::class)->createFromGlobals();
     }
 
-    protected function handleRequest(ServerRequestInterface $request): ResponseHandlerInterface
+    protected function handleRequest(ServerRequestInterface $request): ?ResponseHandlerInterface
     {
         $route = Ep::getDi()->get(RouteInterface::class);
         [$handler, $params] = $route->solveRouteInfo($route->matchRule($request->getUri()->getPath(), $request->getMethod()));

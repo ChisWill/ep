@@ -2,10 +2,9 @@
 
 namespace Ep\Console;
 
-use Ep\base\Controller as BaseController;
 use Ep\Standard\ResponseHandlerInterface;
 
-class Controller extends BaseController
+class Controller extends \Ep\base\Controller
 {
     public function createResponseHandler(): ResponseHandlerInterface
     {

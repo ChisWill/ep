@@ -87,7 +87,7 @@ class Route implements RouteInterface
                 break;
         }
         $controllerName = sprintf('%s\\%s%s\\%s%s', $this->config->appNamespace, $prefix ? $prefix . '\\' : '', $this->config->controllerDirAndSuffix, ucfirst(strtolower($controllerName)), $this->config->controllerDirAndSuffix);
-        $actionName .= $this->config->actionSuffix;
+        $actionName = strtolower($actionName) . $this->config->actionSuffix;
         return [$controllerName, $actionName];
     }
 

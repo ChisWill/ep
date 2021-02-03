@@ -2,6 +2,7 @@
 
 use Ep\Base\Route;
 use Ep\Standard\RouteInterface;
+use HttpSoft\Message\ResponseFactory;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
@@ -10,15 +11,18 @@ use HttpSoft\Message\ServerRequestFactory;
 use HttpSoft\Message\UriFactory;
 use HttpSoft\Message\UploadedFileFactory;
 use HttpSoft\Message\StreamFactory;
+use Psr\Http\Message\ResponseFactoryInterface;
 
 return [
+    // Route
+    RouteInterface::class => Route::class,
     // ServerRequest
     ServerRequestFactoryInterface::class => ServerRequestFactory::class,
     UriFactoryInterface::class => UriFactory::class,
     UploadedFileFactoryInterface::class => UploadedFileFactory::class,
     StreamFactoryInterface::class => StreamFactory::class,
-    // Route
-    RouteInterface::class => Route::class
+    // Response
+    ResponseFactoryInterface::class => ResponseFactory::class,
     // LoggerInterface::class => [
     //     '__class' => Logger::class,
     // ],

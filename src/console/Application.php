@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Ep\Console;
 
-use Ep\Base\Application as BaseApplication;
 use Ep\Base\Route;
 
-class Application extends BaseApplication
+class Application extends \Ep\Base\Application
 {
     protected function handle(): void
     {

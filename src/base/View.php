@@ -12,7 +12,6 @@ use Ep\Standard\ContextInterface;
 
 class View implements ViewInterface
 {
-    public string $title = '';
     public string $layout = 'layouts/main';
 
     private string $content;

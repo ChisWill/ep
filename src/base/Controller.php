@@ -8,13 +8,14 @@ use Ep;
 use RuntimeException;
 use Ep\Standard\ViewInterface;
 use Ep\Standard\ContextInterface;
+use Ep\Standard\ControllerInterface;
 use Ep\Standard\ResponseHandlerInterface;
 
-abstract class Controller implements ContextInterface
+abstract class Controller implements ControllerInterface, ContextInterface
 {
     private ?ViewInterface $view = null;
 
-    public function run(string $actionName, $request): ResponseHandlerInterface
+    public function run(string $actionName, $request): ?ResponseHandlerInterface
     {
         if (!is_callable([$this, $actionName])) {
             throw new RuntimeException(sprintf('%s::%s() is not found.', get_class($this), $actionName));
@@ -28,7 +29,7 @@ abstract class Controller implements ContextInterface
         }
     }
 
-    public function getView(): ViewInterface
+    protected function getView(): ViewInterface
     {
         if ($this->view === null) {
             $this->view = new View($this, Ep::getConfig()->viewPath);
@@ -41,12 +42,12 @@ abstract class Controller implements ContextInterface
         return $string;
     }
 
-    protected function render(string $view, array $params = []): ResponseHandlerInterface
+    protected function render(string $view, array $params = []): ViewInterface
     {
         return $this->getView()->render($view, $params);
     }
 
-    protected function renderPartial(string $view, array $params = []): ResponseHandlerInterface
+    protected function renderPartial(string $view, array $params = []): ViewInterface
     {
         return $this->getView()->renderPartial($view, $params);
     }
@@ -55,5 +56,5 @@ abstract class Controller implements ContextInterface
 
     protected abstract function beforeAction(): bool;
 
-    protected abstract function afterAction(ResponseHandlerInterface $response): void;
+    protected abstract function afterAction(?ResponseHandlerInterface $response): void;
 }
