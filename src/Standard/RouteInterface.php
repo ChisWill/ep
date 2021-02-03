@@ -6,7 +6,7 @@ namespace Ep\Standard;
 
 interface RouteInterface
 {
-    public function matchRule(string $requestPath, string $method): array;
+    public function matchRule(string $requestPath, string $method = 'GET'): array;
 
     public function solveRouteInfo(array $routeInfo): array;
 

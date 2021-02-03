@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Ep\Web;
 
 use Ep;
-use Ep\Base\Application as BaseApplication;
-use Ep\Base\Route;
-use Ep\Standard\ResponseHandlerInterface;
 use Ep\Standard\RouteInterface;
+use Ep\Standard\ResponseHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class Application extends BaseApplication
+class Application extends \Ep\Base\Application
 {
     protected function handle(): void
     {

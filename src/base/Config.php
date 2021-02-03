@@ -64,7 +64,7 @@ final class Config
     /**
      * 视图文件夹地址，支持从路由中获取参数，获取不到时将自动忽略
      */
-    public string $viewFilePath = '@root/<prefix>/View';
+    public string $viewPath = '@root/<prefix>/View';
     /**
      * di 配置
      */

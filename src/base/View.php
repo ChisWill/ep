@@ -6,30 +6,23 @@ namespace Ep\Base;
 
 use Ep;
 use Ep\Helper\Alias;
-use Ep\Standard\ResponseHandlerInterface;
+use Ep\Standard\ViewInterface;
+use Ep\Standard\RouteInterface;
+use Ep\Standard\ContextInterface;
 
-class View implements ResponseHandlerInterface
+class View implements ViewInterface
 {
     public string $title = '';
     public string $layout = 'layouts/main';
 
     private string $content;
+    private string $viewPath;
+    private ContextInterface $context;
 
-    private Controller $controller;
-    private string $viewFilePath;
-
-    public function __construct(Controller $controller)
+    public function __construct(ContextInterface $context, string $viewPath)
     {
-        $this->controller = $controller;
-
-        $this->initViewFilePath();
-    }
-
-    private function initViewFilePath(): void
-    {
-        $viewFilePath = strtr(Ep::getConfig()->viewFilePath, Ep::getDi()->get(Route::class)->getCapture());
-        $viewFilePath = preg_replace('#<\w*>#', '', $viewFilePath);
-        $this->viewFilePath = str_replace('//', '/', $viewFilePath);
+        $this->context = $context;
+        $this->viewPath = str_replace('//', '/', preg_replace('#<\w*>#', '', strtr($viewPath, Ep::getDi()->get(RouteInterface::class)->getCapture())));
     }
 
     public function send(): void
@@ -37,39 +30,39 @@ class View implements ResponseHandlerInterface
         echo $this->content;
     }
 
-    public function render(string $view, array $params = []): ResponseHandlerInterface
+    public function render(string $path, array $params = []): ViewInterface
     {
-        $this->content = $this->renderLayoutFile($view, $params);
+        $this->content = $this->renderLayoutFile($path, $params);
         return $this;
     }
 
-    public function renderPartial(string $view, array $params = []): ResponseHandlerInterface
+    public function renderPartial(string $path, array $params = []): ViewInterface
     {
-        $this->content = $this->renderContentFile($view, $params);
+        $this->content = $this->renderContentFile($path, $params);
         return $this;
     }
 
-    protected function renderLayoutFile(string $view, array $params = []): string
+    protected function renderLayoutFile(string $path, array $params = []): string
     {
         return $this->renderContentFile($this->layout, [
-            'content' => $this->renderContentFile($view, $params)
+            'content' => $this->renderContentFile($path, $params)
         ]);
     }
 
-    protected function renderContentFile(string $view, array $params = []): string
+    protected function renderContentFile(string $path, array $params = []): string
     {
-        return $this->renderPhpFile($this->findViewFile($view), $params);
+        return $this->renderPhpFile($this->findViewFile($path), $params);
     }
 
-    protected function findViewFile(string $view): string
+    protected function findViewFile(string $path): string
     {
-        return Alias::get($this->viewFilePath . '/' . $view . '.php');
+        return Alias::get($this->viewPath . '/' . $path . '.php');
     }
 
     protected function renderPhpFile(string $_file_, array $_params_ = []): string
     {
         ob_start();
-        ob_implicit_flush(false);
+        ob_implicit_flush(0);
         extract($_params_, EXTR_OVERWRITE);
         require($_file_);
 

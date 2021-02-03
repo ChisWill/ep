@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Ep\base;
 
+use Ep;
 use RuntimeException;
+use Ep\Standard\ViewInterface;
+use Ep\Standard\ContextInterface;
 use Ep\Standard\ResponseHandlerInterface;
 
-abstract class Controller
+abstract class Controller implements ContextInterface
 {
-    private ?View $view = null;
+    private ?ViewInterface $view = null;
 
     public function run(string $actionName, $request): ResponseHandlerInterface
     {
@@ -25,10 +28,10 @@ abstract class Controller
         }
     }
 
-    protected function getView(): View
+    public function getView(): ViewInterface
     {
         if ($this->view === null) {
-            $this->view = new View($this);
+            $this->view = new View($this, Ep::getConfig()->viewPath);
         }
         return $this->view;
     }
