@@ -12,8 +12,7 @@ use Ep\Standard\ContextInterface;
 
 class View implements ViewInterface
 {
-    public string $layout = 'layouts/main';
-
+    private string $layout = 'layouts/main';
     private string $content;
     private string $viewPath;
     private ContextInterface $context;
@@ -21,7 +20,7 @@ class View implements ViewInterface
     public function __construct(ContextInterface $context, string $viewPath)
     {
         $this->context = $context;
-        $this->viewPath = str_replace('//', '/', preg_replace('#<\w*>#', '', strtr($viewPath, Ep::getDi()->get(RouteInterface::class)->getCapture())));
+        $this->viewPath = str_replace('//', '/', preg_replace('#<\w*>#', '', strtr($viewPath, Ep::getDi()->get(RouteInterface::class)->getCaptureParams())));
     }
 
     public function send(): void
@@ -29,16 +28,19 @@ class View implements ViewInterface
         echo $this->content;
     }
 
-    public function render(string $path, array $params = []): ViewInterface
+    public function render(string $path, array $params = []): string
     {
-        $this->content = $this->renderLayoutFile($path, $params);
-        return $this;
+        return $this->renderLayoutFile($path, $params);
     }
 
-    public function renderPartial(string $path, array $params = []): ViewInterface
+    public function renderPartial(string $path, array $params = []): string
     {
-        $this->content = $this->renderContentFile($path, $params);
-        return $this;
+        return $this->renderContentFile($path, $params);
+    }
+
+    public function setLayout(string $layout): void
+    {
+        $this->layout = $layout;
     }
 
     protected function renderLayoutFile(string $path, array $params = []): string

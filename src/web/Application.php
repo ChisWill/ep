@@ -6,16 +6,15 @@ namespace Ep\Web;
 
 use Ep;
 use Ep\Standard\RouteInterface;
-use Ep\Standard\ResponseHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Application extends \Ep\Base\Application
 {
     protected function handle(): void
     {
-        $responseHandler = $this->handleRequest($this->createRequest());
-        if ($responseHandler !== null) {
-            $responseHandler->send();
+        $response = $this->handleRequest($this->createRequest());
+        if ($response instanceof ResponseInterface) {
         }
     }
 
@@ -24,14 +23,14 @@ class Application extends \Ep\Base\Application
         return Ep::getDi()->get(ServerRequestFactory::class)->createFromGlobals();
     }
 
-    protected function handleRequest(ServerRequestInterface $request): ?ResponseHandlerInterface
+    protected function handleRequest(ServerRequestInterface $request): ?ResponseInterface
     {
         $route = Ep::getDi()->get(RouteInterface::class);
-        [$handler, $params] = $route->solveRouteInfo($route->matchRule($request->getUri()->getPath(), $request->getMethod()));
+        [$handler, $params] = $route->solveRouteInfo($route->matchRequest($request->getUri()->getPath(), $request->getMethod()));
         if ($params) {
             $request = $request->withQueryParams($params);
         }
         [$controllerClass, $actionName] = $route->parseHandler($handler);
-        return $this->createController($controllerClass)->run($actionName, $request);
+        return $route->createController($controllerClass)->run($actionName, $request);
     }
 }

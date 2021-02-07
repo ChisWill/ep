@@ -10,11 +10,11 @@ class Application extends \Ep\Base\Application
 {
     protected function handle(): void
     {
-        $response = $this->handleRequest($GLOBALS['argv']);
-        $response->send();
+        // $response = $this->handleRequest($GLOBALS['argv']);
+        // $response->send();
     }
 
-    protected function handleRequest($argv): ResponseHandler
+    protected function handleRequest($argv)
     {
         unset($argv[0]);
         $path = '/' . array_shift($argv);

@@ -2,21 +2,23 @@
 
 namespace Ep\Console;
 
-use Ep\Standard\ResponseHandlerInterface;
+use HttpSoft\Message\Response;
+use Psr\Http\Message\ResponseInterface;
 
 class Controller extends \Ep\base\Controller
 {
-    public function createResponseHandler(): ResponseHandlerInterface
+    public function createResponseHandler(): ResponseInterface
     {
-        return new ResponseHandler;
+        return new Response();
     }
 
-    public function beforeAction(): bool
+    public function beforeAction($request): bool
     {
         return true;
     }
 
-    public function afterAction(ResponseHandlerInterface $responseHandler): void
+    public function afterAction($response): bool
     {
+        return true;
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Ep\Base\Config;
 use Yiisoft\Di\Container;
 use Yiisoft\Di\CompositeContainer;
+use Yiisoft\Injector\Injector;
 use Psr\Container\ContainerInterface;
 
 final class Ep
@@ -30,6 +31,11 @@ final class Ep
     public static function getDi(): ContainerInterface
     {
         return self::$di;
+    }
+
+    public static function getInjector(): Injector
+    {
+        return new Injector(self::getDi());
     }
 
     public static function setConfig(array $config): void

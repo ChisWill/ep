@@ -2,19 +2,34 @@
 
 namespace Ep\Tests\App\web\Controller;
 
+use Ep;
 use Ep\Helper\Alias;
+use Ep\Helper\Curl;
+use Ep\Standard\ContextInterface;
+use Ep\Standard\ControllerInterface;
+use Ep\Standard\ViewInterface;
 use Ep\Tests\App\web\Model\User;
+use Ep\Web\View;
 use Psr\Http\Message\ServerRequestInterface;
+use Yiisoft\Injector\Injector;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Message;
 use Yiisoft\Log\Target\File\FileRotator;
 use Yiisoft\Log\Target\File\FileTarget;
+use Yiisoft\Validator\DataSetInterface;
+use Yiisoft\VarDumper\VarDumper;
 
 class IndexController extends \Ep\Web\Controller
 {
     public function indexAction(ServerRequestInterface $request)
     {
+        $this->setLayout('a');
+
         return $this->render('index/index');
+    }
+
+    public function testAction()
+    {
     }
 
     public function requestAction(ServerRequestInterface $request)

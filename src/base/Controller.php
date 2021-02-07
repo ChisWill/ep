@@ -4,57 +4,33 @@ declare(strict_types=1);
 
 namespace Ep\base;
 
-use Ep;
 use RuntimeException;
 use Ep\Standard\ViewInterface;
 use Ep\Standard\ContextInterface;
 use Ep\Standard\ControllerInterface;
-use Ep\Standard\ResponseHandlerInterface;
 
 abstract class Controller implements ControllerInterface, ContextInterface
 {
-    private ?ViewInterface $view = null;
-
-    public function run(string $actionName, $request): ?ResponseHandlerInterface
+    public function run(string $actionName, $request)
     {
         if (!is_callable([$this, $actionName])) {
             throw new RuntimeException(sprintf('%s::%s() is not found.', get_class($this), $actionName));
         }
-        if ($this->beforeAction()) {
-            $responseHandler = $this->$actionName($request);
-            $this->afterAction($responseHandler);
-            return $responseHandler;
-        } else {
-            return $this->createResponseHandler();
+        if ($this->beforeAction($request)) {
+            $response = call_user_func([$this, $actionName], $request);
+            return $this->afterAction($response);
         }
+        return null;
     }
 
-    protected function getView(): ViewInterface
+    protected function setLayout(string $layout): void
     {
-        if ($this->view === null) {
-            $this->view = new View($this, Ep::getConfig()->viewPath);
-        }
-        return $this->view;
+        $this->getView()->setLayout($layout);
     }
 
-    protected function string($string): string
-    {
-        return $string;
-    }
+    protected abstract function beforeAction($request): bool;
 
-    protected function render(string $view, array $params = []): ViewInterface
-    {
-        return $this->getView()->render($view, $params);
-    }
+    protected abstract function afterAction($response);
 
-    protected function renderPartial(string $view, array $params = []): ViewInterface
-    {
-        return $this->getView()->renderPartial($view, $params);
-    }
-
-    protected abstract function createResponseHandler(): ResponseHandlerInterface;
-
-    protected abstract function beforeAction(): bool;
-
-    protected abstract function afterAction(?ResponseHandlerInterface $response): void;
+    protected abstract function getView(): ViewInterface;
 }

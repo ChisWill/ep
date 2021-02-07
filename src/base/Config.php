@@ -58,6 +58,10 @@ final class Config
      */
     public string $language = 'zh-CN';
     /**
+     * 运行时缓存目录地址
+     */
+    public string $runtimeDir = '@root/runtime';
+    /**
      * 项目秘钥
      */
     public string $secretKey = '';
@@ -77,9 +81,9 @@ final class Config
      * 
      * use FastRoute\RouteCollector;
      *
-     * $config->route = function (RouteCollector $route) {
-     *     $route->addGroup('/api', function (RouteCollector $r) {
-     *         $r->get('/error/index', 'error/index');
+     * function (RouteCollector $route) {
+     *     $route->addGroup('/api', function (RouteCollector $route) {
+     *         $route->get('/error/index', 'error/index');
      *     });
      * };
      * ```

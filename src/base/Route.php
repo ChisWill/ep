@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
+use RuntimeException;
 use Ep\Helper\Alias;
+use Ep\Standard\ControllerInterface;
 use Ep\Standard\RouteInterface;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
@@ -15,14 +17,14 @@ use function FastRoute\cachedDispatcher;
 class Route implements RouteInterface
 {
     private Config $config;
-    private array $capture = [];
+    private array $captureParams = [];
 
     public function __construct()
     {
         $this->config = Ep::getConfig();
     }
 
-    public function matchRule(string $path, string $method = 'GET'): array
+    public function matchRequest(string $path, string $method = 'GET'): array
     {
         return cachedDispatcher(function (RouteCollector $route) {
             $callback = $this->config->getRoute();
@@ -31,7 +33,7 @@ class Route implements RouteInterface
             }
             $route->addGroup($this->config->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
         }, [
-            'cacheFile' => Alias::get('@root/runtime/routeRules.cache'),
+            'cacheFile' => Alias::get($this->config->runtimeDir . '/__route/cacheFile'),
             'cacheDisabled' => $this->config->debug
         ])->dispatch($method, rtrim($path, '/') ?: '/');
     }
@@ -61,9 +63,9 @@ class Route implements RouteInterface
         $intersect = array_intersect_key($params, $match);
         $params = array_diff_key($params, $match);
         foreach ($intersect as $key => $value) {
-            $this->capture['<' . $key . '>'] = trim($value, '/');
+            $this->captureParams['<' . $key . '>'] = trim($value, '/');
         }
-        $handler = strtr($handler, $this->capture);
+        $handler = strtr($handler, $this->captureParams);
         return [$handler, $params];
     }
 
@@ -91,8 +93,16 @@ class Route implements RouteInterface
         return [$controllerName, $actionName];
     }
 
-    public function getCapture(): array
+    public function createController(string $controllerName): ControllerInterface
     {
-        return $this->capture;
+        if (!class_exists($controllerName)) {
+            throw new RuntimeException("{$controllerName} is not found.");
+        }
+        return Ep::getDi()->get($controllerName);
+    }
+
+    public function getCaptureParams(): array
+    {
+        return $this->captureParams;
     }
 }
