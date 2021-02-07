@@ -48,7 +48,7 @@ class File
      * @return boolean whether the directory is created successfully
      * @throws Exception if the directory could not be created (i.e. php error due to parallel changes)
      */
-    protected static function mkdir($path, $mode = 0775, $recursive = true)
+    protected static function mkdir(string $path, int $mode = 0775, bool $recursive = true): bool
     {
         if (is_dir($path)) {
             return true;

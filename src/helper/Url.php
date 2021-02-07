@@ -8,7 +8,7 @@ use Ep;
 
 class Url
 {
-    public static $signName = '_sign';
+    public static $signName = '__sign';
 
     /**
      * 根据已有地址，增加额外参数
@@ -18,7 +18,7 @@ class Url
      * @param  boolean $sign   是否添加h签名参数
      * @return string
      */
-    public static function addParams($url, $params = [], $sign = false)
+    public static function addParams(string $url, array $params = [], bool $sign = false): string
     {
         if ($sign === true) {
             $params[self::$signName] = self::getSign($params);
@@ -37,21 +37,21 @@ class Url
     /**
      * 检查 URL 地址是否被篡改过
      * 
-     * @param  array   $get GET 参数
+     * @param  array   $params 待检查参数
      * @return boolean
      */
-    public static function checkSign($get = [])
+    public static function checkSign(array $params = [])
     {
-        $old = $get[self::$signName] ?? '';
-        unset($get[self::$signName]);
-        $new = self::getSign($get);
+        $old = $params[self::$signName] ?? '';
+        unset($params[self::$signName]);
+        $new = self::getSign($params);
         return $old === $new;
     }
 
-    private static function getSign($params)
+    private static function getSign(array $params)
     {
-        $values = array_merge(array_values($params), [Ep::getConfig()->secretKey]);
-        return substr(md5(implode('', $values)), 3, 13);
+        ksort($params);
+        return substr(md5(implode('', array_keys($params)) . implode('', array_values($params)) . Ep::getConfig()->secretKey), 13, 28);
     }
 
     /**
@@ -60,7 +60,7 @@ class Url
      * @param  string $string
      * @return string
      */
-    public static function base64encode($string)
+    public static function base64encode(string $string): string
     {
         return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($string));
     }
@@ -71,7 +71,7 @@ class Url
      * @param  string $string
      * @return string
      */
-    public static function base64decode($string)
+    public static function base64decode(string $string): string
     {
         $string = str_replace(['-', '_'], ['+', '/'], $string);
         $mod4 = strlen($string) % 4;

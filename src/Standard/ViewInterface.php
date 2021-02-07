@@ -11,6 +11,4 @@ interface ViewInterface
     public function render(string $path, array $params = []): string;
 
     public function renderPartial(string $path, array $params = []): string;
-
-    public function setLayout(string $layout): void;
 }

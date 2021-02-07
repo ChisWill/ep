@@ -12,9 +12,9 @@ namespace Ep\Helper;
 class Date
 {
     /**
-     * 获得标准格式时间
+     * 获得标准格式化时间
      * 
-     * @param  int|null $timestamp 时间戳，默认当前时间
+     * @param  int|null $timestamp 时间戳，不传默认为当前时间
      * @return string              格式化后时间
      */
     public static function fromUnix(?int $timestamp = null): string

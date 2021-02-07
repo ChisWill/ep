@@ -6,4 +6,5 @@ namespace Ep\Web;
 
 class View extends \Ep\Base\View
 {
+    public string $title = '';
 }

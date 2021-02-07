@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Web;
 
-use RuntimeException;
-use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -13,6 +11,8 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
+use RuntimeException;
+use InvalidArgumentException;
 
 final class ServerRequestFactory
 {
@@ -99,26 +99,6 @@ final class ServerRequestFactory
         return $request->withBody($body);
     }
 
-    private function getHeadersFromGlobals(): array
-    {
-        if (function_exists('getallheaders')) {
-            $headers = getallheaders();
-            if ($headers === false) {
-                $headers = [];
-            }
-        } else {
-            $headers = [];
-            foreach ($_SERVER as $name => $value) {
-                if (strncmp($name, 'HTTP_', 5) === 0) {
-                    $name = str_replace(' ', '-', strtolower(str_replace('_', ' ', substr($name, 5))));
-                    $headers[$name] = $value;
-                }
-            }
-        }
-
-        return $headers;
-    }
-
     private function getUri(array $server): UriInterface
     {
         $uri = $this->uriFactory->createUri();
@@ -152,6 +132,26 @@ final class ServerRequestFactory
         }
 
         return $uri;
+    }
+
+    private function getHeadersFromGlobals(): array
+    {
+        if (function_exists('getallheaders')) {
+            $headers = getallheaders();
+            if ($headers === false) {
+                $headers = [];
+            }
+        } else {
+            $headers = [];
+            foreach ($_SERVER as $name => $value) {
+                if (strncmp($name, 'HTTP_', 5) === 0) {
+                    $name = str_replace(' ', '-', strtolower(str_replace('_', ' ', substr($name, 5))));
+                    $headers[$name] = $value;
+                }
+            }
+        }
+
+        return $headers;
     }
 
     private function getUploadedFilesArray(array $filesArray): array

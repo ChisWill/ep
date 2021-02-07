@@ -13,8 +13,8 @@ class Alias
     /**
      * 设置别名
      * 
-     * @param  string $alias 别名
-     * @param  string $path  路径或别名
+     * @param string $alias 别名
+     * @param string $path  路径或别名
      */
     public static function set(string $alias, string $path): void
     {
@@ -75,7 +75,7 @@ class Alias
     /**
      * 删除别名
      * 
-     * @param  string $alias 别名
+     * @param string $alias 别名
      */
     public static function remove(string $alias): void
     {

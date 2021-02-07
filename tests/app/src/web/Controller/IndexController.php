@@ -2,30 +2,35 @@
 
 namespace Ep\Tests\App\web\Controller;
 
-use Ep;
 use Ep\Helper\Alias;
-use Ep\Helper\Curl;
-use Ep\Standard\ContextInterface;
-use Ep\Standard\ControllerInterface;
-use Ep\Standard\ViewInterface;
+use Ep\Standard\ServerRequestInterface;
 use Ep\Tests\App\web\Model\User;
-use Ep\Web\View;
-use Psr\Http\Message\ServerRequestInterface;
-use Yiisoft\Injector\Injector;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Message;
 use Yiisoft\Log\Target\File\FileRotator;
 use Yiisoft\Log\Target\File\FileTarget;
-use Yiisoft\Validator\DataSetInterface;
-use Yiisoft\VarDumper\VarDumper;
 
 class IndexController extends \Ep\Web\Controller
 {
-    public function indexAction(ServerRequestInterface $request)
+    public function indexAction()
     {
-        $this->setLayout('a');
-
         return $this->render('index/index');
+    }
+
+    public function benchAction(ServerRequestInterface $request)
+    {
+        $start = microtime(true);
+        $startMem = memory_get_usage();
+        $count = 100;
+
+        for ($i = 0; $i < $count; $i++) {
+        }
+
+        $endMem = memory_get_usage();
+        $end = microtime(true);
+        $result = ($end - $start) * 1000 . '（ms）';
+        $result .= "\n" . ($endMem - $startMem);
+        test($result);
     }
 
     public function testAction()
@@ -45,10 +50,8 @@ class IndexController extends \Ep\Web\Controller
 
     public function redirectAction(ServerRequestInterface $request)
     {
-        $url = $request->getQueryParams()['url'] ?? '';
-        if (!$url) {
-            return $this->string("");
-        }
+        $url = $request->getQueryParams()['url'] ?? 'http://www.baidu.com';
+
         return $this->redirect($url);
     }
 

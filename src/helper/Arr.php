@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Helper;
 
-/**
- * 数组操作助手类
- *
- * @author ChisWill
- */
 class Arr
 {
     /**
@@ -93,10 +88,10 @@ class Arr
      * // $array = ['options' => [1, 2]];
      * ```
      *
-     * @param  array      $array    the array to extract value from
-     * @param  string     $key      key name of the array element
-     * @param  mixed      $default  the default value to be returned if the specified key does not exist
-     * @return mixed|null           the value of the element if found, default value otherwise
+     * @param  array  $array   the array to extract value from
+     * @param  string $key     key name of the array element
+     * @param  mixed  $default the default value to be returned if the specified key does not exist
+     * @return mixed           the value of the element if found, default value otherwise
      */
     public static function remove(array &$array, string $key, $default = null)
     {
@@ -173,7 +168,7 @@ class Arr
      * @param  array $args 要合并的数组们
      * @return array       合并后的数组
      */
-    public static function merge(...$args)
+    public static function merge(...$args): array
     {
         $res = array_shift($args);
         while (!empty($args)) {
@@ -197,10 +192,10 @@ class Arr
     }
 
     /**
-     * 数组转 xml
+     * 数组转 XML
      * 
      * @param  array  $array 待转换数组
-     * @return string        xml
+     * @return string        XML
      */
     public static function toXml(array $array): string
     {
@@ -217,9 +212,9 @@ class Arr
     }
 
     /**
-     * xml 转数组
+     * XML 转数组
      * 
-     * @param  string $xml 待转换 xml 字符串
+     * @param  string $xml 待转换 XML 字符
      * @return array       数组
      */
     public static function fromXml(string $xml): array

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
-use RuntimeException;
 use Ep\Helper\Alias;
 use Ep\Standard\ControllerInterface;
 use Ep\Standard\RouteInterface;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
+use RuntimeException;
 
 use function FastRoute\cachedDispatcher;
 

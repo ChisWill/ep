@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
+use Ep\Helper\Alias;
 use Throwable;
 use RuntimeException;
-use Ep\Helper\Alias;
 
 abstract class Application
 {

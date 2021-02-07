@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Helper;
 
-/**
- * 字符串操作助手类
- *
- * @author ChisWill
- */
 class Str
 {
     /**
@@ -35,14 +30,14 @@ class Str
      * @param  string  $type   随机码的类型
      * @return string          生成后的随机码
      */
-    public static function random(int $length = 16, string $type = 'w'): string
+    public static function random(int $length = 8, string $type = 'w'): string
     {
         $nums = '0123456789';
-        $alps = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $alps = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
         $oths = '!@#$%^&*()-_ []{}<>~`+=,.;:/?|';
         $chars = '';
         switch ($type) {
-            case 'n':
+            case 'd':
                 $chars = $nums;
                 break;
             case 'a':

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Ep\base;
 
-use RuntimeException;
+use Ep;
 use Ep\Standard\ViewInterface;
 use Ep\Standard\ContextInterface;
 use Ep\Standard\ControllerInterface;
+use RuntimeException;
 
 abstract class Controller implements ControllerInterface, ContextInterface
 {
@@ -17,15 +18,9 @@ abstract class Controller implements ControllerInterface, ContextInterface
             throw new RuntimeException(sprintf('%s::%s() is not found.', get_class($this), $actionName));
         }
         if ($this->beforeAction($request)) {
-            $response = call_user_func([$this, $actionName], $request);
+            $response = Ep::getInjector()->invoke([$this, $actionName], [$request]);
             return $this->afterAction($response);
         }
-        return null;
-    }
-
-    protected function setLayout(string $layout): void
-    {
-        $this->getView()->setLayout($layout);
     }
 
     protected abstract function beforeAction($request): bool;

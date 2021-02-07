@@ -6,6 +6,7 @@ namespace Ep\Web;
 
 use Ep;
 use Ep\Standard\RouteInterface;
+use Yiisoft\Http\Method;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -13,14 +14,19 @@ class Application extends \Ep\Base\Application
 {
     protected function handle(): void
     {
-        $response = $this->handleRequest($this->createRequest());
+        $request = $this->createRequest();
+        $response = $this->handleRequest($request);
         if ($response instanceof ResponseInterface) {
+            $emitter = new SapiEmitter();
+            $emitter->emit($response, $request->getMethod() === Method::HEAD);
         }
     }
 
     protected function createRequest(): ServerRequestInterface
     {
-        return Ep::getDi()->get(ServerRequestFactory::class)->createFromGlobals();
+        return Ep::getDi()
+            ->get(ServerRequestFactory::class)
+            ->createFromGlobals();
     }
 
     protected function handleRequest(ServerRequestInterface $request): ?ResponseInterface
@@ -31,6 +37,7 @@ class Application extends \Ep\Base\Application
             $request = $request->withQueryParams($params);
         }
         [$controllerClass, $actionName] = $route->parseHandler($handler);
-        return $route->createController($controllerClass)->run($actionName, $request);
+        return $route->createController($controllerClass)
+            ->run($actionName, $request);
     }
 }

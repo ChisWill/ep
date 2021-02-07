@@ -54,7 +54,7 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
     public static function findModel($condition): ActiveRecord
     {
         if (empty($condition)) {
-            return new static;
+            return new static();
         } else {
             if (is_scalar($condition)) {
                 $condition = ['id' => $condition];

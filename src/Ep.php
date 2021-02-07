@@ -18,7 +18,7 @@ final class Ep
 
     public static function init(array $config = [])
     {
-        self::$di = new CompositeContainer;
+        self::$di = new CompositeContainer();
         self::$config = new Config($config);
         self::$params = self::$config->getParams();
     }

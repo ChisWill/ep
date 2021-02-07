@@ -6,6 +6,8 @@ namespace Ep\Web;
 
 use Ep;
 use Ep\Standard\ViewInterface;
+use Yiisoft\Http\Header;
+use Yiisoft\Http\Status;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -29,6 +31,7 @@ class Controller extends \Ep\Base\Controller
 
     /**
      * @param  ResponseInterface $response
+     * 
      * @return ResponseInterface
      */
     protected function afterAction($response)
@@ -49,7 +52,7 @@ class Controller extends \Ep\Base\Controller
     protected function render(string $view, array $params = []): ResponseInterface
     {
         $response = $this->responseFactory->createResponse();
-        $this->responseFactory->createResponse()->getBody()->write($this->getView()->render($view, $params));
+        $response->getBody()->write($this->getView()->render($view, $params));
         return $response;
     }
 
@@ -60,9 +63,11 @@ class Controller extends \Ep\Base\Controller
         return $response;
     }
 
-    protected function redirect(string $url, $statusCode = 302): ResponseInterface
+    protected function redirect(string $url, $statusCode = Status::FOUND): ResponseInterface
     {
-        return $this->responseFactory->createResponse($statusCode)->withHeader('Location', $url);
+        return $this->responseFactory
+            ->createResponse($statusCode)
+            ->withHeader(Header::LOCATION, $url);
     }
 
 

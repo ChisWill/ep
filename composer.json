@@ -13,7 +13,8 @@
         "yiisoft/log-target-file": "^3.0",
         "yiisoft/db-mysql": "^3.0",
         "yiisoft/active-record": "^3.0",
-        "yiisoft/validator": "^3.0"
+        "yiisoft/validator": "^3.0",
+        "yiisoft/http": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.4"
