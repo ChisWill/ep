@@ -7,6 +7,7 @@ use Yiisoft\Di\Container;
 use Yiisoft\Di\CompositeContainer;
 use Yiisoft\Injector\Injector;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 final class Ep
 {
@@ -23,7 +24,7 @@ final class Ep
         self::$params = self::$config->getParams();
     }
 
-    public static function setDi(array $definitions, array $providers = []): void
+    public static function setDi(array $definitions = [], array $providers = []): void
     {
         self::$di->attach(new Container($definitions, $providers));
     }
@@ -36,6 +37,11 @@ final class Ep
     public static function getInjector(): Injector
     {
         return new Injector(self::getDi());
+    }
+
+    public static function getLogger(?string $name = null): LoggerInterface
+    {
+        return self::$di->get($name ?: LoggerInterface::class);
     }
 
     public static function setConfig(array $config): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
+use Yiisoft\Http\Method;
 use Closure;
 use InvalidArgumentException;
 
@@ -38,9 +39,21 @@ final class Config
      */
     public string $defaultAction = 'index';
     /**
+     * Mysql dsn
+     */
+    public string $mysqlDsn = '';
+    /**
+     * Mysql 用户
+     */
+    public string $mysqlUsername = '';
+    /**
+     * Mysql 密码
+     */
+    public string $mysqlPassword = '';
+    /**
      * 默认路由规则
      */
-    public array $defaultRoute = [['GET', 'POST'], '{prefix:[\w/]*?}{controller:/?[a-zA-Z]\w*|}{action:/?[a-zA-Z]\w*|}', '<prefix>/<controller>/<action>'];
+    public array $defaultRoute = [[Method::GET, Method::POST], '{prefix:[\w/]*?}{controller:/?[a-zA-Z]\w*|}{action:/?[a-zA-Z]\w*|}', '<prefix>/<controller>/<action>'];
     /**
      * 是否开启调试模式
      */

@@ -14,23 +14,28 @@ use Psr\Http\Message\UriInterface;
 use RuntimeException;
 use InvalidArgumentException;
 
-final class ServerRequestFactory
+class ServerRequestFactory implements ServerRequestFactoryInterface
 {
-    private ServerRequestFactoryInterface $serverRequestFactory;
     private UriFactoryInterface $uriFactory;
     private UploadedFileFactoryInterface $uploadedFileFactory;
     private StreamFactoryInterface $streamFactory;
 
     public function __construct(
-        ServerRequestFactoryInterface $serverRequestFactory,
         UriFactoryInterface $uriFactory,
         UploadedFileFactoryInterface $uploadedFileFactory,
         StreamFactoryInterface $streamFactory
     ) {
-        $this->serverRequestFactory = $serverRequestFactory;
         $this->uriFactory = $uriFactory;
         $this->uploadedFileFactory = $uploadedFileFactory;
         $this->streamFactory = $streamFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function createServerRequest(string $method, $uri, array $serverParams = []): ServerRequestInterface
+    {
+        return new ServerRequest($serverParams, [], [], [], null, $method, $uri, [], 'php://temp');
     }
 
     public function createFromGlobals(): ServerRequestInterface
@@ -66,7 +71,7 @@ final class ServerRequestFactory
 
         $uri = $this->getUri($server);
 
-        $request = $this->serverRequestFactory->createServerRequest($method, $uri, $server);
+        $request = $this->createServerRequest($method, $uri, $server);
 
         foreach ($headers as $name => $value) {
             $request = $request->withAddedHeader($name, $value);

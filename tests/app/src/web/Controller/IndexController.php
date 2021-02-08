@@ -1,6 +1,6 @@
 <?php
 
-namespace Ep\Tests\App\web\Controller;
+namespace Ep\Tests\App\Web\Controller;
 
 use Ep\Helper\Alias;
 use Ep\Standard\ServerRequestInterface;
@@ -37,38 +37,6 @@ class IndexController extends \Ep\Web\Controller
     {
     }
 
-    public function requestAction(ServerRequestInterface $request)
-    {
-        tes('Method：' . $request->getMethod());
-        tes('All GET：', $request->getQueryParams());
-        tes('POST String：' . $request->getBody()->getContents());
-        tes('Cookies：', $request->getCookieParams());
-        tes('Host：' . $request->getUri()->getHost());
-        tes('Path：' . $request->getUri()->getPath());
-        tes('Post Array：', $request->getParsedBody());
-    }
-
-    public function redirectAction(ServerRequestInterface $request)
-    {
-        $url = $request->getQueryParams()['url'] ?? 'http://www.baidu.com';
-
-        return $this->redirect($url);
-    }
-
-    public function log($req)
-    {
-        $targets = [];
-        $rotator = new FileRotator(1, 2);
-        $filePath = Alias::get('@root/runtime/logs/tmp.log');
-        $target = new FileTarget($filePath, $rotator);
-        $target->setFormat(function (Message $message, array $commonContext): string {
-            return 'ergerg';
-        });
-        $targets[] = $target;
-        $logger = new Logger($targets);
-        $logger->info('oh no ', ['lala' => 'wefij']);
-    }
-
     public function validateAction()
     {
         $user = User::findModel(11);
@@ -86,45 +54,14 @@ class IndexController extends \Ep\Web\Controller
         $user = User::findModel($request->getAttribute('id'));
         if ($user->load($request)) {
             if (!$user->validate()) {
-                return $this->jsonError($user->getErrors());
+                return $this->json($user->getErrors());
             }
             if ($user->save()) {
-                return $this->jsonSuccess();
+                return $this->json();
             } else {
-                return $this->jsonError('wrong');
+                return $this->json(['error' => 1]);
             }
         }
         return $this->render('');
-    }
-
-    public function jsonAction(ServerRequestInterface $request)
-    {
-        return $this->jsonSuccess(['msg' => 'hello', 'url' => '']);
-    }
-
-    public function db()
-    {
-        $query = User::find();
-        $user = $query->where(['id' => 11])->one();
-        $user->username = mt_rand();
-        $r = $user->save();
-        var_dump($r);
-
-        $subQuery = User::find();
-        $subQuery->where(['state' => 1]);
-        $query = User::find();
-        $query->from(['s' => $subQuery])->where(['>', 'age', 0]);
-        $sql = $query->getRawSql();
-        $result = $query->asArray()->all();
-        tes($sql);
-        test($result);
-    }
-
-    public function yaml()
-    {
-        $path = '';
-        $yaml = file_get_contents($path);
-        $r = yaml_parse($yaml);
-        test($r);
     }
 }

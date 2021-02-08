@@ -33,8 +33,8 @@ class Route implements RouteInterface
             }
             $route->addGroup($this->config->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
         }, [
-            'cacheFile' => Alias::get($this->config->runtimeDir . '/__route/cacheFile'),
-            'cacheDisabled' => $this->config->debug
+            'cacheFile' => Alias::get($this->config->runtimeDir . '/route.cache'),
+            'cacheDisabled' => !$this->config->debug
         ])->dispatch($method, rtrim($path, '/') ?: '/');
     }
 

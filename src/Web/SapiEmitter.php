@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ep\Web;
 
+use Ep\Exception\HeadersHaveBeenSentException;
 use Yiisoft\Http\Status;
-use Yiisoft\Yii\Web\Exception\HeadersHaveBeenSentException;
 use Psr\Http\Message\ResponseInterface;
 use InvalidArgumentException;
 

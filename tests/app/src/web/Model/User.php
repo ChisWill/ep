@@ -1,8 +1,10 @@
 <?php
 
-namespace Ep\Tests\App\web\Model;
+namespace Ep\Tests\App\Web\Model;
 
+use Ep;
 use Ep\Db\ActiveRecord;
+use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Validator\Rule\HasLength;
 use Yiisoft\Validator\Rule\MatchRegularExpression;
 use Yiisoft\Validator\Rule\Number;

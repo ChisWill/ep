@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ep\Helper;
 
 use Closure;
@@ -126,7 +128,7 @@ class Curl
      */
     public static function postMulti($urls, array $data, array $options = [], int $batch = 1): array
     {
-        $params = static::initParams($urls, $data, $options, $batch, function ($option, $url, $data) {
+        $params = static::initParams($urls, $data, $options, $batch, static function ($option, $url, $data) {
             $option[CURLOPT_URL] = $url;
             $option[CURLOPT_CUSTOMREQUEST] = 'POST';
             $option[CURLOPT_POSTFIELDS] = $data;
@@ -154,7 +156,7 @@ class Curl
      */
     public static function getMulti($urls, array $options = [], int $batch = 1): array
     {
-        $params = static::initParams($urls, [], $options, $batch, function ($option, $url) {
+        $params = static::initParams($urls, [], $options, $batch, static function ($option, $url) {
             $option[CURLOPT_URL] = $url;
             $option[CURLOPT_CUSTOMREQUEST] = 'GET';
             return $option;

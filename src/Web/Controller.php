@@ -49,18 +49,32 @@ class Controller extends \Ep\Base\Controller
         return $this->view;
     }
 
+    protected function string(string $data = ''): ResponseInterface
+    {
+        $response = $this->responseFactory
+            ->createResponse(Status::OK)
+            ->withHeader(Header::CONTENT_TYPE, 'text/html; charset=UTF-8');
+        $response->getBody()->write($data);
+        return $response;
+    }
+
+    protected function json(array $data = []): ResponseInterface
+    {
+        $response = $this->responseFactory
+            ->createResponse(Status::OK)
+            ->withHeader(Header::CONTENT_TYPE, 'application/json; charset=UTF-8');
+        $response->getBody()->write(json_encode($data));
+        return $response;
+    }
+
     protected function render(string $view, array $params = []): ResponseInterface
     {
-        $response = $this->responseFactory->createResponse();
-        $response->getBody()->write($this->getView()->render($view, $params));
-        return $response;
+        return $this->string($this->getView()->render($view, $params));
     }
 
     protected function renderPartial(string $view, array $params = []): ResponseInterface
     {
-        $response = $this->responseFactory->createResponse();
-        $response->getBody()->write($this->getView()->renderPartial($view, $params));
-        return $response;
+        return $this->string($this->getView()->renderPartial($view, $params));
     }
 
     protected function redirect(string $url, $statusCode = Status::FOUND): ResponseInterface
@@ -68,14 +82,5 @@ class Controller extends \Ep\Base\Controller
         return $this->responseFactory
             ->createResponse($statusCode)
             ->withHeader(Header::LOCATION, $url);
-    }
-
-
-    protected function jsonSuccess()
-    {
-    }
-
-    protected function jsonError()
-    {
     }
 }
