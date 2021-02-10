@@ -23,7 +23,7 @@ class DemoController extends Controller
                     'body' => $body,
                     'get' => $get
                 ];
-            } else if ($get) {
+            } elseif ($get) {
                 $return = $get;
             } else {
                 $return = ['hello' => 'world'];

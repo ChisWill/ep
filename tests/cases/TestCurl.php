@@ -16,22 +16,22 @@ class TestCurl extends TestCase
             [
                 'url' => $baseUrl . '',
                 'data' => '',
-                'expected' => ['hello' => 'world']
+                'expect' => ['hello' => 'world']
             ], [
                 'url' => $baseUrl . '?name=peter',
                 'data' => '',
-                'expected' => ['name' => 'peter']
+                'expect' => ['name' => 'peter']
             ], [
                 'url' => $baseUrl . '?name=peter2',
                 'data' => 'age=123',
-                'expected' => [
+                'expect' => [
                     'body' => 'age=123',
                     'get' => ['name' => 'peter2']
                 ]
             ], [
                 'url' => $baseUrl . '?name=peter3',
                 'data' => 'age=123',
-                'expected' => [
+                'expect' => [
                     'body' => 'age=123',
                     'get' => ['name' => 'peter3']
                 ]
@@ -42,10 +42,10 @@ class TestCurl extends TestCase
     /**
      * @dataProvider singleGetProvider
      */
-    public function testSingleGet($url, $data, $expected)
+    public function testSingleGet($url, $data, $expect)
     {
         $result = Curl::get($url, $data);
-        $this->assertSame($expected, json_decode($result, true));
+        $this->assertSame($expect, json_decode($result, true));
     }
 
     public function singlePostProvider(): array
@@ -57,7 +57,7 @@ class TestCurl extends TestCase
                 'data' => [
                     'title' => 'good'
                 ],
-                'expected' => [
+                'expect' => [
                     'post' => ['title' => 'good'],
                     'get' => [],
                 ]
@@ -66,7 +66,7 @@ class TestCurl extends TestCase
                 'data' => [
                     'title' => 'good'
                 ],
-                'expected' => [
+                'expect' => [
                     'post' => ['title' => 'good'],
                     'get' => ['name' => 'mary'],
                 ]
@@ -77,10 +77,10 @@ class TestCurl extends TestCase
     /**
      * @dataProvider singlePostProvider
      */
-    public function testSinglePost($url, $data, $expected)
+    public function testSinglePost($url, $data, $expect)
     {
         $result = Curl::post($url, $data);
-        $this->assertSame($expected, json_decode($result, true));
+        $this->assertSame($expect, json_decode($result, true));
     }
 
     public function multiGetProvider(): array
@@ -93,14 +93,14 @@ class TestCurl extends TestCase
                 'urls' => $baseUrl,
                 'data' => '',
                 'batch' => 1,
-                'expected' => [
+                'expect' => [
                     ['hello' => 'world']
                 ]
             ], [
                 'urls' => $baseUrl . '?name=peter',
                 'data' => 'age=1',
                 'batch' => 1,
-                'expected' => [
+                'expect' => [
                     [
                         'body' => 'age=1',
                         'get' => ['name' => 'peter']
@@ -114,7 +114,7 @@ class TestCurl extends TestCase
                 'urls' => $baseUrl . '?name=bob',
                 'data' => 'age=12',
                 'batch' => 2,
-                'expected' => [
+                'expect' => [
                     [
                         'body' => 'age=12',
                         'get' => ['name' => 'bob']
@@ -128,23 +128,23 @@ class TestCurl extends TestCase
                 'urls' => [$baseUrl, $singleProvider[$n = mt_rand(0, $count)]['url']],
                 'data' => ['', $singleProvider[$n]['data']],
                 'batch' => 1,
-                'expected' => [
+                'expect' => [
                     ['hello' => 'world'],
-                    $singleProvider[$n]['expected']
+                    $singleProvider[$n]['expect']
                 ]
             ], [
                 'urls' => [$singleProvider[$m = mt_rand(0, $count)]['url'], $singleProvider[$n = mt_rand(0, $count)]['url']],
                 'data' => [$singleProvider[$m]['data'], $singleProvider[$n]['data'], ''],
                 'batch' => 13,
-                'expected' => [
-                    $singleProvider[$m]['expected'],
-                    $singleProvider[$n]['expected']
+                'expect' => [
+                    $singleProvider[$m]['expect'],
+                    $singleProvider[$n]['expect']
                 ]
             ], [
                 'urls' => $baseUrl . '?name=sai',
                 'data' => ['a=1', 'b=1', 'c=1'],
                 'batch' => 2,
-                'expected' => [
+                'expect' => [
                     [
                         'body' => 'a=1',
                         'get' => ['name' => 'sai']
@@ -162,7 +162,7 @@ class TestCurl extends TestCase
                 'urls' => [$baseUrl . '?name=sai', $baseUrl . '?name=sai2', $baseUrl . '?name=sai3'],
                 'data' => 'age=3',
                 'batch' => 2,
-                'expected' => [
+                'expect' => [
                     [
                         'body' => 'age=3',
                         'get' => ['name' => 'sai']
@@ -183,11 +183,11 @@ class TestCurl extends TestCase
     /**
      * @dataProvider multiGetProvider
      */
-    public function testMultiGet($urls, $data, $batch, $expected)
+    public function testMultiGet($urls, $data, $batch, $expect)
     {
         $result = Curl::getMulti($urls, $data, [], $batch);
         foreach ($result as $k => $ret) {
-            $this->assertSame($expected[$k], json_decode($ret, true));
+            $this->assertSame($expect[$k], json_decode($ret, true));
         }
     }
 
@@ -201,7 +201,7 @@ class TestCurl extends TestCase
                 'urls' => $baseUrl . '?a=1',
                 'data' => ['desc' => 'hello'],
                 'batch' => 1,
-                'expected' => [
+                'expect' => [
                     [
                         'post' => [
                             'desc' => 'hello'
@@ -215,7 +215,7 @@ class TestCurl extends TestCase
                 'urls' => $baseUrl . '?a=1',
                 'data' => ['desc' => 'hello'],
                 'batch' => 2,
-                'expected' => [
+                'expect' => [
                     [
                         'post' => [
                             'desc' => 'hello'
@@ -237,7 +237,7 @@ class TestCurl extends TestCase
                 'urls' => $baseUrl . '?a=1',
                 'data' => [['desc' => 'hello'], ['title' => 'wolrd']],
                 'batch' => 12,
-                'expected' => [
+                'expect' => [
                     [
                         'post' => [
                             'desc' => 'hello'
@@ -258,7 +258,7 @@ class TestCurl extends TestCase
                 'urls' => [$baseUrl . '?a=1', $baseUrl . '?a=2'],
                 'data' => ['desc' => 'hello'],
                 'batch' => 12,
-                'expected' => [
+                'expect' => [
                     [
                         'post' => [
                             'desc' => 'hello'
@@ -279,9 +279,9 @@ class TestCurl extends TestCase
                 'urls' => [$singleProvider[$m = mt_rand(0, $count)]['url'], $singleProvider[$n = mt_rand(0, $count)]['url']],
                 'data' => [$singleProvider[$m]['data'], $singleProvider[$n]['data'], ''],
                 'batch' => 13,
-                'expected' => [
-                    $singleProvider[$m]['expected'],
-                    $singleProvider[$n]['expected']
+                'expect' => [
+                    $singleProvider[$m]['expect'],
+                    $singleProvider[$n]['expect']
                 ]
             ],
         ];
@@ -290,11 +290,11 @@ class TestCurl extends TestCase
     /**
      * @dataProvider multiPostProvider
      */
-    public function testMultiPost($urls, $data, $batch, $expected)
+    public function testMultiPost($urls, $data, $batch, $expect)
     {
         $result = Curl::postMulti($urls, $data, [], $batch);
         foreach ($result as $k => $ret) {
-            $this->assertSame($expected[$k], json_decode($ret, true));
+            $this->assertSame($expect[$k], json_decode($ret, true));
         }
     }
 }

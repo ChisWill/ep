@@ -26,7 +26,7 @@ final class Ep
     {
         self::$config = new Config($config);
 
-        Alias::set('@root', self::$config->basePath);
+        Alias::set('@root', self::$config->rootPath);
         Alias::set('@ep', dirname(__DIR__, 1));
 
         self::$params = self::$config->getParams();

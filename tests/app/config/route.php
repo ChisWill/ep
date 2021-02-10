@@ -1,13 +1,11 @@
 <?php
 
+use Ep\Tests\App\Controller\SiteController;
 use FastRoute\RouteCollector;
 
 return function (RouteCollector $route) {
+    $route->get('/site/info', [SiteController::class, 'userInfo']);
     $route->addGroup('/api', function (RouteCollector $r) {
-        $r->get('/user/list', 'api/user/list');
-        $r->get('/user/{id:\d+}', 'api/user/detail');
-    });
-    $route->addGroup('/shop{sid:\d+}', function (RouteCollector $r) {
-        $r->get('/{ctrl:\w+}/{act:\w+}', 'shop/<ctrl>/<act>');
+        $r->get('/v{ver:\d+}/{ctrl:[a-zA-Z]\w*}/{act:[a-zA-Z]\w*}', 'api//v<ver>/<ctrl>/<act>');
     });
 };

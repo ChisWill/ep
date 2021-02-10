@@ -19,7 +19,7 @@ interface RouteInterface
      * 
      * @return string[]
      */
-    public function parseHandler(string $handler): array;
+    public function parseHandler($handler): array;
     /**
      * 创建控制器
      */

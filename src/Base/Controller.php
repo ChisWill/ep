@@ -18,6 +18,7 @@ abstract class Controller implements ControllerInterface, ContextInterface
      */
     public function run(string $action, $request)
     {
+        $action .= Ep::getConfig()->actionSuffix;
         if (!is_callable([$this, $action])) {
             throw new RuntimeException(sprintf('%s::%s() is not found.', get_class($this), $action));
         }

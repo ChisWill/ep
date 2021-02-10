@@ -56,8 +56,11 @@ final class Route implements RouteInterface
         return [$handler, $params];
     }
 
-    private function replaceHandler(string $handler, array $params): array
+    private function replaceHandler($handler, array $params): array
     {
+        if (is_array($handler)) {
+            return [$handler, $params];
+        }
         preg_match_all('/<(\w+)>/', $handler, $matches);
         $match = array_flip($matches[1]);
         $intersect = array_intersect_key($params, $match);
@@ -70,8 +73,11 @@ final class Route implements RouteInterface
         return [$handler, $params];
     }
 
-    public function parseHandler(string $handler): array
+    public function parseHandler($handler): array
     {
+        if (is_array($handler)) {
+            return $handler;
+        }
         $pieces = explode('/', $handler);
         $prefix = '';
         switch (count($pieces)) {
@@ -89,8 +95,12 @@ final class Route implements RouteInterface
                 $prefix = implode('\\', $pieces);
                 break;
         }
-        $controller = sprintf('%s\\%s%s\\%s%s', $this->config->appNamespace, $prefix ? $prefix . '\\' : '', $this->config->controllerDirAndSuffix, ucfirst($controller), $this->config->controllerDirAndSuffix);
-        $action = $action . $this->config->actionSuffix;
+        if ($prefix) {
+            $ns = strpos($prefix, '\\\\') === false ? $prefix . '\\' . $this->config->controllerDirAndSuffix : str_replace('\\\\', '\\' . $this->config->controllerDirAndSuffix . '\\', $prefix);
+        } else {
+            $ns = $this->config->controllerDirAndSuffix;
+        }
+        $controller = sprintf('%s\\%s\\%s', $this->config->appNamespace, $ns, ucfirst($controller) . $this->config->controllerDirAndSuffix);
         return [$controller, $action];
     }
 

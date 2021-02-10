@@ -2,7 +2,7 @@
 
 return [
     'appNamespace' => 'Ep\Tests\App',
-    'basePath' => dirname(__DIR__),
+    'rootPath' => dirname(__DIR__),
     'mysqlDsn' => 'mysql:host=127.0.0.1;dbname=test',
     'mysqlUsername' => 'root',
     'mysqlPassword' => '',

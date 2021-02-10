@@ -15,21 +15,29 @@ final class Config
      */
     public string $appNamespace = 'App';
     /**
-     * Action 后缀
+     * 项目根目录地址，必填
      */
-    public string $actionSuffix = 'Action';
+    public string $rootPath = '';
     /**
-     * 项目根目录地址
-     */
-    public string $basePath = '';
-    /**
-     * 项目根 URL，必须以 / 开头
+     * 项目路由的根 URL，必须以 / 开头
      */
     public string $baseUrl = '/';
+    /**
+     * 是否开启调试模式
+     */
+    public bool $debug = false;
+    /**
+     * 项目运行的当前环境
+     */
+    public string $env = 'prod';
     /**
      * 控制器所在文件夹名以及类名后缀，强制统一
      */
     public string $controllerDirAndSuffix = 'Controller';
+    /**
+     * Action 后缀
+     */
+    public string $actionSuffix = 'Action';
     /**
      * 默认 Controller
      */
@@ -38,6 +46,22 @@ final class Config
      * 默认 Action
      */
     public string $defaultAction = 'index';
+    /**
+     * 视图文件夹地址，支持从路由中获取参数，获取不到时将自动忽略
+     */
+    public string $viewPath = '@root/views/<prefix>';
+    /**
+     * 运行时缓存目录地址
+     */
+    public string $runtimeDir = '@root/runtime';
+    /**
+     * 默认的错误处理器
+     */
+    public string $errorHandler = 'error/index';
+    /**
+     * 默认路由规则
+     */
+    public array $defaultRoute = [[Method::GET, Method::POST], '{prefix:[\w/]*?}{controller:/?[a-zA-Z]\w*|}{action:/?[a-zA-Z]\w*|}', '<prefix>/<controller>/<action>'];
     /**
      * Mysql dsn
      */
@@ -50,26 +74,6 @@ final class Config
      * Mysql 密码
      */
     public string $mysqlPassword = '';
-    /**
-     * 默认路由规则
-     */
-    public array $defaultRoute = [[Method::GET, Method::POST], '{prefix:[\w/]*?}{controller:/?[a-zA-Z]\w*|}{action:/?[a-zA-Z]\w*|}', '<prefix>/<controller>/<action>'];
-    /**
-     * 是否开启调试模式
-     */
-    public bool $debug = false;
-    /**
-     * 项目运行的当前环境
-     */
-    public string $env = 'prod';
-    /**
-     * 默认的错误处理器
-     */
-    public string $errorHandler = 'error/index';
-    /**
-     * 当前语言
-     */
-    public string $language = 'zh-CN';
     /**
      * Redis Host
      */
@@ -87,17 +91,13 @@ final class Config
      */
     public ?string $redisPassword = null;
     /**
-     * 运行时缓存目录地址
-     */
-    public string $runtimeDir = '@root/runtime';
-    /**
-     * 秘钥
+     * 秘钥，必填
      */
     public string $secretKey = '';
     /**
-     * 视图文件夹地址，支持从路由中获取参数，获取不到时将自动忽略
+     * 当前语言
      */
-    public string $viewPath = '@root/views/<prefix>';
+    public string $language = 'zh-CN';
     /**
      * di 配置
      */
@@ -132,8 +132,8 @@ final class Config
         foreach ($config as $key => $val) {
             $this->$key = $val;
         }
-        if ($this->basePath === '') {
-            throw new InvalidArgumentException('The "basePath" configuration is required.');
+        if ($this->rootPath === '') {
+            throw new InvalidArgumentException('The "rootPath" configuration is required.');
         }
         if ($this->secretKey === '') {
             throw new InvalidArgumentException('The "secretKey" configuration is required.');

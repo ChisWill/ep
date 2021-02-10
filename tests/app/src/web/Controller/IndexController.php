@@ -9,7 +9,7 @@ class IndexController extends \Ep\Web\Controller
 {
     public function indexAction()
     {
-        return $this->render('index/index');
+        return $this->render('index');
     }
 
     public function profilerAction()
