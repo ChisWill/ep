@@ -7,11 +7,11 @@ namespace Ep\Helper;
 use Closure;
 
 /**
- * RESTful Api 的快捷调用助手类
+ * RESTful Api 助手类，缩写了3个常用参数
  *
  * [options]:
- * -format: 返回数据类型，可选范围：json|xml
- * -timeout: 执行最大时间，默认为1秒，可输入小数
+ * -format: 返回数据类型，可选范围：json|xml，默认json
+ * -timeout: 执行最大时间，可输入小数，默认为10秒
  * -header: 设置头信息参数
  * 
  * ps.其他 curl 的参数，通过 $options 参数直接按键值对方式传入即可
@@ -26,7 +26,8 @@ class Curl
      * @param  string       $url     请求地址
      * @param  string|array $data    字符串格式为请求体数据，数组格式为curl选项
      * @param  array        $options curl选项
-     * @return string                响应结果
+     * 
+     * @return string
      */
     public static function get(string $url, $data = '', array $options = []): string
     {
@@ -39,9 +40,7 @@ class Curl
 
         curl_setopt($handle->ch, CURLOPT_URL, $url);
         curl_setopt($handle->ch, CURLOPT_CUSTOMREQUEST, 'GET');
-        if ($data) {
-            curl_setopt($handle->ch, CURLOPT_POSTFIELDS, $data);
-        }
+        curl_setopt($handle->ch, CURLOPT_POSTFIELDS, $data);
 
         $result = $handle->exec();
 
@@ -56,7 +55,8 @@ class Curl
      * @param  string       $url     请求地址
      * @param  string|array $data    请求体数据
      * @param  array        $options curl选项
-     * @return string                响应结果
+     * 
+     * @return string
      */
     public static function post(string $url, $data = [], array $options = []): string
     {
@@ -79,7 +79,8 @@ class Curl
      * @param  string       $url     请求地址
      * @param  string|array $data    请求体数据
      * @param  array        $options curl选项
-     * @return string                响应结果
+     * 
+     * @return string
      */
     public static function put(string $url, $data = [], array $options = []): string
     {
@@ -101,6 +102,7 @@ class Curl
      * 
      * @param  string  $url     请求地址
      * @param  array   $options curl选项
+     * 
      * @return string           响应结果
      */
     public static function delete(string $url, array $options = []): string
@@ -123,7 +125,7 @@ class Curl
      * @param  array|string $urls     一维数组时，表示请求多个地址
      * @param  array        $data     二维数组时，表示使用多个请求参数
      * @param  array        $options  二维数组时，表示使用多个选项
-     * @param  int          $batch    当设置值大于1时，表示直接使用以上参数值，此时以上参数必须为单个值，以发起批量请求
+     * @param  int          $batch    当设置值大于1时，且以上参数都为单值时，则以同样配置发起批量请求
      * @return array
      */
     public static function postMulti($urls, array $data, array $options = [], int $batch = 1): array
@@ -150,15 +152,18 @@ class Curl
      * 模拟并发 get，支持一次执行多批次任务
      *
      * @param  array|string $urls     一维数组时，表示请求多个地址
+     * @param  array|string $data     二维数组时，表示使用多个请求体数据
      * @param  array        $options  二维数组时，表示使用多个选项
-     * @param  int          $batch    当设置值大于1时，表示直接使用以上参数值，此时以上参数必须为单个值，以发起批量请求
+     * @param  int          $batch    当设置值大于1时，且以上参数都为单值时，则以同样配置发起批量请求
+     * 
      * @return mixed
      */
-    public static function getMulti($urls, array $options = [], int $batch = 1): array
+    public static function getMulti($urls, $data = '', array $options = [], int $batch = 1): array
     {
-        $params = static::initParams($urls, [], $options, $batch, static function ($option, $url) {
+        $params = static::initParams($urls, $data, $options, $batch, static function ($option, $url, $data) {
             $option[CURLOPT_URL] = $url;
             $option[CURLOPT_CUSTOMREQUEST] = 'GET';
+            $option[CURLOPT_POSTFIELDS] = $data;
             return $option;
         });
 
@@ -173,29 +178,32 @@ class Curl
         return $results;
     }
 
-    private static function initParams($urls, array $data, array $options, int $batch, Closure $callback)
+    private static function initParams($urls, $data, array $options, int $batch, Closure $callback): array
     {
         $params = [];
         $multiUrl = is_array($urls);
-        $multiData = Arr::isIndexed($data);
-        $multiOptions = Arr::isIndexed($options);
+        $multiData = $data && is_array($data) && Arr::isIndexed($data);
+        $multiOptions = $options && Arr::isIndexed($options);
         if ($multiUrl) {
-            $forData = &$urls;
+            $list = &$urls;
         } elseif ($multiData) {
-            $forData = &$data;
+            $list = &$data;
         } elseif ($multiOptions) {
-            $forData = &$options;
+            $list = &$options;
         }
-        if ($batch > 1 || !isset($forData)) {
-            for ($i = 0; $i < $batch; $i++) {
-                $params[$i] = call_user_func($callback, $options, $urls, $data);
-            }
-        } else {
-            foreach ($forData as $k => $v) {
+        if (isset($list)) {
+            foreach ($list as $k => $v) {
                 $url = $multiUrl ? Arr::getValue($urls, $k, '') : $urls;
+                if (!$url) {
+                    break;
+                }
                 $row = $multiData ? Arr::getValue($data, $k, []) : $data;
                 $opt = $multiOptions ? Arr::getValue($options, $k, []) : $options;
                 $params[$k] = call_user_func($callback, $opt, $url, $row);
+            }
+        } else {
+            for ($i = 0; $i < $batch; $i++) {
+                $params[$i] = call_user_func($callback, $options, $urls, $data);
             }
         }
         return $params;
@@ -211,7 +219,7 @@ class CurlHandle
     //-------------------------------------------------
     //                以下为标准 Curl 方法
     //-------------------------------------------------
-    public function __construct(array $options, bool $isMulti = false)
+    public function __construct(array $options = [], bool $isMulti = false)
     {
         if ($isMulti === false) {
             $this->initCurl($options);
@@ -220,13 +228,14 @@ class CurlHandle
         }
     }
 
-    private function initCurl(array $options): void
+    private function initCurl(array $options = []): void
     {
         $this->ch = curl_init();
         $format = Arr::remove($options, 'format', 'json');
-        $header = ['Accept:application/' . $format];
-        $header = array_merge($header, (array) Arr::remove($options, 'header', []));
-        curl_setopt($this->ch, CURLOPT_HTTPHEADER, $header);
+        $format = ['json' => 'json', 'xml' => 'xml'][$format] ?? 'json';
+        $headers = ['Accept:application/' . $format];
+        $headers = array_merge($headers, (array) Arr::remove($options, 'header', []));
+        curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
 
         $timeout = Arr::remove($options, 'timeout', 10);
         if ($timeout >= 1) {
@@ -241,8 +250,7 @@ class CurlHandle
         curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($this->ch, CURLOPT_MAXREDIRS, 5);
-        curl_setopt($this->ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko');
-        curl_setopt($this->ch, CURLOPT_ENCODING, "gzip");
+        curl_setopt($this->ch, CURLOPT_ENCODING, 'gzip');
 
         curl_setopt_array($this->ch, $options);
     }
@@ -260,7 +268,7 @@ class CurlHandle
     //-------------------------------------------------
     //                以下为 Curl_multi 相关方法
     //-------------------------------------------------
-    protected function initMultiCurl(array $params): void
+    protected function initMultiCurl(array $params = []): void
     {
         $this->mch = curl_multi_init();
 

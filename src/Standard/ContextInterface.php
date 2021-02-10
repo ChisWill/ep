@@ -6,4 +6,5 @@ namespace Ep\Standard;
 
 interface ContextInterface
 {
+    public function getId(): string;
 }

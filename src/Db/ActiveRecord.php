@@ -3,36 +3,40 @@
 namespace Ep\Db;
 
 use Ep;
+use Ep\Standard\ServerRequestInterface;
+use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Validator\Validator;
-use Yiisoft\Db\Connection\ConnectionInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 
 abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implements DataSetInterface
 {
+    protected static string $pk = 'id';
+
     public function __construct(?ConnectionInterface $db = null)
     {
-        parent::__construct($db ?: static::getConnection());
-    }
-
-    protected static function getConnection(): ConnectionInterface
-    {
-        return Ep::getDi()->get(ConnectionInterface::class);
+        parent::__construct($db ?: Ep::getDb());
     }
 
     public static function find(?ConnectionInterface $db = null): ActiveQuery
     {
-        return new ActiveQuery(static::class, $db ?: static::getConnection());
+        return new ActiveQuery(static::class, $db ?: Ep::getDb());
     }
 
-    public static function findModel($condition): ActiveRecord
+    /**
+     * @param  int|string|array|ExpressionInterface $condition
+     * 
+     * @return static
+     * @throws RuntimeException
+     */
+    public static function findModel($condition = null): ActiveRecord
     {
         if (empty($condition)) {
             return new static();
         } else {
             if (is_scalar($condition)) {
-                $condition = ['id' => $condition];
+                $condition = [self::$pk => $condition];
             }
             $model = static::find()->where($condition)->one();
             if ($model === null) {
@@ -42,18 +46,26 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
         }
     }
 
+    public function load(ServerRequestInterface $request): bool
+    {
+        if ($request->isPost()) {
+            $this->setAttributes($request->getParsedBody());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     protected abstract function rules(): array;
 
-    private $_errors = [];
+    private array $_errors = [];
 
     public function validate(): bool
     {
-        $validator = new Validator();
-        $results = $validator->validate($this, $this->rules());
         $this->_errors = [];
-        foreach ($results as $attribute => $result) {
+        foreach ((new Validator)->validate($this, $this->rules()) as $attribute => $result) {
             if (!$result->isValid()) {
-                $this->_errors[$attribute] = current($result->getErrors());
+                $this->_errors[$attribute] = $result->getErrors();
             }
         }
         return empty($this->_errors);
@@ -64,16 +76,11 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
         return $this->_errors;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getAttributeValue(string $attribute)
     {
         return $this->getAttribute($attribute);
-    }
-
-    public function load(ServerRequestInterface $request): bool
-    {
-        $this->setAttributes([]);
-
-        // return $request->isPost;
-        return true;
     }
 }

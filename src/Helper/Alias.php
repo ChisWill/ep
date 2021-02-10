@@ -50,7 +50,9 @@ class Alias
      * 根据别名获取路径
      * 
      * @param  string $alias 别名
+     * 
      * @return string        路径
+     * @throws InvalidArgumentException
      */
     public static function get(string $alias): string
     {

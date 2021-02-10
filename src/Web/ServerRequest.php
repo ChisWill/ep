@@ -6,94 +6,27 @@ namespace Ep\Web;
 
 use Ep\Standard\ServerRequestInterface;
 use Yiisoft\Http\Method;
-use HttpSoft\Message\RequestTrait;
+use HttpSoft\Message\ServerRequest as BaseServerRequest;
 use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
-use InvalidArgumentException;
 
-use function array_key_exists;
-use function gettype;
-use function get_class;
-use function is_array;
-use function is_object;
-use function sprintf;
-
-class ServerRequest implements ServerRequestInterface
+final class ServerRequest implements ServerRequestInterface
 {
-    use RequestTrait;
+    private BaseServerRequest $request;
 
-    /**
-     * @var array
-     */
-    private array $attributes = [];
-
-    /**
-     * @var array
-     */
-    private array $cookieParams;
-
-    /**
-     * @var array|object|null
-     */
-    private $parsedBody;
-
-    /**
-     * @var array
-     */
-    private array $queryParams;
-
-    /**
-     * @var array
-     */
-    private array $serverParams;
-
-    /**
-     * @var array
-     */
-    private array $uploadedFiles;
-
-    /**
-     * @param array $serverParams
-     * @param array $uploadedFiles
-     * @param array $cookieParams
-     * @param array $queryParams
-     * @param array|object|null $parsedBody
-     * @param string $method
-     * @param UriInterface|string $uri
-     * @param array $headers
-     * @param StreamInterface|string|resource $body
-     * @param string $protocol
-     */
-    public function __construct(
-        array $serverParams = [],
-        array $uploadedFiles = [],
-        array $cookieParams = [],
-        array $queryParams = [],
-        $parsedBody = null,
-        string $method = 'GET',
-        $uri = '',
-        array $headers = [],
-        $body = 'php://temp',
-        string $protocol = '1.1'
-    ) {
-        $this->validateUploadedFiles($uploadedFiles);
-        $this->uploadedFiles = $uploadedFiles;
-        $this->serverParams = $serverParams;
-        $this->cookieParams = $cookieParams;
-        $this->queryParams = $queryParams;
-        $this->parsedBody = $parsedBody;
-        $this->init($method, $uri, $headers, $body, $protocol);
+    public function __construct(BaseServerRequest $request)
+    {
+        $this->request = $request;
     }
 
     public function isPost(): bool
     {
-        return $this->getMethod() === Method::POST;
+        return $this->request->getMethod() === Method::POST;
     }
 
     public function isAjax(): bool
     {
-        return ($this->getServerParams()['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
+        return ($this->request->getServerParams()['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
     }
 
     /**
@@ -101,7 +34,7 @@ class ServerRequest implements ServerRequestInterface
      */
     public function getServerParams(): array
     {
-        return $this->serverParams;
+        return $this->request->getServerParams();
     }
 
     /**
@@ -109,7 +42,7 @@ class ServerRequest implements ServerRequestInterface
      */
     public function getCookieParams(): array
     {
-        return $this->cookieParams;
+        return $this->request->getCookieParams();
     }
 
     /**
@@ -118,12 +51,9 @@ class ServerRequest implements ServerRequestInterface
     public function withCookieParams(array $cookies): self
     {
         if ($cookies) {
-            $new = clone $this;
-            $new->cookieParams = $cookies;
-            return $new;
-        } else {
-            return $this;
+            $this->request = $this->request->withCookieParams($cookies);
         }
+        return $this;
     }
 
     /**
@@ -131,7 +61,7 @@ class ServerRequest implements ServerRequestInterface
      */
     public function getQueryParams(): array
     {
-        return $this->queryParams;
+        return $this->request->getQueryParams();
     }
 
     /**
@@ -140,12 +70,9 @@ class ServerRequest implements ServerRequestInterface
     public function withQueryParams(array $query): self
     {
         if ($query) {
-            $new = clone $this;
-            $new->queryParams = $query;
-            return $new;
-        } else {
-            return $this;
+            $this->request = $this->request->withQueryParams($query);
         }
+        return $this;
     }
 
     /**
@@ -153,7 +80,7 @@ class ServerRequest implements ServerRequestInterface
      */
     public function getUploadedFiles(): array
     {
-        return $this->uploadedFiles;
+        return $this->request->getUploadedFiles();
     }
 
     /**
@@ -162,13 +89,9 @@ class ServerRequest implements ServerRequestInterface
     public function withUploadedFiles(array $uploadedFiles): self
     {
         if ($uploadedFiles) {
-            $this->validateUploadedFiles($uploadedFiles);
-            $new = clone $this;
-            $new->uploadedFiles = $uploadedFiles;
-            return $new;
-        } else {
-            return $this;
+            $this->request = $this->request->withUploadedFiles($uploadedFiles);
         }
+        return $this;
     }
 
     /**
@@ -176,30 +99,18 @@ class ServerRequest implements ServerRequestInterface
      */
     public function getParsedBody()
     {
-        return $this->parsedBody;
+        return $this->request->getParsedBody();
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @psalm-suppress DocblockTypeContradiction
      */
     public function withParsedBody($data): self
     {
-        if (!is_array($data) && !is_object($data) && $data !== null) {
-            throw new InvalidArgumentException(sprintf(
-                '"%s" is not valid Parsed Body. It must be a null, an array, or an object.',
-                gettype($data)
-            ));
-        }
-
         if ($data) {
-            $new = clone $this;
-            $new->parsedBody = $data;
-            return $new;
-        } else {
-            return $this;
+            $this->request = $this->request->withParsedBody($data);
         }
+        return $this;
     }
 
     /**
@@ -207,7 +118,7 @@ class ServerRequest implements ServerRequestInterface
      */
     public function getAttributes(): array
     {
-        return $this->attributes;
+        return $this->request->getAttributes();
     }
 
     /**
@@ -215,11 +126,7 @@ class ServerRequest implements ServerRequestInterface
      */
     public function getAttribute($name, $default = null)
     {
-        if (array_key_exists($name, $this->attributes)) {
-            return $this->attributes[$name];
-        }
-
-        return $default;
+        return $this->request->getAttribute($name, $default);
     }
 
     /**
@@ -227,13 +134,8 @@ class ServerRequest implements ServerRequestInterface
      */
     public function withAttribute($name, $value): self
     {
-        if (array_key_exists($name, $this->attributes) && $this->attributes[$name] === $value) {
-            return $this;
-        }
-
-        $new = clone $this;
-        $new->attributes[$name] = $value;
-        return $new;
+        $this->request = $this->request->withAttribute($name, $value);
+        return $this;
     }
 
     /**
@@ -241,35 +143,151 @@ class ServerRequest implements ServerRequestInterface
      */
     public function withoutAttribute($name): self
     {
-        if (!array_key_exists($name, $this->attributes)) {
-            return $this;
-        }
-
-        $new = clone $this;
-        unset($new->attributes[$name]);
-        return $new;
+        $this->request = $this->request->withoutAttribute($name);
+        return $this;
     }
 
     /**
-     * @param array $uploadedFiles
-     * @throws InvalidArgumentException
-     * @psalm-suppress MixedAssignment
+     * {@inheritDoc}
      */
-    private function validateUploadedFiles(array $uploadedFiles): void
+    public function getRequestTarget(): string
     {
-        foreach ($uploadedFiles as $file) {
-            if (is_array($file)) {
-                $this->validateUploadedFiles($file);
-                continue;
-            }
+        return $this->request->getRequestTarget();
+    }
 
-            if (!$file instanceof UploadedFileInterface) {
-                throw new InvalidArgumentException(sprintf(
-                    'Invalid item in uploaded files structure.'
-                        . '"%s" is not an instance of "\Psr\Http\Message\UploadedFileInterface".',
-                    (is_object($file) ? get_class($file) : gettype($file))
-                ));
-            }
-        }
+    /**
+     * {@inheritDoc}
+     */
+    public function withRequestTarget($requestTarget): self
+    {
+        $this->request = $this->request->withRequestTarget($requestTarget);
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMethod(): string
+    {
+        return $this->request->getMethod();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function withMethod($method): self
+    {
+        $this->request = $this->request->withMethod($method);
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getUri(): UriInterface
+    {
+        return $this->request->getUri();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function withUri(UriInterface $uri, $preserveHost = false): self
+    {
+        $this->request = $this->request->withUri($uri, $preserveHost);
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getProtocolVersion(): string
+    {
+        return $this->request->getProtocolVersion();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function withProtocolVersion($version): self
+    {
+        $this->request = $this->request->withProtocolVersion($version);
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getHeaders(): array
+    {
+        return $this->request->getHeaders();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function hasHeader($name): bool
+    {
+        return $this->request->hasHeader($name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getHeader($name): array
+    {
+        return $this->request->getHeader($name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getHeaderLine($name): string
+    {
+        return $this->request->getHeaderLine($name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function withHeader($name, $value): self
+    {
+        $this->request = $this->request->withHeader($name, $value);
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function withAddedHeader($name, $value): self
+    {
+        $this->request = $this->request->withAddedHeader($name, $value);
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function withoutHeader($name): self
+    {
+        $this->request = $this->request->withoutHeader($name);
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function withBody(StreamInterface $body): self
+    {
+        $this->request = $this->request->withBody($body);
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getBody(): StreamInterface
+    {
+        return $this->request->getBody();
     }
 }

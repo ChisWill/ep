@@ -20,7 +20,7 @@ class View implements ViewInterface
     public function __construct(ContextInterface $context, string $viewPath)
     {
         $this->context = $context;
-        $this->viewPath = str_replace('//', '/', preg_replace('#<\w*>#', '', strtr($viewPath, Ep::getDi()->get(RouteInterface::class)->getCaptureParams())));
+        $this->viewPath = rtrim(preg_replace('#/+#', '/', preg_replace('#<\w*>#', '', strtr($viewPath, Ep::getDi()->get(RouteInterface::class)->getCaptureParams()))), '/');
     }
 
     public function render(string $path, array $params = []): string
@@ -37,6 +37,9 @@ class View implements ViewInterface
 
     protected function findViewFile(string $path): string
     {
+        if (strpos($path, '/') === false) {
+            $path = $this->context->getId() . '/' . $path;
+        }
         return Alias::get($this->viewPath . '/' . $path . '.php');
     }
 

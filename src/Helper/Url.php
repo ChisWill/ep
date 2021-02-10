@@ -8,30 +8,31 @@ use Ep;
 
 class Url
 {
-    public static $signName = '__sign';
+    public static $signName = '_s';
 
     /**
-     * 根据已有地址，增加额外参数
+     * 根据已有地址，增加额外参数，如果已存在则覆盖
      *
      * @param  string  $url    基础网址
      * @param  array   $params URL参数
-     * @param  boolean $sign   是否添加h签名参数
+     * @param  boolean $sign   是否添加签名参数
      * @return string
      */
     public static function addParams(string $url, array $params = [], bool $sign = false): string
     {
-        if ($sign === true) {
-            $params[self::$signName] = self::getSign($params);
-        }
-        $info = parse_url($url);
-        $url = explode('?', $url)[0];
-        if (isset($info['query'])) {
-            $d = $params ? '&' : '';
-            return $url . '?' . $info['query'] . $d . http_build_query($params);
+        $urlInfo = parse_url($url);
+        if (isset($urlInfo['query'])) {
+            parse_str($urlInfo['query'], $queryParams);
         } else {
-            $d = $params ? '?' : '';
-            return $url . $d . http_build_query($params);
+            $queryParams = [];
         }
+        $params += $queryParams;
+        if ($sign === true) {
+            $params[self::$signName] = Str::getSign($params, Ep::getConfig()->secretKey, 'md5');
+        }
+        $baseUrl = $queryParams ? substr($url, 0, strpos($url, '?')) : $url;
+        $d = $params ? '?' : '';
+        return $baseUrl . $d . http_build_query($params);
     }
 
     /**
@@ -42,16 +43,9 @@ class Url
      */
     public static function checkSign(array $params = [])
     {
-        $old = $params[self::$signName] ?? '';
-        unset($params[self::$signName]);
-        $new = self::getSign($params);
+        $old = Arr::remove($params, self::$signName, '');
+        $new = Str::getSign($params, Ep::getConfig()->secretKey, 'md5');
         return $old === $new;
-    }
-
-    private static function getSign(array $params)
-    {
-        ksort($params);
-        return substr(md5(implode('', array_keys($params)) . implode('', array_values($params)) . Ep::getConfig()->secretKey), 13, 28);
     }
 
     /**

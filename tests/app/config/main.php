@@ -11,6 +11,7 @@ return [
     'secretKey' => '8FFA893E119A32D0C6A686863217A181',
     'errorHandler' => 'web/demo/error',
     'route' => require('route.php'),
+    'events' => require('events.php'),
     'params' => require('params.php'),
     'definitions' => require('definitions.php')
 ];

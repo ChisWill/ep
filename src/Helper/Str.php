@@ -16,8 +16,8 @@ class Str
      */
     public static function subtext(string $text, int $length, string $suffix = '...'): string
     {
-        if (mb_strlen($text, 'utf8') > $length) {
-            return mb_substr($text, 0, $length, 'utf8') . $suffix;
+        if (mb_strlen($text, 'UTF-8') > $length) {
+            return mb_substr($text, 0, $length, 'UTF-8') . $suffix;
         } else {
             return $text;
         }
@@ -30,11 +30,11 @@ class Str
      * @param  string  $type   随机码的类型
      * @return string          生成后的随机码
      */
-    public static function random(int $length = 8, string $type = 'w'): string
+    public static function random(int $length = 16, string $type = 'w'): string
     {
         $nums = '0123456789';
         $alps = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
-        $oths = '!@#$%^&*()-_ []{}<>~`+=,.;:/?|';
+        $oths = '!@#$%^&*()-_[]{}<>~`+=,.;:/?|';
         $chars = '';
         switch ($type) {
             case 'd':
@@ -53,11 +53,11 @@ class Str
                 $chars = $alps .= $nums .= $oths;
                 break;
         }
-        $string = '';
-        for ($i = 0; $i < $length; $i++) {
-            $string .= $chars[mt_rand(0, strlen($chars) - 1)];
+        $len = strlen($chars);
+        if ($len < $length) {
+            $chars = str_repeat($chars, intval(ceil($length / $len)));
         }
-        return $string;
+        return substr(str_shuffle($chars), 0, $length);
     }
 
     /**
@@ -67,15 +67,12 @@ class Str
      * @param  string 秘钥
      * @return string 签名
      */
-    public static function genSign(array $params, string $secret): string
+    public static function getSign(array $params, string $secret, string $algo = 'sha256'): string
     {
         ksort($params);
-
-        $tmp = [];
         foreach ($params as $key => $value) {
-            $tmp[] = $key . '=' . $value;
+            $arr[] = $key . '=' . $value;
         }
-        $str = implode('&', $tmp);
-        return hash_hmac('SHA256', $str, $secret);
+        return hash_hmac($algo, implode('&', $arr), $secret);
     }
 }

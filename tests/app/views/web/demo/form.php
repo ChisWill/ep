@@ -14,14 +14,15 @@
 <script>
     $(function() {
         $("#btn").click(function() {
-            $.post('', $("#form").serialize(), function(r) {
-                if (r.code == 0) {
+            $.post('form', $("#form").serialize(), function(r) {
+                if (r.errno == 0) {
                     alert('ok');
+                    location.reload();
                 } else {
                     var s = '';
                     var d = '';
-                    for (var k in r.msg) {
-                        s += d + r.msg[k];
+                    for (var k in r.error) {
+                        s += d + k + '：' + r.error[k];
                         d = "\n";
                     }
                     alert(s);

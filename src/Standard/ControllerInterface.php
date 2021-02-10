@@ -6,5 +6,5 @@ namespace Ep\Standard;
 
 interface ControllerInterface
 {
-    public function run(string $actionName, $request);
+    public function run(string $action, $request);
 }

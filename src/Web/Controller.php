@@ -41,6 +41,9 @@ class Controller extends \Ep\Base\Controller
 
     private ?ViewInterface $view = null;
 
+    /**
+     * @inheritDoc
+     */
     protected function getView(): ViewInterface
     {
         if ($this->view === null) {

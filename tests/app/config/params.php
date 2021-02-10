@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'testPort' => '3399'
+    'domain' => 'ep.cc'
 ];

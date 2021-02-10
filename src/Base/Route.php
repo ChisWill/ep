@@ -14,7 +14,7 @@ use RuntimeException;
 
 use function FastRoute\cachedDispatcher;
 
-class Route implements RouteInterface
+final class Route implements RouteInterface
 {
     private Config $config;
     private array $captureParams = [];
@@ -34,7 +34,7 @@ class Route implements RouteInterface
             $route->addGroup($this->config->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
         }, [
             'cacheFile' => Alias::get($this->config->runtimeDir . '/route.cache'),
-            'cacheDisabled' => !$this->config->debug
+            'cacheDisabled' => $this->config->debug
         ])->dispatch($method, rtrim($path, '/') ?: '/');
     }
 
@@ -62,7 +62,8 @@ class Route implements RouteInterface
         $match = array_flip($matches[1]);
         $intersect = array_intersect_key($params, $match);
         $params = array_diff_key($params, $match);
-        foreach ($intersect as $key => $value) {
+        foreach ($intersect as $key => &$value) {
+            $value = strtolower($value);
             $this->captureParams['<' . $key . '>'] = trim($value, '/');
         }
         $handler = strtr($handler, $this->captureParams);
@@ -75,30 +76,33 @@ class Route implements RouteInterface
         $prefix = '';
         switch (count($pieces)) {
             case 0:
-                $controllerName = $this->config->defaultController;
-                $actionName = $this->config->defaultAction;
+                $controller = $this->config->defaultController;
+                $action = $this->config->defaultAction;
                 break;
             case 1:
-                $controllerName = strtolower($pieces[0]);
-                $actionName = $this->config->defaultAction;
+                $controller = $pieces[0];
+                $action = $this->config->defaultAction;
                 break;
             default:
-                $actionName = array_pop($pieces) ?: $this->config->defaultAction;
-                $controllerName = array_pop($pieces) ?: $this->config->defaultController;
+                $action = array_pop($pieces) ?: $this->config->defaultAction;
+                $controller = array_pop($pieces) ?: $this->config->defaultController;
                 $prefix = implode('\\', $pieces);
                 break;
         }
-        $controllerName = sprintf('%s\\%s%s\\%s%s', $this->config->appNamespace, $prefix ? $prefix . '\\' : '', $this->config->controllerDirAndSuffix, ucfirst(strtolower($controllerName)), $this->config->controllerDirAndSuffix);
-        $actionName = strtolower($actionName) . $this->config->actionSuffix;
-        return [$controllerName, $actionName];
+        $controller = sprintf('%s\\%s%s\\%s%s', $this->config->appNamespace, $prefix ? $prefix . '\\' : '', $this->config->controllerDirAndSuffix, ucfirst($controller), $this->config->controllerDirAndSuffix);
+        $action = $action . $this->config->actionSuffix;
+        return [$controller, $action];
     }
 
-    public function createController(string $controllerName): ControllerInterface
+    /**
+     * @throws RuntimeException
+     */
+    public function createController(string $class): ControllerInterface
     {
-        if (!class_exists($controllerName)) {
-            throw new RuntimeException("{$controllerName} is not found.");
+        if (!class_exists($class)) {
+            throw new RuntimeException("{$class} is not found.");
         }
-        return Ep::getDi()->get($controllerName);
+        return Ep::getDi()->get($class);
     }
 
     public function getCaptureParams(): array

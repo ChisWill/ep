@@ -8,6 +8,9 @@ use Ep\Base\Route;
 
 class Application extends \Ep\Base\Application
 {
+    /**
+     * @inheritDoc
+     */
     protected function handle(): void
     {
         // $response = $this->handleRequest($GLOBALS['argv']);

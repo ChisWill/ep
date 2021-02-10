@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Helper;
 
-use Exception;
+use RuntimeException;
 
 class File
 {
@@ -12,13 +12,15 @@ class File
      * 获取指定目录下的所有文件夹（不递归获取）
      * 
      * @param  string $dir 文件路径
+     * 
      * @return array       包含文件夹的数组
+     * @throws RuntimeException
      */
     public static function getDirs(string $dir): array
     {
         $handle = opendir($dir);
         if ($handle === false) {
-            throw new Exception("Unable to open directory: $dir");
+            throw new RuntimeException("Unable to open directory: $dir");
         }
         $list = [];
         while (($file = readdir($handle)) !== false) {
@@ -36,19 +38,16 @@ class File
     }
 
     /**
-     * Creates a new directory.
+     * 递归创建文件夹，并设置权限
      *
-     * This method is similar to the PHP `mkdir()` function except that
-     * it uses `chmod()` to set the permission of the created directory
-     * in order to avoid the impact of the `umask` setting.
-     *
-     * @param string $path path of the directory to be created.
-     * @param integer $mode the permission to be set for the created directory.
-     * @param boolean $recursive whether to create parent directories if they do not exist.
-     * @return boolean whether the directory is created successfully
-     * @throws Exception if the directory could not be created (i.e. php error due to parallel changes)
+     * @param  string   $path      文件夹位置
+     * @param  integer  $mode      权限
+     * @param  boolean  $recursive 是否递归
+     * 
+     * @return boolean
+     * @throws RuntimeException
      */
-    protected static function mkdir(string $path, int $mode = 0775, bool $recursive = true): bool
+    public static function mkdir(string $path, int $mode = 0775, bool $recursive = true): bool
     {
         if (is_dir($path)) {
             return true;
@@ -61,36 +60,32 @@ class File
             if (!mkdir($path, $mode)) {
                 return false;
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             if (!is_dir($path)) {
-                throw new Exception("Failed to create directory \"$path\": " . $e->getMessage(), $e->getCode(), $e);
+                throw new RuntimeException("Failed to create directory \"$path\": " . $e->getMessage(), $e->getCode(), $e);
             }
         }
         try {
             return chmod($path, $mode);
-        } catch (Exception $e) {
-            throw new Exception("Failed to change permissions for directory \"$path\": " . $e->getMessage(), $e->getCode(), $e);
+        } catch (RuntimeException $e) {
+            throw new RuntimeException("Failed to change permissions for directory \"$path\": " . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
     /**
-     * Removes a directory (and all its content) recursively.
+     * 删除文件夹
      *
-     * @param string $dir the directory to be deleted recursively.
-     * @param array $options options for directory remove. Valid options are:
+     * @param  string $dir                  文件夹位置
+     * @param  bool   $ignoreSymlinkContent 是否忽略符号连接指向的内容
      *
-     * - traverseSymlinks: boolean, whether symlinks to the directories should be traversed too.
-     *   Defaults to `false`, meaning the content of the symlinked directory would not be deleted.
-     *   Only symlink would be removed in that default case.
-     *
-     * @throws Exception in case of failure
+     * @throws RuntimeException
      */
-    public static function rmdir(string $dir, array $options = []): void
+    public static function rmdir(string $dir, bool $ignoreSymlinkContent = true): void
     {
         if (!is_dir($dir)) {
             return;
         }
-        if (isset($options['traverseSymlinks']) && $options['traverseSymlinks'] || !is_link($dir)) {
+        if ($ignoreSymlinkContent === false || !is_link($dir)) {
             if (!($handle = opendir($dir))) {
                 return;
             }
@@ -100,11 +95,11 @@ class File
                 }
                 $path = $dir . DIRECTORY_SEPARATOR . $file;
                 if (is_dir($path)) {
-                    static::rmdir($path, $options);
+                    static::rmdir($path, $ignoreSymlinkContent);
                 } else {
                     try {
                         unlink($path);
-                    } catch (Exception $e) {
+                    } catch (RuntimeException $e) {
                         if (DIRECTORY_SEPARATOR === '\\') {
                             // last resort measure for Windows
                             $lines = [];

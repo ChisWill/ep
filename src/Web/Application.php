@@ -8,18 +8,21 @@ use Ep;
 use Ep\Standard\RouteInterface;
 use Ep\Standard\ServerRequestFactoryInterface;
 use Yiisoft\Http\Method;
+use Yiisoft\Yii\Web\SapiEmitter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class Application extends \Ep\Base\Application
+final class Application extends \Ep\Base\Application
 {
+    /**
+     * @inheritDoc
+     */
     protected function handle(): void
     {
         $request = $this->createRequest();
         $response = $this->handleRequest($request);
         if ($response instanceof ResponseInterface) {
-            $emitter = new SapiEmitter();
-            $emitter->emit($response, $request->getMethod() === Method::HEAD);
+            (new SapiEmitter)->emit($response, $request->getMethod() === Method::HEAD);
         }
     }
 
@@ -35,8 +38,9 @@ class Application extends \Ep\Base\Application
         $route = Ep::getDi()->get(RouteInterface::class);
         [$handler, $params] = $route->solveRouteInfo($route->matchRequest($request->getUri()->getPath(), $request->getMethod()));
         $request = $request->withQueryParams($params);
-        [$controllerClass, $actionName] = $route->parseHandler($handler);
-        return $route->createController($controllerClass)
-            ->run($actionName, $request);
+        [$controller, $action] = $route->parseHandler($handler);
+        return $route
+            ->createController($controller)
+            ->run($action, $request);
     }
 }

@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
-use Ep\Helper\Alias;
-use Ep\Helper\Arr;
-use Ep\Tests\Classes\Car;
-use Throwable;
 use RuntimeException;
+use Throwable;
 
 abstract class Application
 {
@@ -20,14 +17,6 @@ abstract class Application
         }, E_ALL);
 
         Ep::init($config);
-
-        Alias::set('@root', $config['basePath']);
-        Alias::set('@ep', dirname(__DIR__, 2));
-
-        Ep::setDi(Arr::merge(
-            require(Alias::get('@ep/config/definitions.php')),
-            Ep::getConfig()->getDefinitions()
-        ), [ServiceProvider::class]);
     }
 
     public function run(): void

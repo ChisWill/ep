@@ -71,17 +71,33 @@ final class Config
      */
     public string $language = 'zh-CN';
     /**
+     * Redis Host
+     */
+    public string $redisHost = 'localhost';
+    /**
+     * Redis Port
+     */
+    public int $rediPort = 6379;
+    /**
+     * Redis Database
+     */
+    public int $redisDatabase = 0;
+    /**
+     * Redis Password
+     */
+    public ?string $redisPassword = null;
+    /**
      * 运行时缓存目录地址
      */
     public string $runtimeDir = '@root/runtime';
     /**
-     * 项目秘钥
+     * 秘钥
      */
     public string $secretKey = '';
     /**
      * 视图文件夹地址，支持从路由中获取参数，获取不到时将自动忽略
      */
-    public string $viewPath = '@root/<prefix>/View';
+    public string $viewPath = '@root/views/<prefix>';
     /**
      * di 配置
      */
@@ -102,6 +118,10 @@ final class Config
      * ```
      */
     private Closure $route;
+    /**
+     * 事件配置
+     */
+    private array $events = [];
     /**
      * 常规配置项
      */
@@ -133,6 +153,11 @@ final class Config
     public function getDefinitions(): array
     {
         return $this->definitions;
+    }
+
+    public function getEvents(): array
+    {
+        return $this->events;
     }
 
     public function getParams(): array

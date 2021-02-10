@@ -7,6 +7,8 @@ namespace Ep\Helper;
 class Arr
 {
     /**
+     * Usage examples,
+     * 
      * ```php
      * $user = [
      *     'id' => 1,
@@ -14,15 +16,17 @@ class Arr
      *         'street' => 'home'
      *     ]
      * ];
-     * $street = \Ep\Helper\Arr::getValue($user, 'address.street', 'defaultValue'); // $street is 'home'
+     * $street = \Ep\Helper\Arr::getValue($user, 'address.street', 'defaultValue');
+     * // $street is 'home'
      * ```
      *
-     * @param  array  $array   待操作数组
-     * @param  string $key     获取的键
-     * @param  mixed  $default 默认值
-     * @return mixed           获取到的值
+     * @param  array      $array   待操作数组
+     * @param  int|string $key     键名
+     * @param  mixed      $default 默认值
+     * 
+     * @return mixed
      */
-    public static function getValue(array $array, string $key, $default = null)
+    public static function getValue(array $array, $key, $default = null)
     {
         if (is_array($array) && array_key_exists($key, $array)) {
             return $array[$key];
@@ -41,16 +45,13 @@ class Arr
     }
 
     /**
-     * Returns a value indicating whether the given array is an indexed array.
+     * 判断数组是否以数字为键
+     * ps. 包括空数组
      *
-     * An array is indexed if all its keys are integers. If `$consecutive` is true,
-     * then the array keys must be a consecutive sequence starting from 0.
-     *
-     * Note that an empty array will be considered indexed.
-     *
-     * @param  array   $array       the array being checked
-     * @param  boolean $consecutive whether the array keys must be a consecutive sequence in order for the array to be treated as indexed.
-     * @return boolean              whether the array is associative
+     * @param  array   $array       待检查数组
+     * @param  boolean $consecutive 检查键是否从0开始
+     * 
+     * @return boolean
      */
     public static function isIndexed(array $array, bool $consecutive = false): bool
     {
@@ -75,23 +76,23 @@ class Arr
     }
 
     /**
-     * Removes an item from an array and returns the value. If the key does not exist in the array, the default value
-     * will be returned instead.
+     * 删除数组一项元素并返回，如果不存在则返回给定的默认值
      *
      * Usage examples,
      *
      * ```php
      * // $array = ['type' => 'A', 'options' => [1, 2]];
      * // working with array
-     * $type = \yii\helpers\ArrayHelper::remove($array, 'type');
+     * $type = \Ep\Helper\Arr::remove($array, 'type');
      * // $array content
      * // $array = ['options' => [1, 2]];
      * ```
      *
-     * @param  array  $array   the array to extract value from
-     * @param  string $key     key name of the array element
-     * @param  mixed  $default the default value to be returned if the specified key does not exist
-     * @return mixed           the value of the element if found, default value otherwise
+     * @param  array  $array   待操作数组
+     * @param  string $key     键名
+     * @param  mixed  $default 默认值
+     * 
+     * @return mixed
      */
     public static function remove(array &$array, string $key, $default = null)
     {
@@ -106,57 +107,56 @@ class Arr
     }
 
     /**
-     * Builds a map (key-value pairs) from a multidimensional array or an array of objects.
-     * The `$from` and `$to` parameters specify the key names or property names to set up the map.
-     * Optionally, one can further group the map according to a grouping field `$group`.
+     * 构建一个键值对数组
      *
-     * For example,
+     * Usage examples,
      *
      * ```php
      * $array = [
-     *     ['id' => '123', 'name' => 'aaa', 'class' => 'x'],
-     *     ['id' => '124', 'name' => 'bbb', 'class' => 'x'],
-     *     ['id' => '345', 'name' => 'ccc', 'class' => 'y'],
+     *     ['id' => '1', 'name' => 'a', 'class' => 'x'],
+     *     ['id' => '2', 'name' => 'b', 'class' => 'x'],
+     *     ['id' => '3', 'name' => 'c', 'class' => 'y'],
      * ];
      *
-     * $result = ArrayHelper::map($array, 'id', 'name');
+     * $result = \Ep\Helper\Arr::map($array, 'id', 'name');
      * // the result is:
      * // [
-     * //     '123' => 'aaa',
-     * //     '124' => 'bbb',
-     * //     '345' => 'ccc',
+     * //     '1' => 'a',
+     * //     '2' => 'b',
+     * //     '3' => 'c',
      * // ]
      *
-     * $result = ArrayHelper::map($array, 'id', 'name', 'class');
+     * $result = \Ep\Helper\Arr::map($array, 'id', 'name', 'class');
      * // the result is:
      * // [
      * //     'x' => [
-     * //         '123' => 'aaa',
-     * //         '124' => 'bbb',
+     * //         '1' => 'a',
+     * //         '2' => 'b',
      * //     ],
      * //     'y' => [
-     * //         '345' => 'ccc',
+     * //         '3' => 'c',
      * //     ],
      * // ]
      * ```
      *
-     * @param  array       $array
-     * @param  string      $from
-     * @param  string      $to
-     * @param  string|null $group
+     * @param  array       $array 待操作数组
+     * @param  string|int  $from  作为键的字段
+     * @param  string|int  $to    作为值的字段
+     * @param  string|null $group 分组字段
+     * 
      * @return array
      */
-    public static function map(array $array, string $from, string $to, ?string $group = null): array
+    public static function map(array $array, $from, $to, ?string $group = null): array
     {
+        if ($group === null) {
+            return array_column($array, $to, $from);
+        }
+
         $result = [];
-        foreach ($array as $element) {
-            $key = static::getValue($element, $from);
-            $value = static::getValue($element, $to);
-            if ($group !== null) {
-                $result[static::getValue($element, $group)][$key] = $value;
-            } else {
-                $result[$key] = $value;
-            }
+        foreach ($array as $item) {
+            $groupKey = static::getValue($item, $group, '');
+            $key = static::getValue($item, $from, '');
+            $result[$groupKey][$key] = static::getValue($item, $to);
         }
 
         return $result;
@@ -165,30 +165,31 @@ class Arr
     /**
      * 合并多个数组，相同键的标量将覆盖，相同键的数组将合并
      * 
-     * @param  array $args 要合并的数组们
+     * @param  array $args 要合并的数组
+     * 
      * @return array       合并后的数组
      */
     public static function merge(...$args): array
     {
-        $res = array_shift($args);
+        $result = array_shift($args);
         while (!empty($args)) {
             $next = array_shift($args);
             foreach ($next as $k => $v) {
                 if (is_int($k)) {
-                    if (isset($res[$k])) {
-                        $res[] = $v;
+                    if (isset($result[$k])) {
+                        $result[] = $v;
                     } else {
-                        $res[$k] = $v;
+                        $result[$k] = $v;
                     }
-                } elseif (is_array($v) && isset($res[$k]) && is_array($res[$k])) {
-                    $res[$k] = self::merge($res[$k], $v);
+                } elseif (is_array($v) && isset($result[$k]) && is_array($result[$k])) {
+                    $result[$k] = static::merge($result[$k], $v);
                 } else {
-                    $res[$k] = $v;
+                    $result[$k] = $v;
                 }
             }
         }
 
-        return $res;
+        return $result;
     }
 
     /**

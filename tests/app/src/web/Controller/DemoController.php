@@ -4,13 +4,32 @@ namespace Ep\Tests\App\Web\Controller;
 
 use Ep;
 use Ep\Standard\ServerRequestInterface;
+use Ep\Tests\App\Common\Component\Controller;
 use Ep\Tests\App\Web\Model\User;
 
-class DemoController extends \Ep\Web\Controller
+class DemoController extends Controller
 {
-    public function jsonAction()
+    public function jsonAction(ServerRequestInterface $request)
     {
-        return $this->json(['say' => 'hello', 'hi' => 'world']);
+        if ($request->isPost()) {
+            $post = $request->getParsedBody();
+            $get = $request->getQueryParams();
+            $return = compact('post', 'get');
+        } else {
+            $body = $request->getBody()->getContents();
+            $get = $request->getQueryParams();
+            if ($body) {
+                $return = [
+                    'body' => $body,
+                    'get' => $get
+                ];
+            } else if ($get) {
+                $return = $get;
+            } else {
+                $return = ['hello' => 'world'];
+            }
+        }
+        return $this->json($return);
     }
 
     public function stringAction()
@@ -37,6 +56,7 @@ class DemoController extends \Ep\Web\Controller
         d('Path：' . $request->getUri()->getPath());
         tes('');
         d('Post Body：', $request->getParsedBody());
+        tes($request->getHeaders());
     }
 
     public function redirectAction(ServerRequestInterface $request)
@@ -58,24 +78,96 @@ class DemoController extends \Ep\Web\Controller
         echo 'over';
     }
 
-    public function queryAction()
+    public function cacheAction()
+    {
+        $cache = Ep::getCache();
+
+        $r = $cache->getOrSet('name', fn () => mt_rand(0, 100), 5);
+
+        dd('Cache Value：', $r);
+    }
+
+    public function saveAction()
     {
         $user = new User;
-        $r = $user->primaryKey();
-        test($r);
-        $query = User::find();
-        $user = $query->where(['id' => 11])->one();
-        $user->username = mt_rand();
-        $r = $user->save();
-        var_dump($r);
+        $user->username = 'Peter' . mt_rand(0, 1000);
+        $user->age = mt_rand(0, 100);
+        $r = $user->insert();
+        d('Insert：', $r);
 
-        $subQuery = User::find();
-        $subQuery->where(['state' => 1]);
-        $query = User::find();
-        $query->from(['s' => $subQuery])->where(['>', 'age', 0]);
-        $sql = $query->getRawSql();
-        $result = $query->asArray()->all();
-        tes($sql);
-        test($result);
+        tes('');
+
+        $user = User::findModel(1);
+        $user->username = 'Mary' . mt_rand(0, 1000);
+        $r = $user->update();
+        d('Update Num：', $r);
+    }
+
+    public function queryAction()
+    {
+        $query = User::find()->where(['like', 'username', 'Peter%', false]);
+        tes('RawSql：' . $query->getRawSql());
+        $user = $query->one();
+        tes('Single User：', $user->getAttributes());
+        $count = $query->count();
+        d('Peter Count：', $count);
+        $list = $query->all();
+        foreach ($list as $user) {
+            /** @var User $user */
+            tes($user->getAttributes());
+        }
+    }
+
+    public function eventAction()
+    {
+        $dipatcher = Ep::getEventDispatcher();
+        $dipatcher->dispatch($this);
+    }
+
+    public function redisAction()
+    {
+        $redis = Ep::getRedis();
+
+        $r = $redis->set('a', mt_rand(0, 100), 'ex', 5, 'nx');
+        d($r);
+
+        $r = $redis->get('a');
+
+        tes($r);
+    }
+
+    public function validateAction()
+    {
+        $user = User::findModel(1);
+        tes($user->getAttributes());
+        $r = $user->validate();
+        if ($r) {
+            d('validate ok');
+        } else {
+            d($user->getErrors());
+        }
+    }
+
+    public function formAction(ServerRequestInterface $request)
+    {
+        $user = User::findModel($request->getQueryParams()['id'] ?? null);
+        if ($user->load($request)) {
+            if (!$user->validate()) {
+                return $this->error($user->getErrors());
+            }
+            if ($user->save()) {
+                return $this->success();
+            } else {
+                return $this->error($user->getErrors());
+            }
+        }
+        return $this->render('form');
+    }
+
+    public function testAction()
+    {
+
+
+        echo 'test over';
     }
 }

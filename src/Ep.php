@@ -3,30 +3,43 @@
 declare(strict_types=1);
 
 use Ep\Base\Config;
+use Ep\Helper\Alias;
+use Ep\Helper\Arr;
+use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Di\Container;
-use Yiisoft\Di\CompositeContainer;
+use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Redis\Connection as RedisConnection;
 use Yiisoft\Injector\Injector;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 final class Ep
 {
-    private static ContainerInterface $di;
-
     private static Config $config;
+
+    private static ContainerInterface $di;
 
     private static array $params;
 
-    public static function init(array $config = [])
+    public static function init(array $config = []): void
     {
-        self::$di = new CompositeContainer();
         self::$config = new Config($config);
+
+        Alias::set('@root', self::$config->basePath);
+        Alias::set('@ep', dirname(__DIR__, 1));
+
         self::$params = self::$config->getParams();
+
+        self::$di = new Container(Arr::merge(
+            require(Alias::get('@ep/config/definitions.php')),
+            self::$config->getDefinitions()
+        ));
     }
 
-    public static function setDi(array $definitions = [], array $providers = []): void
+    public static function getConfig(): Config
     {
-        self::$di->attach(new Container($definitions, $providers));
+        return self::$config;
     }
 
     public static function getDi(): ContainerInterface
@@ -36,45 +49,36 @@ final class Ep
 
     public static function getInjector(): Injector
     {
-        return new Injector(self::getDi());
+        return new Injector(self::$di);
     }
 
-    public static function getLogger(?string $name = null): LoggerInterface
+    public static function getDb(?string $id = null): ConnectionInterface
     {
-        return self::$di->get($name ?: LoggerInterface::class);
+        return self::$di->get($id ?: ConnectionInterface::class);
     }
 
-    public static function setConfig(array $config): void
+    public static function getRedis(?string $id = null): RedisConnection
     {
-        foreach ($config as $name => $value) {
-            self::$config->$name = $value;
-        }
+        return self::$di->get($id ?: RedisConnection::class);
     }
 
-    public static function getConfig(): Config
+    public static function getCache(?string $id = null): CacheInterface
     {
-        return self::$config;
+        return self::$di->get($id ?: CacheInterface::class);
     }
 
-    /**
-     * Get all parameters.
-     * 
-     * @return array
-     */
+    public static function getLogger(?string $id = null): LoggerInterface
+    {
+        return self::$di->get($id ?: LoggerInterface::class);
+    }
+
+    public static function getEventDispatcher(?string $id = null): EventDispatcherInterface
+    {
+        return self::$di->get($id ?: EventDispatcherInterface::class);
+    }
+
     public static function getParams(): array
     {
         return self::$params;
-    }
-
-    /**
-     * Get single parameter.
-     * 
-     * @param  string $name
-     * @param  mixed  $default
-     * @return mixed
-     */
-    public static function getParam(string $name, $default = null)
-    {
-        return self::$params[$name] ?? $default;
     }
 }
