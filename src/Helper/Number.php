@@ -12,9 +12,9 @@ class Number
      * @param  int  $number
      * @return bool
      */
-    function isPrime($number)
+    function isPrime(int $number): bool
     {
-        if (!is_int($number) || $number < 2) {
+        if ($number < 2) {
             return false;
         }
         if ($number == 2 || $number == 3) {

@@ -9,7 +9,7 @@ interface RouteInterface
     /**
      * 匹配请求参数，返回路由信息
      */
-    public function matchRequest(string $requestPath, string $method = 'GET'): array;
+    public function matchRequest(string $path, string $method = 'GET'): array;
     /**
      * 处理路由信息，返回处理器与未捕获到的路由参数
      */

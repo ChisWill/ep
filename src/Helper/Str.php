@@ -70,6 +70,7 @@ class Str
     public static function getSign(array $params, string $secret, string $algo = 'sha256'): string
     {
         ksort($params);
+        $arr = [];
         foreach ($params as $key => $value) {
             $arr[] = $key . '=' . $value;
         }

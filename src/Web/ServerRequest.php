@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Ep\Web;
 
-use Ep\Standard\ServerRequestInterface;
 use Yiisoft\Http\Method;
-use HttpSoft\Message\ServerRequest as BaseServerRequest;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
-final class ServerRequest implements ServerRequestInterface
+final class ServerRequest implements \Ep\Standard\ServerRequestInterface
 {
-    private BaseServerRequest $request;
+    private ServerRequestInterface $request;
 
-    public function __construct(BaseServerRequest $request)
+    public function __construct(ServerRequestInterface $request)
     {
         $this->request = $request;
     }

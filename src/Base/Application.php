@@ -12,7 +12,7 @@ abstract class Application
 {
     public function __construct(array $config)
     {
-        set_error_handler(static function ($errno, $errstr, $errfile, $errline) {
+        set_error_handler(static function (int $errno, string $errstr, string $errfile, int $errline, array $context) {
             throw new RuntimeException(sprintf('%s, in %s:%d', $errstr, $errfile, $errline));
         }, E_ALL);
 

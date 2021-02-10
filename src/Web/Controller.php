@@ -80,7 +80,7 @@ class Controller extends \Ep\Base\Controller
         return $this->string($this->getView()->renderPartial($view, $params));
     }
 
-    protected function redirect(string $url, $statusCode = Status::FOUND): ResponseInterface
+    protected function redirect(string $url, int $statusCode = Status::FOUND): ResponseInterface
     {
         return $this->responseFactory
             ->createResponse($statusCode)

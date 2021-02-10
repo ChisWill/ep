@@ -2,23 +2,36 @@
 
 namespace Ep\Console;
 
-use HttpSoft\Message\Response;
-use Psr\Http\Message\ResponseInterface;
+use Ep;
+use Ep\Base\View;
+use Ep\Standard\ViewInterface;
 
-class Controller extends \Ep\base\Controller
+class Controller extends \Ep\Base\Controller
 {
-    public function createResponseHandler(): ResponseInterface
+    public function __construct()
     {
-        return new Response();
     }
 
-    public function beforeAction($request): bool
+    protected function beforeAction($request): bool
     {
         return true;
     }
 
-    public function afterAction($response): bool
+    protected function afterAction($response)
     {
-        return true;
+        return $response;
+    }
+
+    private ?ViewInterface $view = null;
+
+    /**
+     * @inheritDoc
+     */
+    protected function getView(): ViewInterface
+    {
+        if ($this->view === null) {
+            $this->view = Ep::getInjector()->make(View::class, ['context' => $this, 'viewPath' => Ep::getConfig()->viewPath]);
+        }
+        return $this->view;
     }
 }

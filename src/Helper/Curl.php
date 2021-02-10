@@ -210,11 +210,11 @@ class Curl
     }
 }
 
-class CurlHandle
+final class CurlHandle
 {
     public $ch;
     public $mch;
-    protected $handles = [];
+    private array $handles = [];
 
     //-------------------------------------------------
     //                以下为标准 Curl 方法
@@ -306,7 +306,7 @@ class CurlHandle
         $results = [];
         foreach ($this->handles as $k => $handle) {
             if (curl_error($handle->ch) == '') {
-                $results[$k] = (string) curl_multi_getcontent($handle->ch);
+                $results[$k] = curl_multi_getcontent($handle->ch);
             }
             curl_multi_remove_handle($this->mch, $handle->ch);
             $handle->close();

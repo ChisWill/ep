@@ -31,7 +31,7 @@ class Alias
             } else {
                 static::$aliases[$root] = [$alias => $path];
             }
-        } elseif (\is_string(static::$aliases[$root])) {
+        } elseif (is_string(static::$aliases[$root])) {
             if ($pos === false) {
                 static::$aliases[$root] = $path;
             } else {
@@ -88,7 +88,7 @@ class Alias
         $root = $pos === false ? $alias : substr($alias, 0, $pos);
 
         if (array_key_exists($root, static::$aliases)) {
-            if (\is_array(static::$aliases[$root])) {
+            if (is_array(static::$aliases[$root])) {
                 unset(static::$aliases[$root][$alias]);
             } elseif ($pos === false) {
                 unset(static::$aliases[$root]);

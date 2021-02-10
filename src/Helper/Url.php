@@ -8,7 +8,7 @@ use Ep;
 
 class Url
 {
-    public static $signName = '_s';
+    public static string $signName = '_s';
 
     /**
      * 根据已有地址，增加额外参数，如果已存在则覆盖

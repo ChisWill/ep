@@ -19,14 +19,14 @@ class Application extends \Ep\Base\Application
 
     protected function handleRequest($argv)
     {
-        unset($argv[0]);
-        $path = '/' . array_shift($argv);
-        $params = $argv;
+        // unset($argv[0]);
+        // $path = '/' . array_shift($argv);
+        // $params = $argv;
 
-        $route = new Route($path);
-        // [$handler] = $route->match();
-        // test($handler);
-        $controller = $this->createController('');
-        return $controller->run('', '');
+        // $route = new Route($path);
+        // // [$handler] = $route->match();
+        // // test($handler);
+        // $controller = $this->createController('');
+        // return $controller->run('', '');
     }
 }

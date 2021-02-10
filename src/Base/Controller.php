@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ep\base;
+namespace Ep\Base;
 
 use Ep;
 use Ep\Standard\ViewInterface;
