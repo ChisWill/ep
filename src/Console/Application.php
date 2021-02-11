@@ -4,29 +4,47 @@ declare(strict_types=1);
 
 namespace Ep\Console;
 
-use Ep\Base\Route;
+use Ep;
+use Ep\Standard\ConsoleRequestInterface;
+use Ep\Standard\RouteInterface;
 
-class Application extends \Ep\Base\Application
+final class Application extends \Ep\Base\Application
 {
     /**
      * @inheritDoc
      */
-    protected function handle(): void
+    protected function handle(): int
     {
-        // $response = $this->handleRequest($GLOBALS['argv']);
-        // $response->send();
+        $this->handleRequest($this->createRequest());
+        return 0;
     }
 
-    protected function handleRequest($argv)
+    private function createRequest(): ConsoleRequestInterface
     {
-        // unset($argv[0]);
-        // $path = '/' . array_shift($argv);
-        // $params = $argv;
+        return Ep::getDi()->get(ConsoleRequestInterface::class);
+    }
 
-        // $route = new Route($path);
-        // // [$handler] = $route->match();
-        // // test($handler);
-        // $controller = $this->createController('');
-        // return $controller->run('', '');
+    private function handleRequest(ConsoleRequestInterface $request)
+    {
+        $config = Ep::getConfig();
+        $route = Ep::getDi()
+            ->get(RouteInterface::class)
+            ->setConfig([
+                'config' => $config,
+                'baseUrl' => '/',
+                'controllerSuffix' => $config->commandDirAndSuffix
+            ]);
+        [$handler] = $route->solveRouteInfo(
+            $route->matchRequest(
+                $request->getRoute()
+            )
+        );
+        [$controller, $action] = $route->parseHandler($handler);
+        return $route
+            ->createController($controller)
+            ->setConfig([
+                'config' => $config
+            ])
+            ->run($action, $request);
     }
 }

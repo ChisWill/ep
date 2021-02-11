@@ -1,0 +1,52 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ep\Console;
+
+use Ep;
+use Ep\Base\View;
+use Ep\Standard\ConsoleRequestInterface;
+use Ep\Standard\ViewInterface;
+
+abstract class Command extends \Ep\Base\Controller
+{
+    /**
+     * @inheritDoc
+     */
+    public function getSuffix(): string
+    {
+        return $this->config->commandDirAndSuffix;
+    }
+
+    /**
+     * @param ConsoleRequestInterface $request
+     */
+    protected function beforeAction($request): bool
+    {
+        return true;
+    }
+
+    /**
+     * @param  string
+     * 
+     * @return string
+     */
+    protected function afterAction($response)
+    {
+        return $response;
+    }
+
+    private ?ViewInterface $view = null;
+
+    /**
+     * @return View
+     */
+    protected function getView(): ViewInterface
+    {
+        if ($this->view === null) {
+            $this->view = Ep::getInjector()->make(View::class, ['context' => $this, 'viewPath' => $this->config->viewPath]);
+        }
+        return $this->view;
+    }
+}

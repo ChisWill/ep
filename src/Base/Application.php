@@ -19,14 +19,17 @@ abstract class Application
         Ep::init($config);
     }
 
-    public function run(): void
+    public function run()
     {
         try {
-            $this->handle();
+            return $this->handle();
         } catch (Throwable $e) {
             throw new RuntimeException($e->getMessage() . ' -> ' . $e->getTraceAsString(), $e->getCode(), $e->getPrevious());
         }
     }
 
-    protected abstract function handle(): void;
+    /**
+     * @return int|void
+     */
+    protected abstract function handle();
 }

@@ -37,10 +37,14 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Ep\\Tests\\App\\": "tests\\app\\src",
+            "Ep\\Tests\\Basic\\": "tests\\basic\\src",
+            "Ep\\Tests\\Advance\\": "tests\\advance\\src",
             "Ep\\Tests\\Classes\\": "tests\\classes"
         }
     },
+    "bin": [
+        "bin/ep"
+    ],
     "config": {
         "sort-packages": true
     }

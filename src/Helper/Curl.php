@@ -27,9 +27,9 @@ class Curl
      * @param  string|array $data    字符串格式为请求体数据，数组格式为curl选项
      * @param  array        $options curl选项
      * 
-     * @return string
+     * @return string|null
      */
-    public static function get(string $url, $data = '', array $options = []): string
+    public static function get(string $url, $data = '', array $options = []): ?string
     {
         if (is_array($data)) {
             $options = $data;
@@ -42,11 +42,11 @@ class Curl
         curl_setopt($handle->ch, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($handle->ch, CURLOPT_POSTFIELDS, $data);
 
-        $result = $handle->exec();
-
-        $handle->close();
-
-        return $result;
+        try {
+            return $handle->exec();
+        } finally {
+            $handle->close();
+        }
     }
 
     /**
@@ -56,9 +56,9 @@ class Curl
      * @param  string|array $data    请求体数据
      * @param  array        $options curl选项
      * 
-     * @return string
+     * @return string|null
      */
-    public static function post(string $url, $data = [], array $options = []): string
+    public static function post(string $url, $data = [], array $options = []): ?string
     {
         $handle = new CurlHandle($options);
 
@@ -66,11 +66,11 @@ class Curl
         curl_setopt($handle->ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($handle->ch, CURLOPT_POSTFIELDS, $data);
 
-        $result = $handle->exec();
-
-        $handle->close();
-
-        return $result;
+        try {
+            return $handle->exec();
+        } finally {
+            $handle->close();
+        }
     }
 
     /**
@@ -80,9 +80,9 @@ class Curl
      * @param  string|array $data    请求体数据
      * @param  array        $options curl选项
      * 
-     * @return string
+     * @return string|null
      */
-    public static function put(string $url, $data = [], array $options = []): string
+    public static function put(string $url, $data = [], array $options = []): ?string
     {
         $handle = new CurlHandle($options);
 
@@ -90,11 +90,11 @@ class Curl
         curl_setopt($handle->ch, CURLOPT_CUSTOMREQUEST, 'PUT');
         curl_setopt($handle->ch, CURLOPT_POSTFIELDS, $data);
 
-        $result = $handle->exec();
-
-        $handle->close();
-
-        return $result;
+        try {
+            return $handle->exec();
+        } finally {
+            $handle->close();
+        }
     }
 
     /**
@@ -103,20 +103,20 @@ class Curl
      * @param  string  $url     请求地址
      * @param  array   $options curl选项
      * 
-     * @return string           响应结果
+     * @return string|null
      */
-    public static function delete(string $url, array $options = []): string
+    public static function delete(string $url, array $options = []): ?string
     {
         $handle = new CurlHandle($options);
 
         curl_setopt($handle->ch, CURLOPT_URL, $url);
         curl_setopt($handle->ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
 
-        $result = $handle->exec();
-
-        $handle->close();
-
-        return $result;
+        try {
+            return $handle->exec();
+        } finally {
+            $handle->close();
+        }
     }
 
     /**
@@ -139,13 +139,14 @@ class Curl
 
         $handle = new CurlHandle($params, true);
 
-        $handle->execMulti();
 
-        $results = $handle->getResults();
+        try {
+            $handle->execMulti();
 
-        $handle->closeMulti();
-
-        return $results;
+            return $handle->getResults();
+        } finally {
+            $handle->closeMulti();
+        }
     }
 
     /**
@@ -169,15 +170,20 @@ class Curl
 
         $handle = new CurlHandle($params, true);
 
-        $handle->execMulti();
 
-        $results = $handle->getResults();
+        try {
+            $handle->execMulti();
 
-        $handle->closeMulti();
-
-        return $results;
+            return $handle->getResults();
+        } finally {
+            $handle->closeMulti();
+        }
     }
 
+    /**
+     * @param array|string $urls
+     * @param array|string $data
+     */
     private static function initParams($urls, $data, array $options, int $batch, Closure $callback): array
     {
         $params = [];
@@ -260,9 +266,9 @@ final class CurlHandle
         curl_close($this->ch);
     }
 
-    public function exec()
+    public function exec(): ?string
     {
-        return curl_exec($this->ch);
+        return curl_exec($this->ch) ?: null;
     }
 
     //-------------------------------------------------

@@ -3,10 +3,10 @@
 /**
  * 徒手调试专用，可以传入任意个数变量，便于查看
  */
-function tes(...$args)
+function tes(...$args): void
 {
-    $caller = debug_backtrace()[1]['function'] ?? 'test';
-    $func = $caller == 'test' ? 'print_r' : 'var_dump';
+    $caller = debug_backtrace()[1]['function'] ?? 'tes';
+    $func = strpos($caller, 'dum') === false ? 'print_r' : 'var_dump';
     $isCli = PHP_SAPI === 'cli';
     if (!$isCli && !in_array('Content-type:text/html;charset=utf-8', headers_list())) {
         header('Content-type:text/html;charset=utf-8');
@@ -30,7 +30,7 @@ function tes(...$args)
 /**
  * @see tes()
  */
-function test(...$args)
+function test(...$args): void
 {
     call_user_func_array('tes', $args);
     exit;
@@ -39,7 +39,7 @@ function test(...$args)
 /**
  * @see tes()
  */
-function dum(...$args)
+function dum(...$args): void
 {
     call_user_func_array('tes', $args);
 }
@@ -47,7 +47,7 @@ function dum(...$args)
 /**
  * @see tes()
  */
-function dump(...$args)
+function dump(...$args): void
 {
     call_user_func_array('tes', $args);
     exit;

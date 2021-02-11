@@ -12,13 +12,16 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class Controller extends \Ep\Base\Controller
+abstract class Controller extends \Ep\Base\Controller
 {
-    private ResponseFactoryInterface $responseFactory;
+    protected ResponseFactoryInterface $responseFactory;
 
-    public function __construct(ResponseFactoryInterface $responseFactory)
+    /**
+     * @inheritDoc
+     */
+    public function getSuffix(): string
     {
-        $this->responseFactory = $responseFactory;
+        return $this->config->controllerDirAndSuffix;
     }
 
     /**
@@ -42,12 +45,12 @@ class Controller extends \Ep\Base\Controller
     private ?ViewInterface $view = null;
 
     /**
-     * @inheritDoc
+     * @return View
      */
     protected function getView(): ViewInterface
     {
         if ($this->view === null) {
-            $this->view = Ep::getInjector()->make(View::class, ['context' => $this, 'viewPath' => Ep::getConfig()->viewPath]);
+            $this->view = Ep::getInjector()->make(View::class, ['context' => $this, 'viewPath' => $this->config->viewPath]);
         }
         return $this->view;
     }

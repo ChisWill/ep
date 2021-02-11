@@ -8,11 +8,14 @@ use Ep;
 use Ep\Standard\ViewInterface;
 use Ep\Standard\ContextInterface;
 use Ep\Standard\ControllerInterface;
-use Yiisoft\Strings\StringHelper;
 use RuntimeException;
 
 abstract class Controller implements ControllerInterface, ContextInterface
 {
+    use ConfigurableTrait;
+
+    protected Config $config;
+
     /**
      * @inheritDoc
      */
@@ -33,10 +36,18 @@ abstract class Controller implements ControllerInterface, ContextInterface
     /**
      * @inheritDoc
      */
-    public function getId(): string
+    public function getId(bool $short = true): string
     {
+        if ($short === false) {
+            return static::class;
+        }
         if ($this->id === null) {
-            $this->id = lcfirst(StringHelper::baseName(get_class($this), Ep::getConfig()->controllerDirAndSuffix));
+            $this->id = implode('/', array_filter(
+                array_map('lcfirst', explode(
+                    '\\',
+                    str_replace([$this->config->appNamespace, $this->getSuffix()], '', static::class)
+                ))
+            ));
         }
         return $this->id;
     }

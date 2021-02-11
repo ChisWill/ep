@@ -1,7 +1,9 @@
 <?php
 
 use Ep\Base\Route;
+use Ep\Console\ConsoleRequest;
 use Ep\Helper\Alias;
+use Ep\Standard\ConsoleRequestInterface;
 use Ep\Web\ServerRequestFactory;
 use Ep\Standard\RouteInterface;
 use Ep\Standard\ServerRequestFactoryInterface as EpServerRequestFactoryInterface;
@@ -39,6 +41,8 @@ $config = Ep::getConfig();
 return [
     // Route
     RouteInterface::class => Route::class,
+    // Console
+    ConsoleRequestInterface::class => ConsoleRequest::class,
     // ServerRequest
     EpServerRequestFactoryInterface::class => YiiServerRequestFactory::class,
     ServerRequestFactoryInterface::class => ServerRequestFactory::class,

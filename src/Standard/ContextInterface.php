@@ -6,5 +6,8 @@ namespace Ep\Standard;
 
 interface ContextInterface
 {
-    public function getId(): string;
+    /**
+     * 获取上下文代号，默认获取短名称
+     */
+    public function getId(bool $short = true): string;
 }

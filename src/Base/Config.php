@@ -19,7 +19,7 @@ final class Config
      */
     public string $rootPath = '';
     /**
-     * 项目路由的根 URL，必须以 / 开头
+     * 默认路由的根 URL，必须以 / 开头
      */
     public string $baseUrl = '/';
     /**
@@ -31,9 +31,13 @@ final class Config
      */
     public string $env = 'prod';
     /**
-     * 控制器所在文件夹名以及类名后缀，强制统一
+     * Web 控制器所在目录名以及类名后缀，强制统一
      */
     public string $controllerDirAndSuffix = 'Controller';
+    /**
+     * Console 控制器所在目录名以及类名后缀，强制统一
+     */
+    public string $commandDirAndSuffix = 'Command';
     /**
      * Action 后缀
      */
@@ -47,9 +51,13 @@ final class Config
      */
     public string $defaultAction = 'index';
     /**
-     * 视图文件夹地址，支持从路由中获取参数，获取不到时将自动忽略
+     * 视图目录地址
      */
-    public string $viewPath = '@root/views/<prefix>';
+    public string $viewPath = '@root/views';
+    /**
+     * Layout 目录名称
+     */
+    public string $layoutDir = '_layouts';
     /**
      * 运行时缓存目录地址
      */
@@ -117,7 +125,7 @@ final class Config
      * };
      * ```
      */
-    private Closure $route;
+    private ?Closure $route = null;
     /**
      * 事件配置
      */
@@ -145,7 +153,7 @@ final class Config
         throw new InvalidArgumentException("{$name} is invalid.");
     }
 
-    public function getRoute(): Closure
+    public function getRoute(): ?Closure
     {
         return $this->route;
     }

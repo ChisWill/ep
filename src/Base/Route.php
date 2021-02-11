@@ -14,16 +14,17 @@ use RuntimeException;
 
 use function FastRoute\cachedDispatcher;
 
-final class Route implements RouteInterface
+class Route implements RouteInterface
 {
+    use ConfigurableTrait;
+
     private Config $config;
-    private array $captureParams = [];
+    private string $baseUrl;
+    private string $controllerSuffix;
 
-    public function __construct()
-    {
-        $this->config = Ep::getConfig();
-    }
-
+    /**
+     * @inheritDoc
+     */
     public function matchRequest(string $path, string $method = 'GET'): array
     {
         return cachedDispatcher(function (RouteCollector $route) {
@@ -31,26 +32,29 @@ final class Route implements RouteInterface
             if (is_callable($callback)) {
                 call_user_func($callback, $route);
             }
-            $route->addGroup($this->config->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
+            $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
         }, [
             'cacheFile' => Alias::get($this->config->runtimeDir . '/route.cache'),
             'cacheDisabled' => $this->config->debug
         ])->dispatch($method, rtrim($path, '/') ?: '/');
     }
 
+    /**
+     * @inheritDoc
+     */
     public function solveRouteInfo(array $routeInfo): array
     {
         switch ($routeInfo[0]) {
+            case Dispatcher::FOUND:
+                [$handler, $params] = $this->replaceHandler($routeInfo[1], $routeInfo[2]);
+                break;
             case Dispatcher::NOT_FOUND:
                 $params = [];
                 $handler = $this->config->errorHandler;
                 break;
-            case Dispatcher::METHOD_NOT_ALLOWED:
+            default:
                 $params = [];
                 $handler = $this->config->errorHandler;
-                break;
-            case Dispatcher::FOUND:
-                [$handler, $params] = $this->replaceHandler($routeInfo[1], $routeInfo[2]);
                 break;
         }
         return [$handler, $params];
@@ -65,14 +69,18 @@ final class Route implements RouteInterface
         $match = array_flip($matches[1]);
         $intersect = array_intersect_key($params, $match);
         $params = array_diff_key($params, $match);
+        $captureParams = [];
         foreach ($intersect as $key => &$value) {
             $value = strtolower($value);
-            $this->captureParams['<' . $key . '>'] = trim($value, '/');
+            $captureParams['<' . $key . '>'] = trim($value, '/');
         }
-        $handler = strtr($handler, $this->captureParams);
+        $handler = strtr($handler, $captureParams);
         return [$handler, $params];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function parseHandler($handler): array
     {
         if (is_array($handler)) {
@@ -96,15 +104,17 @@ final class Route implements RouteInterface
                 break;
         }
         if ($prefix) {
-            $ns = strpos($prefix, '\\\\') === false ? $prefix . '\\' . $this->config->controllerDirAndSuffix : str_replace('\\\\', '\\' . $this->config->controllerDirAndSuffix . '\\', $prefix);
+            $ns = strpos($prefix, '\\\\') === false ? $prefix . '\\' . $this->controllerSuffix : str_replace('\\\\', '\\' . $this->controllerSuffix . '\\', $prefix);
         } else {
-            $ns = $this->config->controllerDirAndSuffix;
+            $ns = $this->controllerSuffix;
         }
-        $controller = sprintf('%s\\%s\\%s', $this->config->appNamespace, $ns, ucfirst($controller) . $this->config->controllerDirAndSuffix);
+        $controller = sprintf('%s\\%s\\%s', $this->config->appNamespace, $ns, ucfirst($controller) . $this->controllerSuffix);
         return [$controller, $action];
     }
 
     /**
+     * @inheritDoc
+     * 
      * @throws RuntimeException
      */
     public function createController(string $class): ControllerInterface
@@ -113,10 +123,5 @@ final class Route implements RouteInterface
             throw new RuntimeException("{$class} is not found.");
         }
         return Ep::getDi()->get($class);
-    }
-
-    public function getCaptureParams(): array
-    {
-        return $this->captureParams;
     }
 }
