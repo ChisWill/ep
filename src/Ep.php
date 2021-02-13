@@ -20,16 +20,13 @@ final class Ep
 
     private static ContainerInterface $di;
 
-    private static array $params;
-
     public static function init(array $config = []): void
     {
         self::$config = new Config($config);
 
         Alias::set('@root', self::$config->rootPath);
+        Alias::set('@vendor', self::$config->vendorPath);
         Alias::set('@ep', dirname(__DIR__, 1));
-
-        self::$params = self::$config->getParams();
 
         self::$di = new Container(Arr::merge(
             require(Alias::get('@ep/config/definitions.php')),
@@ -79,6 +76,6 @@ final class Ep
 
     public static function getParams(): array
     {
-        return self::$params;
+        return self::$config->getParams();
     }
 }

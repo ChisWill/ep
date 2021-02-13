@@ -2,7 +2,8 @@
 
 return [
     'appNamespace' => 'Ep\Tests\Advance',
-    'rootPath' => dirname(__DIR__),
+    'rootPath' => dirname(__DIR__, 1),
+    'vendorPath' => dirname(__DIR__, 3) . '/vendor',
     'baseUrl' => '/ad',
     'mysqlDsn' => 'mysql:host=127.0.0.1;dbname=test',
     'mysqlUsername' => 'root',

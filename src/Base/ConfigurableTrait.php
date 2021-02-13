@@ -16,4 +16,16 @@ trait ConfigurableTrait
         }
         return $this;
     }
+
+    /**
+     * @return static
+     */
+    public function withConfig(array $config)
+    {
+        $new = clone $this;
+        foreach ($config as $k => $v) {
+            $new->$k = $v;
+        }
+        return $new;
+    }
 }

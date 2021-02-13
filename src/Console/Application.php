@@ -11,12 +11,19 @@ use Ep\Standard\RouteInterface;
 final class Application extends \Ep\Base\Application
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    protected function handle(): int
+    protected function register(): void
+    {
+        Ep::getDi()->get(ErrorHandler::class)->register();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function handle(): void
     {
         $this->handleRequest($this->createRequest());
-        return 0;
     }
 
     private function createRequest(): ConsoleRequestInterface
@@ -42,9 +49,6 @@ final class Application extends \Ep\Base\Application
         [$controller, $action] = $route->parseHandler($handler);
         return $route
             ->createController($controller)
-            ->setConfig([
-                'config' => $config
-            ])
             ->run($action, $request);
     }
 }

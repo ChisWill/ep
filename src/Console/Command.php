@@ -12,11 +12,11 @@ use Ep\Standard\ViewInterface;
 abstract class Command extends \Ep\Base\Controller
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getSuffix(): string
     {
-        return $this->config->commandDirAndSuffix;
+        return Ep::getConfig()->commandDirAndSuffix;
     }
 
     /**
@@ -28,11 +28,12 @@ abstract class Command extends \Ep\Base\Controller
     }
 
     /**
-     * @param  string
+     * @param  ConsoleRequestInterface $request 
+     * @param  string                  $response
      * 
      * @return string
      */
-    protected function afterAction($response)
+    protected function afterAction($request, $response)
     {
         return $response;
     }
@@ -45,7 +46,7 @@ abstract class Command extends \Ep\Base\Controller
     protected function getView(): ViewInterface
     {
         if ($this->view === null) {
-            $this->view = Ep::getInjector()->make(View::class, ['context' => $this, 'viewPath' => $this->config->viewPath]);
+            $this->view = Ep::getInjector()->make(View::class, ['context' => $this, 'viewPath' => Ep::getConfig()->viewPath]);
         }
         return $this->view;
     }

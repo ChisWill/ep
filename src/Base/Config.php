@@ -51,17 +51,21 @@ final class Config
      */
     public string $defaultAction = 'index';
     /**
-     * 视图目录地址
+     * 运行时缓存目录路径
+     */
+    public string $runtimeDir = '@root/runtime';
+    /**
+     * Vendor 目录路径
+     */
+    public string $vendorPath = '@root/vendor';
+    /**
+     * View 目录路径
      */
     public string $viewPath = '@root/views';
     /**
      * Layout 目录名称
      */
     public string $layoutDir = '_layouts';
-    /**
-     * 运行时缓存目录地址
-     */
-    public string $runtimeDir = '@root/runtime';
     /**
      * 默认的错误处理器
      */

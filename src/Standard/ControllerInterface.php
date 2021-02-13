@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Standard;
 
-interface ControllerInterface extends ConfigurableInterface
+interface ControllerInterface
 {
     public function run(string $action, $request);
 

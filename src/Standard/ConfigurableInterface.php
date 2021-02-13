@@ -14,4 +14,11 @@ interface ConfigurableInterface
      * @return static
      */
     public function setConfig(array $config);
+
+    /**
+     * 当想以某个实例为模板，快速复制一个具有新配置的实例时使用
+     * 
+     * @return static
+     */
+    public function withConfig(array $config);
 }

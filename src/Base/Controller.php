@@ -12,12 +12,8 @@ use RuntimeException;
 
 abstract class Controller implements ControllerInterface, ContextInterface
 {
-    use ConfigurableTrait;
-
-    protected Config $config;
-
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function run(string $action, $request)
     {
@@ -27,14 +23,14 @@ abstract class Controller implements ControllerInterface, ContextInterface
         }
         if ($this->beforeAction($request)) {
             $response = Ep::getInjector()->invoke([$this, $action], [$request]);
-            return $this->afterAction($response);
+            return $this->afterAction($request, $response);
         }
     }
 
     private ?string $id = null;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getId(bool $short = true): string
     {
@@ -45,7 +41,7 @@ abstract class Controller implements ControllerInterface, ContextInterface
             $this->id = implode('/', array_filter(
                 array_map('lcfirst', explode(
                     '\\',
-                    str_replace([$this->config->appNamespace, $this->getSuffix()], '', static::class)
+                    str_replace([Ep::getConfig()->appNamespace, $this->getSuffix()], '', static::class)
                 ))
             ));
         }
@@ -54,7 +50,7 @@ abstract class Controller implements ControllerInterface, ContextInterface
 
     protected abstract function beforeAction($request): bool;
 
-    protected abstract function afterAction($response);
+    protected abstract function afterAction($request, $response);
 
     protected abstract function getView(): ViewInterface;
 }

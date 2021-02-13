@@ -23,7 +23,7 @@ class Route implements RouteInterface
     private string $controllerSuffix;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function matchRequest(string $path, string $method = 'GET'): array
     {
@@ -40,7 +40,7 @@ class Route implements RouteInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function solveRouteInfo(array $routeInfo): array
     {
@@ -79,7 +79,7 @@ class Route implements RouteInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function parseHandler($handler): array
     {
@@ -114,7 +114,6 @@ class Route implements RouteInterface
 
     /**
      * @inheritDoc
-     * 
      * @throws RuntimeException
      */
     public function createController(string $class): ControllerInterface

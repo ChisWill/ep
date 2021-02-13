@@ -9,14 +9,21 @@ use Ep\Standard\RouteInterface;
 use Ep\Standard\ServerRequestFactoryInterface;
 use Yiisoft\Http\Method;
 use Yiisoft\Yii\Web\SapiEmitter;
-use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class Application extends \Ep\Base\Application
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     */
+    protected function register(): void
+    {
+        Ep::getDi()->get(ErrorHandler::class)->register();
+    }
+
+    /**
+     * {@inheritDoc}
      */
     protected function handle(): void
     {
@@ -54,10 +61,6 @@ final class Application extends \Ep\Base\Application
         [$controller, $action] = $route->parseHandler($handler);
         return $route
             ->createController($controller)
-            ->setConfig([
-                'config' => $config,
-                'responseFactory' => Ep::getDi()->get(ResponseFactoryInterface::class)
-            ])
             ->run($action, $request);
     }
 }

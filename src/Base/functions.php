@@ -5,7 +5,7 @@
  */
 function tes(...$args): void
 {
-    $caller = debug_backtrace()[1]['function'] ?? 'tes';
+    $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'] ?? 'test';
     $func = strpos($caller, 'dum') === false ? 'print_r' : 'var_dump';
     $isCli = PHP_SAPI === 'cli';
     if (!$isCli && !in_array('Content-type:text/html;charset=utf-8', headers_list())) {

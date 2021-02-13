@@ -5,23 +5,18 @@ declare(strict_types=1);
 namespace Ep\Web;
 
 use Ep;
-use Ep\Standard\ViewInterface;
-use Yiisoft\Http\Header;
 use Yiisoft\Http\Status;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 
 abstract class Controller extends \Ep\Base\Controller
 {
-    protected ResponseFactoryInterface $responseFactory;
-
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getSuffix(): string
     {
-        return $this->config->controllerDirAndSuffix;
+        return Ep::getConfig()->controllerDirAndSuffix;
     }
 
     /**
@@ -33,60 +28,58 @@ abstract class Controller extends \Ep\Base\Controller
     }
 
     /**
-     * @param  ResponseInterface $response
+     * @param  ServerRequestInterface $request
+     * @param  ResponseInterface      $response
      * 
      * @return ResponseInterface
      */
-    protected function afterAction($response)
+    protected function afterAction($request, $response)
     {
         return $response;
     }
 
-    private ?ViewInterface $view = null;
+    private ?Service $service = null;
 
-    /**
-     * @return View
-     */
-    protected function getView(): ViewInterface
+    protected function getService(): Service
+    {
+        if ($this->service === null) {
+            $this->service = Ep::getDi()->get(Service::class);
+        }
+        return $this->service;
+    }
+
+    private ?View $view = null;
+
+    protected function getView(): View
     {
         if ($this->view === null) {
-            $this->view = Ep::getInjector()->make(View::class, ['context' => $this, 'viewPath' => $this->config->viewPath]);
+            $this->view = Ep::getInjector()->make(View::class, ['context' => $this, 'viewPath' => Ep::getConfig()->viewPath]);
         }
         return $this->view;
     }
 
     protected function string(string $data = ''): ResponseInterface
     {
-        $response = $this->responseFactory
-            ->createResponse(Status::OK)
-            ->withHeader(Header::CONTENT_TYPE, 'text/html; charset=UTF-8');
-        $response->getBody()->write($data);
-        return $response;
+        return $this->getService()->string($data);
     }
 
     protected function json(array $data = []): ResponseInterface
     {
-        $response = $this->responseFactory
-            ->createResponse(Status::OK)
-            ->withHeader(Header::CONTENT_TYPE, 'application/json; charset=UTF-8');
-        $response->getBody()->write(json_encode($data));
-        return $response;
+        return $this->getService()->json($data);
     }
 
     protected function render(string $view, array $params = []): ResponseInterface
     {
-        return $this->string($this->getView()->render($view, $params));
+        return $this->getService()->string($this->getView()->render($view, $params));
     }
 
     protected function renderPartial(string $view, array $params = []): ResponseInterface
     {
-        return $this->string($this->getView()->renderPartial($view, $params));
+        return $this->getService()->string($this->getView()->renderPartial($view, $params));
     }
 
     protected function redirect(string $url, int $statusCode = Status::FOUND): ResponseInterface
     {
-        return $this->responseFactory
-            ->createResponse($statusCode)
-            ->withHeader(Header::LOCATION, $url);
+        return $this->getService()->redirect($url, $statusCode);
     }
 }

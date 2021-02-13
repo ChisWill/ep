@@ -10,7 +10,7 @@ use RuntimeException;
 class ConsoleRequest implements ConsoleRequestInterface
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getRoute(): string
     {
@@ -20,7 +20,7 @@ class ConsoleRequest implements ConsoleRequestInterface
     private ?array $params = null;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getParams(): array
     {

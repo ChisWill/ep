@@ -13,9 +13,10 @@ class View implements ViewInterface
 {
     public string $layout = 'main';
 
-    private Config $confg;
+    protected Config $confg;
+    protected ContextInterface $context;
+
     private string $viewPath;
-    private ContextInterface $context;
 
     public function __construct(ContextInterface $context, string $viewPath)
     {
@@ -39,6 +40,14 @@ class View implements ViewInterface
         return $this->renderPhpFile($this->findViewFile($path), $params);
     }
 
+    protected function loadFile(string $file): string
+    {
+        if (strpos($file, '/') !== 0) {
+            $file = '/' . $this->context->getId() . '/' . $file;
+        }
+        return file_get_contents($this->findViewFile($file, false));
+    }
+
     private function renderLayout(string $layout, array $params = []): string
     {
         if (strpos($layout, '/') !== 0) {
@@ -53,9 +62,9 @@ class View implements ViewInterface
         return $this->renderPhpFile($this->findViewFile($layout), $params);
     }
 
-    private function findViewFile(string $path): string
+    private function findViewFile(string $path, bool $isPHPFile = true): string
     {
-        return Alias::get($this->viewPath . $path . '.php');
+        return Alias::get($this->viewPath . $path . ($isPHPFile ? '.php' : ''));
     }
 
     private function renderPhpFile(string $_file_, array $_params_ = []): string

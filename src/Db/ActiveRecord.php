@@ -77,7 +77,7 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getAttributeValue(string $attribute)
     {
