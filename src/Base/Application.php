@@ -15,12 +15,16 @@ abstract class Application
 
     public function run(): void
     {
-        $this->register();
+        $request = $this->createRequest();
 
-        $this->handle();
+        $this->register($request);
+
+        $this->handleRequest($request);
     }
 
-    protected abstract function handle(): void;
+    abstract protected function createRequest();
 
-    protected abstract function register(): void;
+    abstract protected function register($request): void;
+
+    abstract protected function handleRequest($request): void;
 }

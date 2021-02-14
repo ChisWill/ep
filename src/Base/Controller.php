@@ -38,19 +38,20 @@ abstract class Controller implements ControllerInterface, ContextInterface
             return static::class;
         }
         if ($this->id === null) {
+            $config = Ep::getConfig();
             $this->id = implode('/', array_filter(
                 array_map('lcfirst', explode(
                     '\\',
-                    str_replace([Ep::getConfig()->appNamespace, $this->getSuffix()], '', static::class)
+                    str_replace([$config->appNamespace, PHP_SAPI === 'cli' ? $config->commandDirAndSuffix : $config->controllerDirAndSuffix], '', static::class)
                 ))
             ));
         }
         return $this->id;
     }
 
-    protected abstract function beforeAction($request): bool;
+    abstract protected function beforeAction($request): bool;
 
-    protected abstract function afterAction($request, $response);
+    abstract protected function afterAction($request, $response);
 
-    protected abstract function getView(): ViewInterface;
+    abstract protected function getView(): ViewInterface;
 }

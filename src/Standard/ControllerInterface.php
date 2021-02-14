@@ -7,6 +7,4 @@ namespace Ep\Standard;
 interface ControllerInterface
 {
     public function run(string $action, $request);
-
-    public function getSuffix(): string;
 }

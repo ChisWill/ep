@@ -25,7 +25,7 @@ final class Config
     /**
      * 是否开启调试模式
      */
-    public bool $debug = false;
+    public bool $debug = true;
     /**
      * 项目运行的当前环境
      */
@@ -67,9 +67,13 @@ final class Config
      */
     public string $layoutDir = '_layouts';
     /**
-     * 默认的错误处理器
+     * 页面未找到处理器
      */
-    public string $errorHandler = 'error/index';
+    public string $notFoundHandler = 'index/miss';
+    /**
+     * 错误处理器
+     */
+    public string $errorHandler = 'index/error';
     /**
      * 默认路由规则
      */

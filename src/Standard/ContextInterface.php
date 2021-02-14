@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Ep\Standard;
 
+/**
+ * @property string $id
+ */
 interface ContextInterface
 {
     /**

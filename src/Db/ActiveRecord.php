@@ -56,8 +56,6 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
         }
     }
 
-    protected abstract function rules(): array;
-
     private array $_errors = [];
 
     public function validate(): bool
@@ -83,4 +81,6 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
     {
         return $this->getAttribute($attribute);
     }
+
+    abstract protected function rules(): array;
 }

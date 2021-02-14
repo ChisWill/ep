@@ -12,14 +12,6 @@ use Ep\Standard\ViewInterface;
 abstract class Command extends \Ep\Base\Controller
 {
     /**
-     * {@inheritDoc}
-     */
-    public function getSuffix(): string
-    {
-        return Ep::getConfig()->commandDirAndSuffix;
-    }
-
-    /**
      * @param ConsoleRequestInterface $request
      */
     protected function beforeAction($request): bool

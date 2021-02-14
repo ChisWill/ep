@@ -5,7 +5,9 @@ namespace Ep\Tests\Basic\Controller;
 use Ep;
 use Ep\Tests\Basic\Component\Controller;
 use Ep\Web\ErrorHandler;
+use Exception;
 use RuntimeException;
+use Yiisoft\Http\Status;
 
 class IndexController extends Controller
 {
@@ -18,11 +20,21 @@ class IndexController extends Controller
         return $this->render('index', compact('message'));
     }
 
+    public function missAction()
+    {
+        return $this->string('迷路了', Status::NOT_FOUND);
+    }
+
     public function errorAction()
+    {
+        return $this->string('我错了');
+    }
+
+    public function testErrorAction()
     {
         $handler = Ep::getDi()->get(ErrorHandler::class);
 
-        return $handler->renderException(
+        return $this->string($handler->renderException(
             new RuntimeException(
                 '我错了',
                 500,
@@ -34,6 +46,6 @@ class IndexController extends Controller
                     )
                 ),
             )
-        );
+        ));
     }
 }

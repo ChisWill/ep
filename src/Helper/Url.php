@@ -16,6 +16,7 @@ class Url
      * @param  string  $url    基础网址
      * @param  array   $params URL参数
      * @param  boolean $sign   是否添加签名参数
+     * 
      * @return string
      */
     public static function addParams(string $url, array $params = [], bool $sign = false): string
@@ -39,6 +40,7 @@ class Url
      * 检查 URL 地址是否被篡改过
      * 
      * @param  array   $params 待检查参数
+     * 
      * @return boolean
      */
     public static function checkSign(array $params = [])
@@ -52,26 +54,23 @@ class Url
      * URL安全的 base64 编码
      * 
      * @param  string $string
+     * 
      * @return string
      */
-    public static function base64encode(string $string): string
+    public static function base64encode(string $input): string
     {
-        return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($string));
+        return strtr(base64_encode($input), '+/', '-_');
     }
 
     /**
      * URL安全的 base64 解码
      * 
-     * @param  string $string
+     * @param  string $input
+     * 
      * @return string
      */
-    public static function base64decode(string $string): string
+    public static function base64decode(string $input): string
     {
-        $string = str_replace(['-', '_'], ['+', '/'], $string);
-        $mod4 = strlen($string) % 4;
-        if ($mod4) {
-            $string .= substr('====', $mod4);
-        }
-        return base64_decode($string);
+        return base64_decode(strtr($input, '-_', '+/'));
     }
 }

@@ -18,10 +18,10 @@ class Service
         $this->responseFactory = $responseFactory;
     }
 
-    public function string(string $data): ResponseInterface
+    public function string(string $data, int $statusCode = Status::OK): ResponseInterface
     {
         $response = $this->responseFactory
-            ->createResponse(Status::OK)
+            ->createResponse($statusCode)
             ->withHeader(Header::CONTENT_TYPE, 'text/html; charset=UTF-8');
         $response->getBody()->write($data);
         return $response;

@@ -196,6 +196,7 @@ class Arr
      * 数组转 XML
      * 
      * @param  array  $array 待转换数组
+     * 
      * @return string        XML
      */
     public static function toXml(array $array): string
@@ -216,6 +217,7 @@ class Arr
      * XML 转数组
      * 
      * @param  string $xml 待转换 XML 字符
+     * 
      * @return array       数组
      */
     public static function fromXml(string $xml): array

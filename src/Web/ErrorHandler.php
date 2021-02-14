@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace Ep\Web;
 
 use Ep;
+use Ep\Base\ControllerFactory;
 use Ep\Helper\Alias;
 use Ep\Helper\Date;
 use Ep\Standard\ContextInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Yiisoft\Http\Method;
+use Yiisoft\Http\Status;
 use Throwable;
 
 class ErrorHandler extends \Ep\Base\ErrorHandler implements ContextInterface
@@ -18,12 +23,10 @@ class ErrorHandler extends \Ep\Base\ErrorHandler implements ContextInterface
 
     public array $displayVars = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION'];
 
-    private View $view;
     private string $vendorPath;
 
     protected function init(): void
     {
-        $this->view = Ep::getInjector()->make(View::class, ['context' => $this, 'viewPath' => '@ep/views']);
         $this->vendorPath = Alias::get('@vendor');
     }
 
@@ -39,18 +42,52 @@ class ErrorHandler extends \Ep\Base\ErrorHandler implements ContextInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function renderException(Throwable $exception): string
+    private ?View $view = null;
+
+    protected function getView(): View
     {
-        return $this->view->renderPartial('exception', compact('exception'));
+        if ($this->view === null) {
+            $this->view = Ep::getInjector()->make(View::class, ['context' => $this, 'viewPath' => '@ep/views']);
+        }
+        return $this->view;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     */
+    protected function log(Throwable $e, $request): void
+    {
+        $context = [
+            'category' => 'exception',
+            'host' => $request->getUri()->getHost(),
+            'path' => $request->getRequestTarget(),
+            'method' => $request->getMethod()
+        ];
+        if ($request->getMethod() === Method::POST) {
+            $context['post'] = $request->getParsedBody();
+        }
+        $this->logger->error($this->convertToString($e), $context);
+    }
+
+    /**
+     * @param ServerRequestInterface|null $request
+     * 
+     * @return string|ResponseInterface|null
+     */
+    public function renderException(Throwable $exception, $request = null)
+    {
+        if (Ep::getConfig()->debug) {
+            http_response_code(Status::INTERNAL_SERVER_ERROR);
+            return $this->getView()->renderPartial('exception', compact('exception'));
+        } else {
+            return (new ControllerFactory)->run(Ep::getConfig()->errorHandler, $request);
+        }
     }
 
     public function renderPreviousException(Throwable $e)
     {
         if (($previous = $e->getPrevious()) !== null) {
-            return $this->view->renderPartial('_previous', ['exception' => $previous]);
+            return $this->getView()->renderPartial('_previous', ['exception' => $previous]);
         } else {
             return '';
         }
@@ -66,13 +103,12 @@ class ErrorHandler extends \Ep\Base\ErrorHandler implements ContextInterface
             if ($line < 0 || $lines === false || ($lineCount = count($lines)) < $line) {
                 return '';
             }
-
             $half = (int) (($index === 1 ? $this->maxSourceLines : $this->maxTraceSourceLines) / 2);
             $begin = $line - $half > 0 ? $line - $half : 0;
             $end = $line + $half < $lineCount ? $line + $half : $lineCount - 1;
         }
 
-        return $this->view->renderPartial('_item', [
+        return $this->getView()->renderPartial('_item', [
             'file' => $file,
             'line' => $line,
             'class' => $class,
@@ -93,7 +129,6 @@ class ErrorHandler extends \Ep\Base\ErrorHandler implements ContextInterface
                 $request .= '$' . $name . ' = ' . var_export($GLOBALS[$name], true) . ";\n\n";
             }
         }
-
         if ($request) {
             return '<pre>' . rtrim($request, "\n") . '</pre>';
         } else {

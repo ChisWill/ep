@@ -9,7 +9,7 @@ return [
     'mysqlUsername' => 'root',
     'mysqlPassword' => '',
     'env' => 'test',
-    'debug' => true,
+    'debug' => false,
     'secretKey' => '8FFA893E119A32D0C6A686863217A181',
     'errorHandler' => 'index/error',
     'route' => require('route.php'),

@@ -12,14 +12,6 @@ use Psr\Http\Message\ResponseInterface;
 abstract class Controller extends \Ep\Base\Controller
 {
     /**
-     * {@inheritDoc}
-     */
-    public function getSuffix(): string
-    {
-        return Ep::getConfig()->controllerDirAndSuffix;
-    }
-
-    /**
      * @param ServerRequestInterface $request
      */
     protected function beforeAction($request): bool
@@ -58,9 +50,9 @@ abstract class Controller extends \Ep\Base\Controller
         return $this->view;
     }
 
-    protected function string(string $data = ''): ResponseInterface
+    protected function string(string $data = '', int $statusCode = Status::FOUND): ResponseInterface
     {
-        return $this->getService()->string($data);
+        return $this->getService()->string($data, $statusCode);
     }
 
     protected function json(array $data = []): ResponseInterface

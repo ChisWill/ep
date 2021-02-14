@@ -10,6 +10,7 @@ class Number
      * 判断是否是质数
      * 
      * @param  int  $number
+     * 
      * @return bool
      */
     function isPrime(int $number): bool

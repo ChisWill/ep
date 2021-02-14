@@ -126,6 +126,7 @@ class Curl
      * @param  array        $data     二维数组时，表示使用多个请求参数
      * @param  array        $options  二维数组时，表示使用多个选项
      * @param  int          $batch    当设置值大于1时，且以上参数都为单值时，则以同样配置发起批量请求
+     * 
      * @return array
      */
     public static function postMulti($urls, array $data, array $options = [], int $batch = 1): array

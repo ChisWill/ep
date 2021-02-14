@@ -120,6 +120,7 @@ class Alias
      * 判断是否是别名
      * 
      * @param  string $alias 别名
+     * 
      * @return bool
      */
     public static function isAlias(string $alias): bool

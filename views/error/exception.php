@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @var Exception $exception
+ * @var Throwable $exception
  * @var Ep\Web\View $this
  * @var Ep\Web\ErrorHandler $handler
  */
@@ -23,7 +23,7 @@ $handler = $this->context;
 
 <body>
     <div class="header">
-        <h1><?= get_class($exception) . ($exception->getCode() ? (' : ' . $exception->getCode()) : '') ?></h1>
+        <h1><?= ($exception instanceof ErrorException ? '<span>' . $handler->getErrorName($exception->getSeverity()) . '</span> &ndash; ' : '') . get_class($exception) ?></h1>
         <h2><?= nl2br($handler->htmlEncode($exception->getMessage())) ?></h2>
         <?= $handler->renderPreviousException($exception) ?>
     </div>
