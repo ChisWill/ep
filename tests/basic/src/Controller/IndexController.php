@@ -2,16 +2,12 @@
 
 namespace Ep\Tests\Basic\Controller;
 
-use Ep;
 use Ep\Tests\Basic\Component\Controller;
-use Ep\Web\ErrorHandler;
-use Exception;
-use RuntimeException;
 use Yiisoft\Http\Status;
 
 class IndexController extends Controller
 {
-    public string $name = 'idx';
+    public string $title = '首页';
 
     public function indexAction()
     {
@@ -28,24 +24,5 @@ class IndexController extends Controller
     public function errorAction()
     {
         return $this->string('我错了');
-    }
-
-    public function testErrorAction()
-    {
-        $handler = Ep::getDi()->get(ErrorHandler::class);
-
-        return $this->string($handler->renderException(
-            new RuntimeException(
-                '我错了',
-                500,
-                new \Yiisoft\Db\Exception\Exception(
-                    "我又错啦",
-                    [],
-                    new \Yiisoft\Db\Exception\Exception(
-                        "我怎么总错",
-                    )
-                ),
-            )
-        ));
     }
 }

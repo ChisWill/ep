@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
+use Ep\Standard\ConsoleRequestInterface;
 use Ep\Standard\ControllerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 
 final class ControllerFactory
@@ -20,7 +22,10 @@ final class ControllerFactory
     }
 
     /**
-     * @param string|array $hander
+     * @param  string|array $handler
+     * @param  ServerRequestInterface|ConsoleRequestInterface $request
+     * 
+     * @return mixed
      */
     public function run($handler, $request)
     {
@@ -28,7 +33,7 @@ final class ControllerFactory
 
         $controller = $this->create($class);
 
-        return $controller->run($action, $request);
+        return $this->runAction($controller, $action, $request);
     }
 
     private function create(string $class): ControllerInterface
@@ -39,6 +44,27 @@ final class ControllerFactory
         return Ep::getDi()->get($class);
     }
 
+    /**
+     * @param  ServerRequestInterface|ConsoleRequestInterface $request
+     * 
+     * @return mixed
+     */
+    private function runAction(ControllerInterface $controller, string $action, $request)
+    {
+        $action .= $this->config->actionSuffix;
+        if (!is_callable([$controller, $action])) {
+            throw new RuntimeException(sprintf('%s::%s() is not found.', get_class($controller), $action));
+        }
+        $response = $controller->before($request);
+        if ($response === true) {
+            $response = Ep::getInjector()->invoke([$controller, $action], [$request]);
+        }
+        return $controller->after($request, $response);
+    }
+
+    /**
+     * @param string|array $handler
+     */
     private function parseHandler($handler): array
     {
         if (is_array($handler)) {

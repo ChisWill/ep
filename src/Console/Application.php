@@ -33,6 +33,7 @@ final class Application extends \Ep\Base\Application
     protected function handleRequest($request): void
     {
         [$handler] = (new Route)->match($request->getRoute());
+
         (new ControllerFactory)->run($handler, $request);
     }
 }

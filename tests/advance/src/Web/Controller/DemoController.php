@@ -6,6 +6,8 @@ use Ep\Tests\Advance\Common\Component\Controller;
 
 class DemoController extends Controller
 {
+    public string $title = 'Advance Demo';
+
     public function testAction()
     {
 

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
+use Ep\Standard\ConsoleRequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 abstract class Application
 {
@@ -22,9 +24,24 @@ abstract class Application
         $this->handleRequest($request);
     }
 
+    /**
+     * 创建请求对象
+     * 
+     * @return ServerRequestInterface|ConsoleRequestInterface
+     */
     abstract protected function createRequest();
 
+    /**
+     * 注册事件
+     * 
+     * @param ServerRequestInterface|ConsoleRequestInterface $request
+     */
     abstract protected function register($request): void;
 
+    /**
+     * 处理请求
+     * 
+     * @param ServerRequestInterface|ConsoleRequestInterface $request
+     */
     abstract protected function handleRequest($request): void;
 }

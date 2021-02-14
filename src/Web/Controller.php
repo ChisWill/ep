@@ -5,27 +5,31 @@ declare(strict_types=1);
 namespace Ep\Web;
 
 use Ep;
+use Ep\Base\View;
+use Ep\Standard\ControllerInterface;
 use Yiisoft\Http\Status;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-abstract class Controller extends \Ep\Base\Controller
+abstract class Controller implements ControllerInterface
 {
+    public string $id = '';
+
     /**
-     * @param ServerRequestInterface $request
+     * @param  ServerRequestInterface $request
+     * 
+     * @return ResponseInterface|bool
      */
-    protected function beforeAction($request): bool
+    public function before($request)
     {
         return true;
     }
 
     /**
      * @param  ServerRequestInterface $request
-     * @param  ResponseInterface      $response
-     * 
-     * @return ResponseInterface
+     * @param  ResponseInterface|null $response
      */
-    protected function afterAction($request, $response)
+    public function after($request, $response): ?ResponseInterface
     {
         return $response;
     }
@@ -45,12 +49,12 @@ abstract class Controller extends \Ep\Base\Controller
     protected function getView(): View
     {
         if ($this->view === null) {
-            $this->view = Ep::getInjector()->make(View::class, ['context' => $this, 'viewPath' => Ep::getConfig()->viewPath]);
+            $this->view = new View($this, Ep::getConfig()->viewPath);
         }
         return $this->view;
     }
 
-    protected function string(string $data = '', int $statusCode = Status::FOUND): ResponseInterface
+    protected function string(string $data = '', int $statusCode = Status::OK): ResponseInterface
     {
         return $this->getService()->string($data, $statusCode);
     }

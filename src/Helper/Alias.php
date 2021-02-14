@@ -8,7 +8,7 @@ use InvalidArgumentException;
 
 class Alias
 {
-    protected static $aliases = [];
+    protected static array $aliases = [];
 
     /**
      * 设置别名

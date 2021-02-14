@@ -7,38 +7,38 @@ namespace Ep\Console;
 use Ep;
 use Ep\Base\View;
 use Ep\Standard\ConsoleRequestInterface;
-use Ep\Standard\ViewInterface;
+use Ep\Standard\ControllerInterface;
 
-abstract class Command extends \Ep\Base\Controller
+abstract class Command implements ControllerInterface
 {
     /**
      * @param ConsoleRequestInterface $request
      */
-    protected function beforeAction($request): bool
+    public function before($request)
     {
         return true;
     }
 
     /**
      * @param  ConsoleRequestInterface $request 
-     * @param  string                  $response
+     * @param  mixed                   $response
      * 
      * @return string
      */
-    protected function afterAction($request, $response)
+    public function after($request, $response)
     {
         return $response;
     }
 
-    private ?ViewInterface $view = null;
+    private ?View $view = null;
 
     /**
      * @return View
      */
-    protected function getView(): ViewInterface
+    protected function getView(): View
     {
         if ($this->view === null) {
-            $this->view = Ep::getInjector()->make(View::class, ['context' => $this, 'viewPath' => Ep::getConfig()->viewPath]);
+            $this->view = new View($this, Ep::getConfig()->viewPath);
         }
         return $this->view;
     }

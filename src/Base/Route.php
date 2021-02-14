@@ -8,30 +8,33 @@ use Ep;
 use Ep\Helper\Alias;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
+use Closure;
 
 use function FastRoute\cachedDispatcher;
 
 class Route
 {
+    public bool $default = true;
+
     private Config $config;
     private string $baseUrl;
+    private ?Closure $rule;
 
-    public function __construct()
+    public function __construct(?Closure $rule = null)
     {
         $this->config = Ep::getConfig();
         $this->baseUrl = PHP_SAPI === 'cli' ? '/' : $this->config->baseUrl;
+        $this->rule = $rule;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function match(string $path, string $method = 'GET'): array
     {
         return $this->solveRouteInfo(
             cachedDispatcher(function (RouteCollector $route) {
-                $callback = $this->config->getRoute();
-                $callback !== null && call_user_func($callback, $route);
-                $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
+                $rule = $this->config->getRoute();
+                $rule !== null && call_user_func($rule, $route);
+                $this->rule !== null && call_user_func($this->rule, $route);
+                $this->default && $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
             }, [
                 'cacheFile' => Alias::get($this->config->runtimeDir . '/route.cache'),
                 'cacheDisabled' => $this->config->debug
@@ -57,6 +60,9 @@ class Route
         return [$handler, $params];
     }
 
+    /**
+     * @param string|array $handler
+     */
     private function replaceHandler($handler, array $params): array
     {
         if (is_array($handler)) {

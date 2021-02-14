@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
+use Ep\Standard\ConsoleRequestInterface;
 use Yiisoft\Yii\Web\SapiEmitter;
 use Psr\Log\LoggerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use ErrorException;
 use Throwable;
@@ -35,10 +37,11 @@ abstract class ErrorHandler
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
-
-        $this->init();
     }
 
+    /**
+     * @param ServerRequestInterface|ConsoleRequestInterface $request
+     */
     public function register($request): void
     {
         set_exception_handler(fn (Throwable $e) => $this->handleException($e, $request));
@@ -46,6 +49,9 @@ abstract class ErrorHandler
         register_shutdown_function([$this, 'handleFatalError'], $request);
     }
 
+    /**
+     * @param ServerRequestInterface|ConsoleRequestInterface $request
+     */
     public function handleException(Throwable $e, $request): void
     {
         $this->unregister();
@@ -65,6 +71,9 @@ abstract class ErrorHandler
         throw new ErrorException($message, $severity, $severity, $file, $line);
     }
 
+    /**
+     * @param ServerRequestInterface|ConsoleRequestInterface $request
+     */
     public function handleFatalError($request): void
     {
         $error = error_get_last();
@@ -94,7 +103,7 @@ abstract class ErrorHandler
 
     private function isFatalError(array $error): bool
     {
-        return isset($error['type']) && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING], true);
+        return in_array($error['type'] ?? null, [E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING], true);
     }
 
     private function unregister(): void
@@ -103,7 +112,10 @@ abstract class ErrorHandler
         restore_exception_handler();
     }
 
-    private function send($data)
+    /**
+     * @param ResponseInterface|string|null $data
+     */
+    private function send($data): void
     {
         if (is_string($data)) {
             echo $data;
@@ -112,9 +124,15 @@ abstract class ErrorHandler
         }
     }
 
-    abstract protected function init(): void;
-
+    /**
+     * @param  ServerRequestInterface|ConsoleRequestInterface|null $request
+     * 
+     * @return ResponseInterface|string|null
+     */
     abstract protected function renderException(Throwable $e, $request = null);
 
+    /**
+     * @param ServerRequestInterface|ConsoleRequestInterface $request
+     */
     abstract protected function log(Throwable $e, $request): void;
 }

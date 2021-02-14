@@ -13,7 +13,7 @@ class File
      * 
      * @param  string $dir 文件路径
      * 
-     * @return array       包含文件夹的数组
+     * @return array
      * @throws RuntimeException
      */
     public static function getDirs(string $dir): array
@@ -42,9 +42,9 @@ class File
      *
      * @param  string   $path      文件夹位置
      * @param  integer  $mode      权限
-     * @param  boolean  $recursive 是否递归
+     * @param  bool     $recursive 是否递归
      * 
-     * @return boolean
+     * @return bool
      * @throws RuntimeException
      */
     public static function mkdir(string $path, int $mode = 0775, bool $recursive = true): bool

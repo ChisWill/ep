@@ -143,7 +143,7 @@ final class Config
      */
     private array $params = [];
 
-    public function __construct($config = [])
+    public function __construct(array $config = [])
     {
         foreach ($config as $key => $val) {
             $this->$key = $val;
@@ -156,7 +156,10 @@ final class Config
         }
     }
 
-    public function __set($name, $value)
+    /**
+     * @param mixed $value
+     */
+    public function __set(string $name, $value)
     {
         throw new InvalidArgumentException("{$name} is invalid.");
     }

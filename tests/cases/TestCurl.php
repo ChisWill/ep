@@ -11,7 +11,7 @@ class TestCurl extends TestCase
 {
     public function singleGetProvider(): array
     {
-        $baseUrl = 'http://ep.cc/web/demo/json';
+        $baseUrl = 'http://ep.cc/demo/json';
         return [
             [
                 'url' => $baseUrl . '',
@@ -50,7 +50,7 @@ class TestCurl extends TestCase
 
     public function singlePostProvider(): array
     {
-        $baseUrl = 'http://ep.cc/web/demo/json';
+        $baseUrl = 'http://ep.cc/demo/json';
         return [
             [
                 'url' => $baseUrl . '',
@@ -85,7 +85,7 @@ class TestCurl extends TestCase
 
     public function multiGetProvider(): array
     {
-        $baseUrl = 'http://ep.cc/web/demo/json';
+        $baseUrl = 'http://ep.cc/demo/json';
         $singleProvider = $this->singleGetProvider();
         $count = count($singleProvider) - 1;
         return [
@@ -193,7 +193,7 @@ class TestCurl extends TestCase
 
     public function multiPostProvider(): array
     {
-        $baseUrl = 'http://ep.cc/web/demo/json';
+        $baseUrl = 'http://ep.cc/demo/json';
         $singleProvider = $this->singlePostProvider();
         $count = count($singleProvider) - 1;
         return [

@@ -13,7 +13,7 @@ class Str
      * @param  int    $length 显示长度
      * @param  string $suffix 省略后缀
      * 
-     * @return string         处理后文本
+     * @return string
      */
     public static function subtext(string $text, int $length, string $suffix = '...'): string
     {
@@ -30,7 +30,7 @@ class Str
      * @param  integer $length 随机码的长度
      * @param  string  $type   随机码的类型
      * 
-     * @return string          生成后的随机码
+     * @return string
      */
     public static function random(int $length = 16, string $type = 'w'): string
     {
@@ -68,7 +68,7 @@ class Str
      * @param  array  参数
      * @param  string 秘钥
      * 
-     * @return string 签名
+     * @return string
      */
     public static function getSign(array $params, string $secret, string $algo = 'sha256'): string
     {

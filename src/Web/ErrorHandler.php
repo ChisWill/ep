@@ -6,6 +6,7 @@ namespace Ep\Web;
 
 use Ep;
 use Ep\Base\ControllerFactory;
+use Ep\Base\View;
 use Ep\Helper\Alias;
 use Ep\Helper\Date;
 use Ep\Standard\ContextInterface;
@@ -17,39 +18,37 @@ use Throwable;
 
 class ErrorHandler extends \Ep\Base\ErrorHandler implements ContextInterface
 {
+    public string $id = 'error';
+
     public int $maxSourceLines = 19;
 
     public int $maxTraceSourceLines = 13;
 
     public array $displayVars = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION'];
 
-    private string $vendorPath;
-
-    protected function init(): void
-    {
-        $this->vendorPath = Alias::get('@vendor');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getId(bool $short = true): string
-    {
-        if ($short) {
-            return 'error';
-        } else {
-            return static::class;
-        }
-    }
-
     private ?View $view = null;
 
     protected function getView(): View
     {
         if ($this->view === null) {
-            $this->view = Ep::getInjector()->make(View::class, ['context' => $this, 'viewPath' => '@ep/views']);
+            $this->view = new View($this, '@ep/views');
         }
         return $this->view;
+    }
+
+    /**
+     * @param  ServerRequestInterface|null $request
+     * 
+     * @return ResponseInterface|string|null
+     */
+    public function renderException(Throwable $e, $request = null)
+    {
+        if (Ep::getConfig()->debug) {
+            http_response_code(Status::INTERNAL_SERVER_ERROR);
+            return $this->getView()->renderPartial('exception', ['exception' => $e]);
+        } else {
+            return (new ControllerFactory)->run(Ep::getConfig()->errorHandler, $request);
+        }
     }
 
     /**
@@ -69,22 +68,7 @@ class ErrorHandler extends \Ep\Base\ErrorHandler implements ContextInterface
         $this->logger->error($this->convertToString($e), $context);
     }
 
-    /**
-     * @param ServerRequestInterface|null $request
-     * 
-     * @return string|ResponseInterface|null
-     */
-    public function renderException(Throwable $exception, $request = null)
-    {
-        if (Ep::getConfig()->debug) {
-            http_response_code(Status::INTERNAL_SERVER_ERROR);
-            return $this->getView()->renderPartial('exception', compact('exception'));
-        } else {
-            return (new ControllerFactory)->run(Ep::getConfig()->errorHandler, $request);
-        }
-    }
-
-    public function renderPreviousException(Throwable $e)
+    public function renderPreviousException(Throwable $e): string
     {
         if (($previous = $e->getPrevious()) !== null) {
             return $this->getView()->renderPartial('_previous', ['exception' => $previous]);
@@ -138,7 +122,7 @@ class ErrorHandler extends \Ep\Base\ErrorHandler implements ContextInterface
 
     public function isVendorFile(?string $file): bool
     {
-        return $file === null || strpos($file, $this->vendorPath) === 0;
+        return $file === null || strpos($file, Alias::get('@vendor')) === 0;
     }
 
     public function htmlEncode(string $text): string

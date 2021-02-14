@@ -4,7 +4,22 @@ declare(strict_types=1);
 
 namespace Ep\Standard;
 
-interface ControllerInterface
+use Psr\Http\Message\ServerRequestInterface;
+
+interface ControllerInterface extends ContextInterface
 {
-    public function run(string $action, $request);
+    /**
+     * @param  ServerRequestInterface|ConsoleRequestInterface $request
+     * 
+     * @return mixed
+     */
+    public function before($request);
+
+    /**
+     * @param  ServerRequestInterface|ConsoleRequestInterface $request
+     * @param  mixed $response
+     * 
+     * @return mixed
+     */
+    public function after($request, $response);
 }

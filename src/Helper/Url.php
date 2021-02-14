@@ -15,7 +15,7 @@ class Url
      *
      * @param  string  $url    基础网址
      * @param  array   $params URL参数
-     * @param  boolean $sign   是否添加签名参数
+     * @param  bool    $sign   是否添加签名参数
      * 
      * @return string
      */
@@ -41,7 +41,7 @@ class Url
      * 
      * @param  array   $params 待检查参数
      * 
-     * @return boolean
+     * @return bool
      */
     public static function checkSign(array $params = [])
     {

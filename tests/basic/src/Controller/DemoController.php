@@ -9,6 +9,8 @@ use Ep\Tests\Basic\Model\User;
 
 class DemoController extends Controller
 {
+    public string $title = 'Demo';
+
     public function indexAction()
     {
         return $this->string('<h1>hello world</h1>');
@@ -56,6 +58,8 @@ class DemoController extends Controller
         d('Path：' . $request->getUri()->getPath());
         tes('');
         d('Post Body：', $request->getParsedBody());
+        tes('');
+        d('Upload Files：', $request->getUploadedFiles());
         tes($request->getHeaders());
     }
 

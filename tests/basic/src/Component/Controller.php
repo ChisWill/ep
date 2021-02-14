@@ -15,10 +15,10 @@ class Controller extends \Ep\Web\Controller
         ]);
     }
 
-    protected function error($error = [], $body = []): ResponseInterface
+    protected function error($error, $errno = 500, $body = []): ResponseInterface
     {
         return $this->json([
-            'errno' => 500,
+            'errno' => $errno,
             'error' => $error,
             'body' => $body
         ]);

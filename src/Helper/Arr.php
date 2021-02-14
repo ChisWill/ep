@@ -28,8 +28,12 @@ class Arr
      */
     public static function getValue(array $array, $key, $default = null)
     {
-        if (is_array($array) && array_key_exists($key, $array)) {
+        if (array_key_exists($key, $array)) {
             return $array[$key];
+        }
+
+        if (is_int($key)) {
+            return $default;
         }
 
         if (($pos = strrpos($key, '.')) !== false) {
@@ -49,16 +53,12 @@ class Arr
      * ps. 包括空数组
      *
      * @param  array   $array       待检查数组
-     * @param  boolean $consecutive 检查键是否从0开始
+     * @param  bool $consecutive 检查键是否从0开始
      * 
-     * @return boolean
+     * @return bool
      */
     public static function isIndexed(array $array, bool $consecutive = false): bool
     {
-        if (!is_array($array)) {
-            return false;
-        }
-
         if (empty($array)) {
             return true;
         }

@@ -131,7 +131,7 @@ class Curl
      */
     public static function postMulti($urls, array $data, array $options = [], int $batch = 1): array
     {
-        $params = static::initParams($urls, $data, $options, $batch, static function ($option, $url, $data) {
+        $params = static::initParams($urls, $data, $options, $batch, static function (array $option, string $url, $data): array {
             $option[CURLOPT_URL] = $url;
             $option[CURLOPT_CUSTOMREQUEST] = 'POST';
             $option[CURLOPT_POSTFIELDS] = $data;
@@ -162,7 +162,7 @@ class Curl
      */
     public static function getMulti($urls, $data = '', array $options = [], int $batch = 1): array
     {
-        $params = static::initParams($urls, $data, $options, $batch, static function ($option, $url, $data) {
+        $params = static::initParams($urls, $data, $options, $batch, static function (array $option, string $url, $data): array {
             $option[CURLOPT_URL] = $url;
             $option[CURLOPT_CUSTOMREQUEST] = 'GET';
             $option[CURLOPT_POSTFIELDS] = $data;
