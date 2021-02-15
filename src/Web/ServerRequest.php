@@ -9,7 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
-final class ServerRequest implements \Ep\Standard\ServerRequestInterface
+final class ServerRequest implements \Ep\Contract\ServerRequestInterface
 {
     private ServerRequestInterface $request;
 

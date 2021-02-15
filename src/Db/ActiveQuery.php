@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ep\Db;
 
 class ActiveQuery extends \Yiisoft\ActiveRecord\ActiveQuery

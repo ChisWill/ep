@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
-use Ep\Standard\ConsoleRequestInterface;
-use Ep\Standard\ControllerInterface;
+use Ep\Contract\ConsoleRequestInterface;
+use Ep\Contract\ControllerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 
@@ -15,10 +15,10 @@ final class ControllerFactory
     private Config $config;
     private string $suffix;
 
-    public function __construct()
+    public function __construct(string $suffix)
     {
         $this->config = Ep::getConfig();
-        $this->suffix = PHP_SAPI === 'cli' ? $this->config->commandDirAndSuffix : $this->config->controllerDirAndSuffix;
+        $this->suffix = $suffix;
     }
 
     /**
@@ -32,6 +32,7 @@ final class ControllerFactory
         [$class, $action] = $this->parseHandler($handler);
 
         $controller = $this->create($class);
+        $controller->id = $this->getContextId($controller);
 
         return $this->runAction($controller, $action, $request);
     }
@@ -94,5 +95,15 @@ final class ControllerFactory
         }
         $class = sprintf('%s\\%s\\%s', $this->config->appNamespace, $ns, ucfirst($controller) . $this->suffix);
         return [$class, $action];
+    }
+
+    private function getContextId(ControllerInterface $controller): string
+    {
+        return implode('/', array_filter(
+            array_map('lcfirst', explode(
+                '\\',
+                str_replace([$this->config->appNamespace, $this->suffix], '', get_class($controller))
+            ))
+        ));
     }
 }

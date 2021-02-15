@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ep\Db;
 
 use Ep;
-use Ep\Standard\ServerRequestInterface;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Http\Method;
 use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Validator\Rule;
 use Yiisoft\Validator\Validator;
+use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 
 abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implements DataSetInterface
@@ -49,7 +52,7 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
 
     public function load(ServerRequestInterface $request): bool
     {
-        if ($request->isPost()) {
+        if ($request->getMethod() === Method::POST) {
             $this->setAttributes($request->getParsedBody() ?: []);
             return true;
         } else {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Console;
 
-use Ep\Standard\ConsoleRequestInterface;
+use Ep\Contract\ConsoleRequestInterface;
 use Throwable;
 
 class ErrorHandler extends \Ep\Base\ErrorHandler

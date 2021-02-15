@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
-use Ep\Standard\ConsoleRequestInterface;
+use Ep\Contract\ConsoleRequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class Application

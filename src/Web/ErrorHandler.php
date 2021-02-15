@@ -7,9 +7,9 @@ namespace Ep\Web;
 use Ep;
 use Ep\Base\ControllerFactory;
 use Ep\Base\View;
+use Ep\Contract\ContextInterface;
 use Ep\Helper\Alias;
 use Ep\Helper\Date;
-use Ep\Standard\ContextInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Yiisoft\Http\Method;
@@ -47,7 +47,7 @@ class ErrorHandler extends \Ep\Base\ErrorHandler implements ContextInterface
             http_response_code(Status::INTERNAL_SERVER_ERROR);
             return $this->getView()->renderPartial('exception', ['exception' => $e]);
         } else {
-            return (new ControllerFactory)->run(Ep::getConfig()->errorHandler, $request);
+            return (new ControllerFactory(Ep::getConfig()->controllerDirAndSuffix))->run(Ep::getConfig()->errorHandler, $request);
         }
     }
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ep\Standard;
+namespace Ep\Contract;
 
 use Psr\Http\Message\ServerRequestInterface;
 

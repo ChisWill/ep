@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
-use Ep\Standard\ConsoleRequestInterface;
+use Ep\Contract\ConsoleRequestInterface;
 use Yiisoft\Yii\Web\SapiEmitter;
 use Psr\Log\LoggerInterface;
 use Psr\Http\Message\ServerRequestInterface;

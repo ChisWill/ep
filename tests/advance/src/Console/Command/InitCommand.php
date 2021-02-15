@@ -3,7 +3,7 @@
 namespace Ep\Tests\Advance\Console\Command;
 
 use Ep\Console\Command;
-use Ep\Standard\ConsoleRequestInterface;
+use Ep\Contract\ConsoleRequestInterface;
 
 class InitCommand extends Command
 {

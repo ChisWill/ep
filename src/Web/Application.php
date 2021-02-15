@@ -7,7 +7,7 @@ namespace Ep\Web;
 use Ep;
 use Ep\Base\ControllerFactory;
 use Ep\Base\Route;
-use Ep\Standard\ServerRequestFactoryInterface;
+use Ep\Contract\ServerRequestFactoryInterface;
 use Yiisoft\Http\Method;
 use Yiisoft\Yii\Web\SapiEmitter;
 use Psr\Http\Message\ResponseInterface;
@@ -39,16 +39,19 @@ final class Application extends \Ep\Base\Application
      */
     protected function handleRequest($request): void
     {
-        [$handler, $params] = (new Route)->match(
+        $config = Ep::getConfig();
+
+        [$handler, $params] = (new Route($config->baseUrl))->match(
             $request->getUri()->getPath(),
             $request->getMethod()
         );
         $request = $request->withQueryParams($params);
-        $factory = new ControllerFactory;
+
+        $factory = new ControllerFactory($config->controllerDirAndSuffix);
         try {
             $response = $factory->run($handler, $request);
         } catch (RuntimeException $e) {
-            $response = $factory->run(Ep::getConfig()->notFoundHandler, $request);
+            $response = $factory->run($config->notFoundHandler, $request);
         }
         if ($response instanceof ResponseInterface) {
             (new SapiEmitter)->emit($response, $request->getMethod() === Method::HEAD);

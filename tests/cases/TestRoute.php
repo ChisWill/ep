@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ep\Tests\Cases;
 
 use Ep;
-use Ep\Base\ControllerFactory;
 use Ep\Base\Route;
 use FastRoute\RouteCollector;
 use PHPUnit\Framework\TestCase;
@@ -133,7 +132,7 @@ class TestRoute extends TestCase
     public function testRules($rule, $cases)
     {
         foreach ($cases as $row) {
-            $route = new Route($rule);
+            $route = new Route('/', $rule);
             $route->default = false;
             [$handler, $params] = $route->match($row['path']);
             $this->assertSame($row['handler'], $handler, $row['path'] . ' is wrong.');

@@ -4,7 +4,7 @@ namespace Ep\Tests\Basic\Command;
 
 use Ep;
 use Ep\Console\Command;
-use Ep\Standard\ConsoleRequestInterface;
+use Ep\Contract\ConsoleRequestInterface;
 
 class InitCommand extends Command
 {
@@ -18,5 +18,7 @@ class InitCommand extends Command
     public function logAction()
     {
         Ep::getLogger()->info('log info', ['act' => self::class]);
+
+        return 'ok';
     }
 }

@@ -6,15 +6,13 @@ namespace Ep\Web;
 
 use Ep;
 use Ep\Base\View;
-use Ep\Standard\ControllerInterface;
+use Ep\Contract\ControllerInterface;
 use Yiisoft\Http\Status;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 abstract class Controller implements ControllerInterface
 {
-    public string $id = '';
-
     /**
      * @param  ServerRequestInterface $request
      * 

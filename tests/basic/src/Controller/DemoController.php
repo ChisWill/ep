@@ -3,9 +3,10 @@
 namespace Ep\Tests\Basic\Controller;
 
 use Ep;
-use Ep\Standard\ServerRequestInterface;
+use Ep\Contract\ServerRequestInterface;
 use Ep\Tests\Basic\Component\Controller;
 use Ep\Tests\Basic\Model\User;
+use Psr\Http\Message\ServerRequestInterface as PsrServerRequestInterface;
 
 class DemoController extends Controller
 {
@@ -152,7 +153,7 @@ class DemoController extends Controller
         }
     }
 
-    public function formAction(ServerRequestInterface $request)
+    public function formAction(PsrServerRequestInterface $request)
     {
         $user = User::findModel($request->getQueryParams()['id'] ?? null);
         if ($user->load($request)) {

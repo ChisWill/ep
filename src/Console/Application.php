@@ -7,7 +7,8 @@ namespace Ep\Console;
 use Ep;
 use Ep\Base\ControllerFactory;
 use Ep\Base\Route;
-use Ep\Standard\ConsoleRequestInterface;
+use Ep\Contract\ConsoleRequestInterface;
+use RuntimeException;
 
 final class Application extends \Ep\Base\Application
 {
@@ -32,8 +33,18 @@ final class Application extends \Ep\Base\Application
      */
     protected function handleRequest($request): void
     {
-        [$handler] = (new Route)->match($request->getRoute());
+        $config = Ep::getConfig();
 
-        (new ControllerFactory)->run($handler, $request);
+        [$handler] = (new Route($config->baseUrl))->match($request->getRoute());
+
+        try {
+            (new ControllerFactory($config->commandDirAndSuffix))->run($handler, $request);
+        } catch (RuntimeException $e) {
+            $command = trim($handler, '/');
+            echo <<<HELP
+Error: unknown command "{$command}"
+HELP;
+            exit(1);
+        }
     }
 }

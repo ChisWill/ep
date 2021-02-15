@@ -20,10 +20,10 @@ class Route
     private string $baseUrl;
     private ?Closure $rule;
 
-    public function __construct(?Closure $rule = null)
+    public function __construct(string $baseUrl, ?Closure $rule = null)
     {
         $this->config = Ep::getConfig();
-        $this->baseUrl = PHP_SAPI === 'cli' ? '/' : $this->config->baseUrl;
+        $this->baseUrl = $baseUrl;
         $this->rule = $rule;
     }
 
@@ -31,10 +31,12 @@ class Route
     {
         return $this->solveRouteInfo(
             cachedDispatcher(function (RouteCollector $route) {
-                $rule = $this->config->getRoute();
-                $rule !== null && call_user_func($rule, $route);
                 $this->rule !== null && call_user_func($this->rule, $route);
-                $this->default && $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
+                if ($this->default) {
+                    $rule = $this->config->getRoute();
+                    $rule !== null && call_user_func($rule, $route);
+                    $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
+                }
             }, [
                 'cacheFile' => Alias::get($this->config->runtimeDir . '/route.cache'),
                 'cacheDisabled' => $this->config->debug

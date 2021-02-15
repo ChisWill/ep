@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ep\Standard;
+namespace Ep\Contract;
 
 interface ServerRequestInterface extends \Psr\Http\Message\ServerRequestInterface
 {

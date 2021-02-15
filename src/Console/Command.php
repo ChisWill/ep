@@ -6,8 +6,8 @@ namespace Ep\Console;
 
 use Ep;
 use Ep\Base\View;
-use Ep\Standard\ConsoleRequestInterface;
-use Ep\Standard\ControllerInterface;
+use Ep\Contract\ConsoleRequestInterface;
+use Ep\Contract\ControllerInterface;
 
 abstract class Command implements ControllerInterface
 {

@@ -1,10 +1,10 @@
 <?php
 
 use Ep\Console\ConsoleRequest;
+use Ep\Contract\ConsoleRequestInterface;
+use Ep\Contract\ServerRequestFactoryInterface as EpServerRequestFactoryInterface;
 use Ep\Helper\Alias;
-use Ep\Standard\ConsoleRequestInterface;
 use Ep\Web\ServerRequestFactory;
-use Ep\Standard\ServerRequestFactoryInterface as EpServerRequestFactoryInterface;
 use HttpSoft\Message\ResponseFactory;
 use HttpSoft\Message\StreamFactory;
 use HttpSoft\Message\UploadedFileFactory;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ep\Standard;
+namespace Ep\Contract;
 
 interface ConsoleRequestInterface
 {
@@ -12,7 +12,7 @@ interface ConsoleRequestInterface
     public function getRoute(): string;
 
     /**
-     * 参数格式为：param1=foo param2=bar
+     * 参数格式为：param1=foo param2=bar -d -force
      */
     public function getParams(): array;
 }
