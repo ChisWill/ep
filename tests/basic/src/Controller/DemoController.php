@@ -3,10 +3,10 @@
 namespace Ep\Tests\Basic\Controller;
 
 use Ep;
-use Ep\Contract\ServerRequestInterface;
 use Ep\Tests\Basic\Component\Controller;
 use Ep\Tests\Basic\Model\User;
-use Psr\Http\Message\ServerRequestInterface as PsrServerRequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Yiisoft\Http\Method;
 
 class DemoController extends Controller
 {
@@ -19,7 +19,7 @@ class DemoController extends Controller
 
     public function jsonAction(ServerRequestInterface $request)
     {
-        if ($request->isPost()) {
+        if ($request->getMethod() === Method::POST) {
             $post = $request->getParsedBody();
             $get = $request->getQueryParams();
             $return = compact('post', 'get');
@@ -43,10 +43,6 @@ class DemoController extends Controller
     public function requestAction(ServerRequestInterface $request)
     {
         d('Method：' . $request->getMethod());
-        tes('');
-        d('isPost：', $request->isPost());
-        tes('');
-        d('IsAjax：', $request->isAjax());
         tes('');
         d('All GET：', $request->getQueryParams());
         tes('');
@@ -126,7 +122,8 @@ class DemoController extends Controller
     public function eventAction()
     {
         $dipatcher = Ep::getEventDispatcher();
-        $dipatcher->dispatch($this);
+        $r = $dipatcher->dispatch($this);
+        test($r);
     }
 
     public function redisAction()
@@ -153,7 +150,7 @@ class DemoController extends Controller
         }
     }
 
-    public function formAction(PsrServerRequestInterface $request)
+    public function formAction(ServerRequestInterface $request)
     {
         $user = User::findModel($request->getQueryParams()['id'] ?? null);
         if ($user->load($request)) {
@@ -171,7 +168,6 @@ class DemoController extends Controller
 
     public function testAction()
     {
-
 
         echo 'test over';
     }

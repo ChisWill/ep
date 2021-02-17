@@ -3,18 +3,35 @@
 namespace Ep\Tests\Basic\Controller;
 
 use Ep;
-use Ep\Helper\Arr;
 use Ep\Tests\Basic\Component\Controller;
 use Ep\Web\ErrorHandler;
+use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 
 class TestController extends Controller
 {
-    public function indexAction()
+    public string $title = 'Test';
+
+    public function indexAction(ServerRequestInterface $req)
     {
-        $a = [4];
-        $r = Arr::getValue($a, 3, 9);
-        test($r);
+        $message = 'test';
+
+        return $this->render('/index/index', compact('message'));
+    }
+
+    public function stringAction()
+    {
+        return 'test string';
+    }
+
+    public function arrayAction()
+    {
+        return [
+            'state' => 1,
+            'data' => [
+                'msg' => 'ok'
+            ]
+        ];
     }
 
     public function errorAction()

@@ -59,8 +59,9 @@ final class ControllerFactory
         $response = $controller->before($request);
         if ($response === true) {
             $response = Ep::getInjector()->invoke([$controller, $action], [$request]);
+            $response = $controller->after($request, $response);
         }
-        return $controller->after($request, $response);
+        return $response;
     }
 
     /**

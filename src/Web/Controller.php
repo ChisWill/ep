@@ -16,7 +16,7 @@ abstract class Controller implements ControllerInterface
     /**
      * @param  ServerRequestInterface $request
      * 
-     * @return ResponseInterface|bool
+     * @return mixed
      */
     public function before($request)
     {
@@ -25,9 +25,11 @@ abstract class Controller implements ControllerInterface
 
     /**
      * @param  ServerRequestInterface $request
-     * @param  ResponseInterface|null $response
+     * @param  mixed                  $response
+     * 
+     * @return mixed
      */
-    public function after($request, $response): ?ResponseInterface
+    public function after($request, $response)
     {
         return $response;
     }

@@ -17,9 +17,9 @@ use RuntimeException;
 final class Application extends \Ep\Base\Application
 {
     /**
-     * {@inheritDoc}
+     * @return ServerRequestInterface
      */
-    protected function createRequest(): ServerRequestInterface
+    public function createRequest(): ServerRequestInterface
     {
         return Ep::getDi()
             ->get(ServerRequestFactoryInterface::class)
@@ -29,15 +29,17 @@ final class Application extends \Ep\Base\Application
     /**
      * @param ServerRequestInterface $request
      */
-    protected function register($request): void
+    public function register($request): void
     {
         Ep::getDi()->get(ErrorHandler::class)->register($request);
     }
 
     /**
-     * @param ServerRequestInterface $request
+     * @param  ServerRequestInterface $request
+     * 
+     * @return mixed
      */
-    protected function handleRequest($request): void
+    public function handleRequest($request)
     {
         $config = Ep::getConfig();
 
@@ -49,12 +51,27 @@ final class Application extends \Ep\Base\Application
 
         $factory = new ControllerFactory($config->controllerDirAndSuffix);
         try {
-            $response = $factory->run($handler, $request);
+            return $factory->run($handler, $request);
         } catch (RuntimeException $e) {
-            $response = $factory->run($config->notFoundHandler, $request);
+            return $factory->run($config->notFoundHandler, $request);
         }
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param mixed                  $response
+     */
+    public function send($request, $response): void
+    {
         if ($response instanceof ResponseInterface) {
             (new SapiEmitter)->emit($response, $request->getMethod() === Method::HEAD);
+        } else {
+            $service = Ep::getDi()->get(Service::class);
+            if (is_string($response)) {
+                $this->send($request, $service->string($response));
+            } elseif (is_array($response)) {
+                $this->send($request, $service->json($response));
+            }
         }
     }
 }

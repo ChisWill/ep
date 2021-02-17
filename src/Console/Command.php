@@ -12,7 +12,9 @@ use Ep\Contract\ControllerInterface;
 abstract class Command implements ControllerInterface
 {
     /**
-     * @param ConsoleRequestInterface $request
+     * @param  ConsoleRequestInterface $request
+     * 
+     * @return mixed
      */
     public function before($request)
     {
@@ -23,7 +25,7 @@ abstract class Command implements ControllerInterface
      * @param  ConsoleRequestInterface $request 
      * @param  mixed                   $response
      * 
-     * @return string
+     * @return mixed
      */
     public function after($request, $response)
     {

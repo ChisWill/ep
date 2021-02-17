@@ -11,6 +11,11 @@ class XEngine implements EngineInterface
         $this->power = $power;
     }
 
+    public function __toString()
+    {
+        return 'I am ' . static::class;
+    }
+
     public function getPower(): int
     {
         return $this->power;

@@ -9,14 +9,14 @@ use Psr\Http\Message\ServerRequestInterface;
 interface ControllerInterface extends ContextInterface
 {
     /**
-     * @param  ServerRequestInterface|ConsoleRequestInterface $request
+     * @param  mixed $request
      * 
      * @return mixed
      */
     public function before($request);
 
     /**
-     * @param  ServerRequestInterface|ConsoleRequestInterface $request
+     * @param  mixed $request
      * @param  mixed $response
      * 
      * @return mixed

@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
-use Ep\Contract\ConsoleRequestInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 abstract class Application
 {
-    public function __construct(array $config)
+    public function __construct(?array $config = null)
     {
-        Ep::init($config);
+        if ($config !== null) {
+            Ep::init($config);
+        }
     }
 
     public function run(): void
@@ -21,27 +21,37 @@ abstract class Application
 
         $this->register($request);
 
-        $this->handleRequest($request);
+        $this->send($request, $this->handleRequest($request));
     }
 
     /**
      * 创建请求对象
      * 
-     * @return ServerRequestInterface|ConsoleRequestInterface
+     * @return mixed
      */
-    abstract protected function createRequest();
+    abstract public function createRequest();
 
     /**
      * 注册事件
      * 
-     * @param ServerRequestInterface|ConsoleRequestInterface $request
+     * @param mixed $request
      */
-    abstract protected function register($request): void;
+    abstract public function register($request): void;
 
     /**
      * 处理请求
      * 
-     * @param ServerRequestInterface|ConsoleRequestInterface $request
+     * @param  mixed $request
+     * 
+     * @return mixed
      */
-    abstract protected function handleRequest($request): void;
+    abstract public function handleRequest($request);
+
+    /**
+     * 发送结果
+     * 
+     * @param mixed $request
+     * @param mixed $response
+     */
+    abstract public function send($request, $response): void;
 }

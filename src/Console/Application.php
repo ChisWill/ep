@@ -13,9 +13,9 @@ use RuntimeException;
 final class Application extends \Ep\Base\Application
 {
     /**
-     * {@inheritDoc}
+     * @return ConsoleRequestInterface
      */
-    protected function createRequest(): ConsoleRequestInterface
+    public function createRequest(): ConsoleRequestInterface
     {
         return Ep::getDi()->get(ConsoleRequestInterface::class);
     }
@@ -23,28 +23,41 @@ final class Application extends \Ep\Base\Application
     /**
      * @param ConsoleRequestInterface $request
      */
-    protected function register($request): void
+    public function register($request): void
     {
         Ep::getDi()->get(ErrorHandler::class)->register($request);
     }
 
     /**
      * @param ConsoleRequestInterface $request
+     * 
+     * @return mixed
      */
-    protected function handleRequest($request): void
+    public function handleRequest($request)
     {
         $config = Ep::getConfig();
 
         [$handler] = (new Route($config->baseUrl))->match($request->getRoute());
 
         try {
-            (new ControllerFactory($config->commandDirAndSuffix))->run($handler, $request);
+            return (new ControllerFactory($config->commandDirAndSuffix))->run($handler, $request);
         } catch (RuntimeException $e) {
             $command = trim($handler, '/');
             echo <<<HELP
 Error: unknown command "{$command}"
 HELP;
             exit(1);
+        }
+    }
+
+    /**
+     * @param ConsoleRequestInterface $request
+     * @param mixed                   $response
+     */
+    public function send($request, $response): void
+    {
+        if (is_string($response)) {
+            echo $response;
         }
     }
 }
