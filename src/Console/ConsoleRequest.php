@@ -37,8 +37,6 @@ class ConsoleRequest implements ConsoleRequestInterface
                             [$k, $v] = explode('=', $_SERVER['argv'][$i]);
                             $this->params[$k] = $v;
                         }
-                    } catch (RuntimeException $e) {
-                        $this->params[$k] = false;
                     } catch (ErrorException $e) {
                         echo <<<HELP
 Error: invalid param "{$_SERVER['argv'][$i]}"

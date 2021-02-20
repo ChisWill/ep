@@ -37,11 +37,11 @@ class ErrorHandler extends \Ep\Base\ErrorHandler implements ContextInterface
     }
 
     /**
-     * @param  ServerRequestInterface|null $request
+     * @param  ServerRequestInterface $request
      * 
-     * @return ResponseInterface|string|null
+     * @return ResponseInterface|string
      */
-    public function renderException(Throwable $e, $request = null)
+    public function renderException(Throwable $e, $request)
     {
         if (Ep::getConfig()->debug) {
             http_response_code(Status::INTERNAL_SERVER_ERROR);

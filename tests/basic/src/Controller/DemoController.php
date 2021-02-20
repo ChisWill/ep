@@ -42,22 +42,17 @@ class DemoController extends Controller
 
     public function requestAction(ServerRequestInterface $request)
     {
-        d('Method：' . $request->getMethod());
-        tes('');
-        d('All GET：', $request->getQueryParams());
-        tes('');
-        d('POST String：' . $request->getBody()->getContents());
-        tes('');
-        d('Cookies：', $request->getCookieParams());
-        tes('');
-        d('Host：' . $request->getUri()->getHost());
-        tes('');
-        d('Path：' . $request->getUri()->getPath());
-        tes('');
-        d('Post Body：', $request->getParsedBody());
-        tes('');
-        d('Upload Files：', $request->getUploadedFiles());
-        tes($request->getHeaders());
+        $result = [
+            'Method' => $request->getMethod(),
+            'All GET' => $request->getQueryParams(),
+            'All POST' => $request->getParsedBody(),
+            'Raw body' => $request->getBody()->getContents(),
+            'Cookies' => $request->getCookieParams(),
+            'Host' => $request->getUri()->getHost(),
+            'Header' => $request->getHeaders(),
+            'Path' => $request->getUri()->getPath()
+        ];
+        return $result;
     }
 
     public function redirectAction(ServerRequestInterface $request)
@@ -67,16 +62,11 @@ class DemoController extends Controller
         return $this->redirect($url);
     }
 
-    public function errorAction()
-    {
-        d('error');
-    }
-
     public function loggerAction()
     {
         $logger = Ep::getLogger();
         $logger->info('halo');
-        echo 'over';
+        return $this->string('over');
     }
 
     public function cacheAction()
@@ -85,7 +75,7 @@ class DemoController extends Controller
 
         $r = $cache->getOrSet('name', fn () => mt_rand(0, 100), 5);
 
-        dd('Cache Value：', $r);
+        return $this->string($r);
     }
 
     public function saveAction()
@@ -93,60 +83,57 @@ class DemoController extends Controller
         $user = new User;
         $user->username = 'Peter' . mt_rand(0, 1000);
         $user->age = mt_rand(0, 100);
-        $r = $user->insert();
-        d('Insert：', $r);
+        $r1 = $user->insert();
 
-        tes('');
 
         $user = User::findModel(1);
         $user->username = 'Mary' . mt_rand(0, 1000);
-        $r = $user->update();
-        d('Update Num：', $r);
+        $r2 = $user->update();
+
+        return compact('r1', 'r2');
     }
 
     public function queryAction()
     {
+        $result = [];
         $query = User::find()->where(['like', 'username', 'Peter%', false]);
-        tes('RawSql：' . $query->getRawSql());
+        $result['RawSql'] = $query->getRawSql();
         $user = $query->one();
-        tes('Single User：', $user->getAttributes());
-        $count = $query->count();
-        d('Peter Count：', $count);
-        $list = $query->all();
-        foreach ($list as $user) {
-            /** @var User $user */
-            tes($user->getAttributes());
-        }
+        $result['Model Attributes'] = $user->getAttributes();
+        $result['Count'] = $query->count();
+        $list = $query->asArray()->all();
+        $result['All'] = $list;
+
+        return $result;
     }
 
     public function eventAction()
     {
         $dipatcher = Ep::getEventDispatcher();
-        $r = $dipatcher->dispatch($this);
-        test($r);
+        $dipatcher->dispatch($this);
     }
 
     public function redisAction()
     {
         $redis = Ep::getRedis();
 
+        $result = [];
         $r = $redis->set('a', mt_rand(0, 100), 'ex', 5, 'nx');
-        d($r);
-
+        $result['set'] = $r;
         $r = $redis->get('a');
+        $result['get'] = $r;
 
-        tes($r);
+        return $result;
     }
 
     public function validateAction()
     {
         $user = User::findModel(1);
-        tes($user->getAttributes());
         $r = $user->validate();
         if ($r) {
-            d('validate ok');
+            return 'validate ok';
         } else {
-            d($user->getErrors());
+            return $user->getErrors();
         }
     }
 
@@ -166,9 +153,15 @@ class DemoController extends Controller
         return $this->render('form');
     }
 
+    public function wsAction()
+    {
+        return $this->render('ws');
+    }
+
     public function testAction()
     {
+        echo 'test string';
 
-        echo 'test over';
+        return 'over';
     }
 }

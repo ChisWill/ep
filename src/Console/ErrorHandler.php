@@ -10,9 +10,9 @@ use Throwable;
 class ErrorHandler extends \Ep\Base\ErrorHandler
 {
     /**
-     * @param ConsoleRequestInterface|null $request
+     * @param ConsoleRequestInterface $request
      */
-    public function renderException(Throwable $e, $request = null): string
+    public function renderException(Throwable $e, $request): string
     {
         return $this->convertToString($e);
     }

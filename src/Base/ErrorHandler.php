@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
-use Ep\Contract\ConsoleRequestInterface;
 use Yiisoft\Yii\Web\SapiEmitter;
 use Psr\Log\LoggerInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use ErrorException;
 use Throwable;
@@ -40,7 +38,7 @@ abstract class ErrorHandler
     }
 
     /**
-     * @param ServerRequestInterface|ConsoleRequestInterface $request
+     * @param mixed $request
      */
     public function register($request): void
     {
@@ -50,7 +48,7 @@ abstract class ErrorHandler
     }
 
     /**
-     * @param ServerRequestInterface|ConsoleRequestInterface $request
+     * @param mixed $request
      */
     public function handleException(Throwable $e, $request): void
     {
@@ -72,7 +70,7 @@ abstract class ErrorHandler
     }
 
     /**
-     * @param ServerRequestInterface|ConsoleRequestInterface $request
+     * @param mixed $request
      */
     public function handleFatalError($request): void
     {
@@ -113,7 +111,7 @@ abstract class ErrorHandler
     }
 
     /**
-     * @param ResponseInterface|string|null $data
+     * @param ResponseInterface|string $data
      */
     private function send($data): void
     {
@@ -125,14 +123,14 @@ abstract class ErrorHandler
     }
 
     /**
-     * @param  ServerRequestInterface|ConsoleRequestInterface|null $request
+     * @param  mixed $request
      * 
-     * @return ResponseInterface|string|null
+     * @return ResponseInterface|string
      */
-    abstract protected function renderException(Throwable $e, $request = null);
+    abstract protected function renderException(Throwable $e, $request);
 
     /**
-     * @param ServerRequestInterface|ConsoleRequestInterface $request
+     * @param mixed $request
      */
     abstract protected function log(Throwable $e, $request): void;
 }

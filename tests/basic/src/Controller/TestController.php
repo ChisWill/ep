@@ -19,6 +19,13 @@ class TestController extends Controller
         return $this->render('/index/index', compact('message'));
     }
 
+    public function sleepAction()
+    {
+        sleep(5);
+
+        return 'ok';
+    }
+
     public function stringAction()
     {
         return 'test string';
@@ -34,7 +41,7 @@ class TestController extends Controller
         ];
     }
 
-    public function errorAction()
+    public function errorAction(ServerRequestInterface $request)
     {
         $handler = Ep::getDi()->get(ErrorHandler::class);
 
@@ -50,7 +57,8 @@ class TestController extends Controller
                         700
                     )
                 ),
-            )
+            ),
+            $request
         ));
     }
 }

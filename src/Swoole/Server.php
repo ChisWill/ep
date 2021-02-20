@@ -5,38 +5,64 @@ declare(strict_types=1);
 namespace Ep\Swoole;
 
 use Ep;
-use Ep\Console\Application as Console;
-use Ep\Contract\ConsoleRequestInterface;
-use Ep\Swoole\Http\Application as HttpApplication;
+use Ep\Swoole\Contract\ServerInterface;
+use Ep\Swoole\Http\Server as HttpServer;
+use Ep\Swoole\Tcp\Server as TcpServer;
+use Ep\Swoole\WebSocket\Server as WebSocketServer;
 
-final class Server
+class Server
 {
-    private Config $config;
+    const SERVER_HTTP = 1;
+    const SERVER_WEBSOCKET = 2;
+    const SERVER_TCP = 3;
 
-    public function __construct(array $config)
+    private ServerInterface $mainServer;
+
+    private Config $config;
+    private array $settings;
+
+    public function __construct(Config $config, array $settings)
     {
-        $this->config = new Config($config);
+        $this->config = $config;
+        $this->settings = $settings + $this->config->settings;
     }
 
     public function run(): void
     {
-        $console = new Console($this->config->appConfig);
+        $this->mainServer = $this->createServer($this->config->type, [
+            'host' => $this->config->host,
+            'port' => $this->config->port,
+            'mode' => $this->config->mode,
+            'sockType' => $this->config->sockType,
+            'settings' => $this->settings
+        ]);
 
-        $request = $console->createRequest();
+        foreach ($this->config->servers as $config) {
+            $this->mainServer->listen($config['host'], $config['port'], $config['sock_type'] ?? SWOOLE_SOCK_TCP);
+        }
 
-        $this->handlerRequest($request);
+        $this->mainServer->start();
     }
 
-    private function handlerRequest(ConsoleRequestInterface $request)
+    private function createServer($type, $config): ServerInterface
     {
-        $route = ltrim($request->getRoute(), '/');
-        $params = $request->getParams();
-
-        switch ($route) {
+        switch ($type) {
+            case self::SERVER_HTTP:
+                return Ep::getInjector()->make(HttpServer::class, [
+                    'config' => $config,
+                ]);
+            case self::SERVER_WEBSOCKET:
+                return Ep::getInjector()->make(WebSocketServer::class, [
+                    'config' => $config,
+                ]);
             default:
-                $application = Ep::getInjector()->make(HttpApplication::class, ['config' => $this->config]);
-                $application->run();
-                break;
+                return Ep::getInjector()->make(TcpServer::class, [
+                    'config' => $config,
+                ]);
         }
+    }
+
+    private function start(): void
+    {
     }
 }
