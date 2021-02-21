@@ -21,6 +21,7 @@ final class Application
         $console = new Console($this->config->appConfig);
 
         $request = $console->createRequest();
+
         $console->register($request);
 
         $this->handlerRequest($request);
@@ -33,7 +34,7 @@ final class Application
         switch ($command) {
             case '':
             case 'start':
-                $server = new Server($this->config, $settings);
+                $server = new SwooleServer($this->config, $settings);
                 $server->run();
                 break;
             case 'stop':

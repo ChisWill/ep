@@ -14,7 +14,7 @@
 </div>
 
 <script>
-    var wsServer = 'ws://127.0.0.1:9502/websocket';
+    var wsServer = 'ws://127.0.0.1:9501';
     var websocket = new WebSocket(wsServer);
 
     var display = function(data, type = 2) {

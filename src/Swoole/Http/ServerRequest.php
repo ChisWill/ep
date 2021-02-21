@@ -47,15 +47,16 @@ final class ServerRequest implements ServerRequestInterface
 
     public function create(Request $request): self
     {
-        $this->request = $request;
+        $new = clone $this;
 
-        $this->method = $request->server['request_method'] ?? $this->method;
-        $this->protocol = $this->initProtocolVersion();
-        $this->uploadedFiles = $this->initUploadedFiles();
-        $this->uri = $this->initUri();
-        $this->stream = $this->initStream();
+        $new->request = $request;
+        $new->method = $request->server['request_method'] ?? $new->method;
+        $new->protocol = $new->initProtocolVersion();
+        $new->uploadedFiles = $new->initUploadedFiles();
+        $new->uri = $new->initUri();
+        $new->stream = $new->initStream();
 
-        return clone $this;
+        return $new;
     }
 
     /**

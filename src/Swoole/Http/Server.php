@@ -4,71 +4,62 @@ declare(strict_types=1);
 
 namespace Ep\Swoole\Http;
 
+use Closure;
 use Ep\Swoole\Config;
 use Ep\Swoole\Contract\ServerInterface;
+use Ep\Swoole\Contract\ServerTrait;
 use Ep\Swoole\Http\Emitter;
 use Ep\Swoole\Http\ServerRequest;
+use Ep\Swoole\SwooleEvent;
 use Ep\Web\Application as WebApplication;
 use Ep\Web\ErrorHandler;
 use Ep\Web\Service;
 use Yiisoft\Http\Method;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
+use Swoole\Http\Server as HttpServer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Swoole\Http\Server as SwooleHttpServer;
 use Throwable;
 
-final class Server implements ServerInterface
+class Server implements ServerInterface
 {
-    private SwooleHttpServer $server;
+    use ServerTrait;
 
-    private array $config;
     private WebApplication $webApplication;
     private ServerRequest $serverRequest;
     private ErrorHandler $errorHandler;
     private Service $service;
 
     public function __construct(
-        array $config,
         WebApplication $webApplication,
         ServerRequest $serverRequest,
         ErrorHandler $errorHandler,
         Service $service
     ) {
-        $this->config = $config;
         $this->webApplication = $webApplication;
         $this->serverRequest = $serverRequest;
         $this->errorHandler = $errorHandler;
         $this->service = $service;
-
-        $this->init();
     }
 
-    private function init(): void
+    /**
+     * {@inheritDoc}
+     */
+    protected function getServerClass(): string
     {
-        $this->server = new SwooleHttpServer(
-            $this->config['host'] ?? '127.0.0.1',
-            $this->config['port'] ?? null,
-            $this->config['mode'] ?? null,
-            $this->config['sockType'] ?? null,
-        );
-        $this->server->set($this->config['settings'] ?? []);
-        $this->server->on('request', [$this, 'handlerRequest']);
+        return HttpServer::class;
     }
 
-    public function start(): void
+    /**
+     * {@inheritDoc}
+     */
+    protected function onRequest(): void
     {
-        $this->server->start();
+        $this->getServer()->on(SwooleEvent::ON_REQUEST, [$this, 'handleRequest']);
     }
 
-    public function listen(string $host, int $port, int $socketType): ServerInterface
-    {
-        $port = $this->server->listen($host, $port, $socketType);
-        return $this;
-    }
-
-    public function handlerRequest(Request $request, Response $response): void
+    public function handleRequest(Request $request, Response $response): void
     {
         try {
             $serverRequest = $this->serverRequest->create($request);

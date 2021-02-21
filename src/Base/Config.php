@@ -161,7 +161,7 @@ final class Config
      */
     public function __set(string $name, $value)
     {
-        throw new InvalidArgumentException("{$name} is invalid.");
+        throw new InvalidArgumentException("The \"{$name}\" configuration is invalid.");
     }
 
     public function getRoute(): ?Closure
