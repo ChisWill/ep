@@ -8,7 +8,6 @@ use Ep\Swoole\Config;
 use Ep\Swoole\SwooleEvent;
 use Swoole\Server;
 use Swoole\Server\Port;
-use Closure;
 use InvalidArgumentException;
 
 trait ServerTrait
@@ -54,8 +53,9 @@ trait ServerTrait
             if (!isset($config['port'])) {
                 throw new InvalidArgumentException("The \"servers[port]\" configuration is required.");
             }
+            $config['host'] ??= '0.0.0.0';
             $port = $server->listen(
-                $config['host'] ?? '0.0.0.0',
+                $config['host'],
                 $config['port'],
                 $config['socketType'] ?? SWOOLE_SOCK_TCP,
             );
@@ -64,7 +64,7 @@ trait ServerTrait
                 $this->onEvents($port, $config['events'] ?? []);
                 $this->ports[] = $port;
             } else {
-                throw new InvalidParamException("Failed to listen server port [{$host}:{$port}]");
+                throw new InvalidArgumentException("Failed to listen server port [{$config['host']}:{$config['port']}]");
             }
         }
     }
@@ -76,10 +76,10 @@ trait ServerTrait
     {
         foreach ($events as $event => $callback) {
             if (!SwooleEvent::isSwooleEvent($event)) {
-                throw new InvalidParamException("The \"servers[events]\" configuration must have Swoole Event as the key of the array.");
+                throw new InvalidArgumentException("The \"servers[events]\" configuration must have Swoole Event as the key of the array.");
             }
             if (!is_callable($callback)) {
-                throw new InvalidParamException("The \"servers[events]\" configuration is an array of string-callback pairs.");
+                throw new InvalidArgumentException("The \"servers[events]\" configuration is an array of string-callback pairs.");
             }
             $port->on($event, $callback);
         }
