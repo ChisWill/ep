@@ -6,6 +6,9 @@ use Psr\Http\Message\ResponseInterface;
 
 class Controller extends \Ep\Web\Controller
 {
+    /**
+     * @param array|string $body
+     */
     protected function success($body = []): ResponseInterface
     {
         return $this->json([
@@ -15,7 +18,11 @@ class Controller extends \Ep\Web\Controller
         ]);
     }
 
-    protected function error($error, $errno = 500, $body = []): ResponseInterface
+    /**
+     * @param array|string $error
+     * @param array|string $body
+     */
+    protected function error($error, int $errno = 500, $body = []): ResponseInterface
     {
         return $this->json([
             'errno' => $errno,

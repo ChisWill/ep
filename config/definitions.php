@@ -19,6 +19,7 @@ use Yiisoft\Db\Redis\Connection as RedisConnection;
 use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
 use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Log\Logger;
+use Yiisoft\Log\Target\File\FileRotator;
 use Yiisoft\Log\Target\File\FileTarget;
 use Yiisoft\Profiler\Profiler;
 use Yiisoft\Profiler\ProfilerInterface;
@@ -49,7 +50,13 @@ return [
     // Response
     ResponseFactoryInterface::class => ResponseFactory::class,
     // Logger
-    FileTarget::class => static fn () => new FileTarget(Alias::get($config->runtimeDir . '/logs/app.log')),
+    FileTarget::class => [
+        '__class' => FileTarget::class,
+        '__construct()' => [
+            Alias::get($config->runtimeDir . '/logs/app.log'),
+            new FileRotator()
+        ]
+    ],
     LoggerInterface::class => static fn (FileTarget $fileTarget) => new Logger([$fileTarget]),
     // Cache
     CacheInterface::class => static fn () => new Cache(new FileCache(Alias::get($config->runtimeDir . '/cache'))),
