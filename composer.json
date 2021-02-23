@@ -18,11 +18,13 @@
         "yiisoft/log": "^1.0",
         "yiisoft/log-target-file": "dev-master",
         "yiisoft/router-fastroute": "3.0.x-dev@dev",
+        "yiisoft/session": "dev-master",
         "yiisoft/strings": "^2.0",
         "yiisoft/validator": "^3.0",
         "yiisoft/yii-web": "^3.0@dev"
     },
     "require-dev": {
+        "phpbench/phpbench": "^1.0.0",
         "phpunit/phpunit": "^9.4",
         "swoole/ide-helper": "~4.5.10",
         "vimeo/psalm": "^4.5"
@@ -38,9 +40,10 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Ep\\Tests\\Basic\\": "tests\\basic\\src",
-            "Ep\\Tests\\Advance\\": "tests\\advance\\src",
-            "Ep\\Tests\\Classes\\": "tests\\classes"
+            "Ep\\Tests\\": "tests",
+            "Ep\\Tests\\Basic\\": "tests/AppBasic/src",
+            "Ep\\Tests\\Advance\\": "tests/AppAdvance/src",
+            "Ep\\Tests\\Support\\": "tests/Support"
         }
     },
     "config": {

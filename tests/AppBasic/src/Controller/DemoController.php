@@ -2,10 +2,14 @@
 
 namespace Ep\Tests\Basic\Controller;
 
+use DateInterval;
 use Ep;
 use Ep\Tests\Basic\Component\Controller;
 use Ep\Tests\Basic\Model\User;
+use Ep\Web\ServerRequest;
 use Psr\Http\Message\ServerRequestInterface;
+use Yiisoft\Cookies\Cookie;
+use Yiisoft\Cookies\CookieCollection;
 use Yiisoft\Http\Method;
 
 class DemoController extends Controller
@@ -40,7 +44,7 @@ class DemoController extends Controller
         return $this->json($return);
     }
 
-    public function requestAction(ServerRequestInterface $request)
+    public function requestAction(ServerRequest $request)
     {
         $result = [
             'Method' => $request->getMethod(),
@@ -156,6 +160,23 @@ class DemoController extends Controller
     public function wsAction()
     {
         return $this->render('ws');
+    }
+
+    public function getCookieAction(ServerRequestInterface $request)
+    {
+        $cookies = CookieCollection::fromArray($request->getCookieParams());
+
+        return [
+            'testcookie' => $cookies->getValue('testcookie')
+        ];
+    }
+
+    public function setCookieAction()
+    {
+        $cookie = new Cookie('testcookie', 'testcookie' . mt_rand());
+        $cookie = $cookie->withMaxAge(new DateInterval('PT10S'))->withSecure(false);
+        $response = $this->string('ok');
+        return $cookie->addToResponse($response);
     }
 
     public function testAction()

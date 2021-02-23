@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ep\Tests\Cases;
+namespace Ep\Tests\Unit;
 
 use Ep\Helper\Curl;
 use PHPUnit\Framework\TestCase;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Ep\Tests\Classes;
+namespace Ep\Tests\Support;
 
 class DragoonEngine implements EngineInterface
 {

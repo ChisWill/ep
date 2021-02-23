@@ -75,17 +75,17 @@ class File
     /**
      * 删除文件夹
      *
-     * @param  string $dir                  文件夹位置
-     * @param  bool   $ignoreSymlinkContent 是否忽略符号连接指向的内容
+     * @param  string $dir           文件夹位置
+     * @param  bool   $ignoreSymlink 是否忽略符号连接指向的内容
      *
      * @throws RuntimeException
      */
-    public static function rmdir(string $dir, bool $ignoreSymlinkContent = true): void
+    public static function rmdir(string $dir, bool $ignoreSymlink = true): void
     {
         if (!is_dir($dir)) {
             return;
         }
-        if ($ignoreSymlinkContent === false || !is_link($dir)) {
+        if ($ignoreSymlink === false || !is_link($dir)) {
             if (!($handle = opendir($dir))) {
                 return;
             }
@@ -95,7 +95,7 @@ class File
                 }
                 $path = $dir . DIRECTORY_SEPARATOR . $file;
                 if (is_dir($path)) {
-                    static::rmdir($path, $ignoreSymlinkContent);
+                    static::rmdir($path, $ignoreSymlink);
                 } else {
                     try {
                         unlink($path);

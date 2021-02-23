@@ -7,9 +7,9 @@ namespace Ep\Web;
 use Ep;
 use Ep\Base\ControllerFactory;
 use Ep\Base\Route;
-use Ep\Contract\ServerRequestFactoryInterface;
 use Yiisoft\Http\Method;
 use Yiisoft\Yii\Web\SapiEmitter;
+use Yiisoft\Yii\Web\ServerRequestFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
@@ -22,7 +22,7 @@ final class Application extends \Ep\Base\Application
     public function createRequest(): ServerRequestInterface
     {
         return Ep::getDi()
-            ->get(ServerRequestFactoryInterface::class)
+            ->get(ServerRequestFactory::class)
             ->createFromGlobals();
     }
 
@@ -64,7 +64,7 @@ final class Application extends \Ep\Base\Application
     public function send($request, $response): void
     {
         if ($response instanceof ResponseInterface) {
-            (new SapiEmitter)->emit($response, $request->getMethod() === Method::HEAD);
+            (new SapiEmitter())->emit($response, $request->getMethod() === Method::HEAD);
         } else {
             $service = Ep::getDi()->get(Service::class);
             if (is_string($response)) {

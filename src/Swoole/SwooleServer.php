@@ -14,9 +14,9 @@ use InvalidArgumentException;
 
 final class SwooleServer
 {
-    const HTTP = 1;
-    const WEBSOCKET = 2;
-    const TCP = 3;
+    public const HTTP = 1;
+    public const WEBSOCKET = 2;
+    public const TCP = 3;
 
     private Config $config;
     private array $settings;

@@ -8,55 +8,55 @@ use ReflectionClass;
 
 final class SwooleEvent
 {
-    const ON_START = 'start';
+    public const ON_START = 'start';
 
-    const ON_SHUTDOWN = 'shutdown';
+    public const ON_SHUTDOWN = 'shutdown';
 
-    const ON_WORKER_START = 'workerStart';
+    public const ON_WORKER_START = 'workerStart';
 
-    const ON_WORKER_STOP = 'workerStop';
+    public const ON_WORKER_STOP = 'workerStop';
 
-    const ON_WORKER_EXIT = 'workerExit';
+    public const ON_WORKER_EXIT = 'workerExit';
 
-    const ON_CONNECT = 'connect';
+    public const ON_CONNECT = 'connect';
 
-    const ON_RECEIVE = 'receive';
+    public const ON_RECEIVE = 'receive';
 
-    const ON_PACKET = 'packet';
+    public const ON_PACKET = 'packet';
 
-    const ON_CLOSE = 'close';
+    public const ON_CLOSE = 'close';
 
-    const ON_TASK = 'task';
+    public const ON_TASK = 'task';
 
-    const ON_FINISH = 'finish';
+    public const ON_FINISH = 'finish';
 
-    const ON_PIPE_MESSAGE = 'pipeMessage';
+    public const ON_PIPE_MESSAGE = 'pipeMessage';
 
-    const ON_WORKER_ERROR = 'workerError';
+    public const ON_WORKER_ERROR = 'workerError';
 
-    const ON_MANAGER_START = 'managerStart';
+    public const ON_MANAGER_START = 'managerStart';
 
-    const ON_MANAGER_STOP = 'managerStop';
+    public const ON_MANAGER_STOP = 'managerStop';
 
-    const ON_BEFORE_RELOAD = 'beforeReload';
+    public const ON_BEFORE_RELOAD = 'beforeReload';
 
-    const ON_AFTER_RELOAD = 'afterReload';
+    public const ON_AFTER_RELOAD = 'afterReload';
     /**
      * WebSocket Event.
      */
-    const ON_HAND_SHAKE = 'handshake';
+    public const ON_HAND_SHAKE = 'handshake';
     /**
      * WebSocket Event.
      */
-    const ON_OPEN = 'open';
+    public const ON_OPEN = 'open';
     /**
      * WebSocket Event.
      */
-    const ON_MESSAGE = 'message';
+    public const ON_MESSAGE = 'message';
     /**
      * Http Event.
      */
-    const ON_REQUEST = 'request';
+    public const ON_REQUEST = 'request';
 
     public static function isSwooleEvent($event): bool
     {

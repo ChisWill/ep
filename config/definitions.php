@@ -2,10 +2,10 @@
 
 use Ep\Console\ConsoleRequest;
 use Ep\Contract\ConsoleRequestInterface;
-use Ep\Contract\ServerRequestFactoryInterface as EpServerRequestFactoryInterface;
 use Ep\Helper\Alias;
 use Ep\Web\ServerRequestFactory;
 use HttpSoft\Message\ResponseFactory;
+use HttpSoft\Message\ServerRequestFactory as HttpSoftServerRequestFactory;
 use HttpSoft\Message\StreamFactory;
 use HttpSoft\Message\UploadedFileFactory;
 use HttpSoft\Message\UriFactory;
@@ -23,7 +23,6 @@ use Yiisoft\Log\Target\File\FileTarget;
 use Yiisoft\Profiler\Profiler;
 use Yiisoft\Profiler\ProfilerInterface;
 use Yiisoft\Yii\Event\ListenerCollectionFactory;
-use Yiisoft\Yii\Web\ServerRequestFactory as YiiServerRequestFactory;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
@@ -40,8 +39,10 @@ return [
     // Console
     ConsoleRequestInterface::class => ConsoleRequest::class,
     // ServerRequest
-    EpServerRequestFactoryInterface::class => YiiServerRequestFactory::class,
-    ServerRequestFactoryInterface::class => ServerRequestFactory::class,
+    ServerRequestFactoryInterface::class => [
+        '__class' => ServerRequestFactory::class,
+        '__construct()' => [new HttpSoftServerRequestFactory()]
+    ],
     UriFactoryInterface::class => UriFactory::class,
     UploadedFileFactoryInterface::class => UploadedFileFactory::class,
     StreamFactoryInterface::class => StreamFactory::class,
