@@ -29,7 +29,6 @@
     "require-dev": {
         "phpbench/phpbench": "^1.0.0",
         "phpunit/phpunit": "^9.4",
-        "swoole/ide-helper": "~4.5.10",
         "vimeo/psalm": "^4.5"
     },
     "autoload": {
