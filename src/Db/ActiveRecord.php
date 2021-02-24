@@ -56,8 +56,12 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
     public function load(ServerRequestInterface $request, ?string $scope = null): bool
     {
         if ($request->getMethod() === Method::POST) {
-            $scope ??= StringHelper::baseName(static::class);
-            $this->setAttributes($request->getParsedBody()[$scope] ?? []);
+            if ($scope === '') {
+                $this->setAttributes($request->getParsedBody());
+            } else {
+                $scope ??= StringHelper::baseName(static::class);
+                $this->setAttributes($request->getParsedBody()[$scope] ?? []);
+            }
             return true;
         } else {
             return false;
