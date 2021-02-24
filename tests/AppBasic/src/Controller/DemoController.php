@@ -145,12 +145,15 @@ class DemoController extends Controller
     {
         $user = User::findModel($request->getQueryParams()['id'] ?? null);
         if ($user->load($request)) {
+            $trans = Ep::getDb()->beginTransaction();
             if (!$user->validate()) {
                 return $this->error($user->getErrors());
             }
             if ($user->save()) {
+                $trans->commit();
                 return $this->success();
             } else {
+                $trans->rollBack();
                 return $this->error($user->getErrors());
             }
         }

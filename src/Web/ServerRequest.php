@@ -104,7 +104,7 @@ final class ServerRequest implements ServerRequestInterface
      */
     public function getParsedBody()
     {
-        return $this->request->getParsedBody();
+        return $this->request->getParsedBody() ?: [];
     }
 
     /**

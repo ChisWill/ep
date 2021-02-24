@@ -6,9 +6,9 @@ use Ep\Base\Config;
 use Ep\Helper\Alias;
 use Ep\Helper\Arr;
 use Yiisoft\Cache\CacheInterface;
-use Yiisoft\Di\Container;
-use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Redis\Connection as RedisConnection;
+use Yiisoft\Di\Container;
 use Yiisoft\Injector\Injector;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -49,9 +49,9 @@ final class Ep
         return new Injector(self::$di);
     }
 
-    public static function getDb(?string $id = null): ConnectionInterface
+    public static function getDb(?string $id = null): Connection
     {
-        return self::$di->get($id ?: ConnectionInterface::class);
+        return self::$di->get($id ?: Connection::class);
     }
 
     public static function getRedis(?string $id = null): RedisConnection

@@ -12,9 +12,9 @@ use HttpSoft\Message\UriFactory;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cache\File\FileCache;
-use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Connection\LazyConnectionDependencies;
-use Yiisoft\Db\Mysql\Connection;
+use Yiisoft\Db\Mysql\Connection as MysqlConnection;
 use Yiisoft\Db\Redis\Connection as RedisConnection;
 use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
 use Yiisoft\EventDispatcher\Provider\Provider;
@@ -66,8 +66,8 @@ return [
     ListenerProviderInterface::class => static fn (ContainerInterface $container) => new Provider($container->get(ListenerCollectionFactory::class)->create($config->getEvents())),
     EventDispatcherInterface::class => Dispatcher::class,
     // Default DB
-    ConnectionInterface::class => static function (ContainerInterface $container) use ($config) {
-        $connection = new Connection(
+    Connection::class => static function (ContainerInterface $container) use ($config) {
+        $connection = new MysqlConnection(
             $config->mysqlDsn,
             new LazyConnectionDependencies($container)
         );

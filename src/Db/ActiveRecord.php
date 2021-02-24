@@ -10,7 +10,10 @@ use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Http\Method;
 use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Validator\Rule;
+use Yiisoft\Strings\StringHelper;
 use Yiisoft\Validator\Validator;
+use Yiisoft\Validator\ValidationContext;
+use Yiisoft\Validator\Result;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 
@@ -34,7 +37,7 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
      * @return static
      * @throws RuntimeException
      */
-    public static function findModel($condition = null)
+    public static function findModel($condition)
     {
         if (empty($condition)) {
             return new static;
@@ -50,10 +53,11 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
         }
     }
 
-    public function load(ServerRequestInterface $request): bool
+    public function load(ServerRequestInterface $request, ?string $scope = null): bool
     {
         if ($request->getMethod() === Method::POST) {
-            $this->setAttributes($request->getParsedBody() ?: []);
+            $scope ??= StringHelper::baseName(static::class);
+            $this->setAttributes($request->getParsedBody()[$scope] ?? []);
             return true;
         } else {
             return false;
@@ -84,6 +88,29 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
     public function getAttributeValue(string $attribute)
     {
         return $this->getAttribute($attribute);
+    }
+
+    protected function rule(callable $callback): Rule
+    {
+        return new class ($callback) extends Rule
+        {
+            /**
+             * @param callback $callback
+             */
+            private $callback;
+
+            public function __construct(callable $callback)
+            {
+                $this->callback = $callback;
+            }
+
+            protected function validateValue($value, ?ValidationContext $context = null): Result
+            {
+                $result = new Result;
+                call_user_func($this->callback, $value, $result, $context);
+                return $result;
+            }
+        };
     }
 
     /**

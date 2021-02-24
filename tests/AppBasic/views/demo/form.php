@@ -2,11 +2,13 @@
 
 <form method="post" id="form">
     账号：
-    <input type="text" name="username">
+    <input type="text" name="User[username]">
     密码：
-    <input type="text" name="password">
+    <input type="text" name="User[password]">
     年龄：
-    <input type="text" name="age">
+    <input type="text" name="User[age]">
+    出生年月：
+    <input type="text" name="User[birthday]">
 
     <input type="submit" id="btn">
 </form>
