@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\Db;
 
 use Ep;
+use Ep\Helper\Date;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Http\Method;
@@ -19,7 +20,9 @@ use RuntimeException;
 
 abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implements DataSetInterface
 {
-    protected static string $pk = 'id';
+    public const PK = 'id';
+    public const CREATED_AT = 'created_at';
+    public const UPDATED_AT = 'updated_at';
 
     public function __construct(?ConnectionInterface $db = null)
     {
@@ -43,7 +46,7 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
             return new static;
         } else {
             if (is_scalar($condition)) {
-                $condition = [self::$pk => $condition];
+                $condition = [static::PK => $condition];
             }
             $model = static::find()->where($condition)->one();
             if ($model === null) {
@@ -51,6 +54,22 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
             }
             return $model;
         }
+    }
+
+    public function insert(?array $attributes = null): bool
+    {
+        foreach (array_intersect($this->attributes(), [static::CREATED_AT, static::UPDATED_AT]) as $field) {
+            $this->$field = Date::fromUnix();
+        }
+        return parent::insert($attributes);
+    }
+
+    public function update(?array $attributeNames = null)
+    {
+        if (in_array(static::UPDATED_AT, $this->attributes())) {
+            $this->{static::UPDATED_AT} = Date::fromUnix();
+        }
+        return parent::update($attributeNames);
     }
 
     public function load(ServerRequestInterface $request, ?string $scope = null): bool

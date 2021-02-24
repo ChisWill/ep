@@ -61,9 +61,9 @@ class DemoController extends Controller
 
     public function redirectAction(ServerRequestInterface $request)
     {
-        $url = $request->getQueryParams()['url'] ?? 'http://www.baidu.com';
+        $id = User::find()->orderBy('id DESC')->select('id')->scalar();
 
-        return $this->redirect($url);
+        return $this->redirect('form?id=' . $id);
     }
 
     public function loggerAction()
@@ -143,7 +143,7 @@ class DemoController extends Controller
 
     public function formAction(ServerRequestInterface $request)
     {
-        $user = User::findModel($request->getQueryParams()['id'] ?? null);
+        $user = User::findModel($request->getQueryParams()['id'] ?? 0);
         if ($user->load($request)) {
             $trans = Ep::getDb()->beginTransaction();
             if (!$user->validate()) {
@@ -157,7 +157,7 @@ class DemoController extends Controller
                 return $this->error($user->getErrors());
             }
         }
-        return $this->render('form');
+        return $this->render('form', compact('user'));
     }
 
     public function wsAction()
