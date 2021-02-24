@@ -1,7 +1,12 @@
 <?php
 
 use Ep\Tests\Basic\Controller\DemoController;
+use Ep\Tests\Support\XEngine;
 
 return [
-    DemoController::class => [fn (DemoController $event) => $event->testAction()]
+    XEngine::class => [
+        function (XEngine $event) {
+            echo $event->getPower();
+        }
+    ]
 ];

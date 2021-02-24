@@ -12,7 +12,7 @@ use Yiisoft\Yii\Web\SapiEmitter;
 use Yiisoft\Yii\Web\ServerRequestFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use RuntimeException;
+use UnexpectedValueException;
 
 final class Application extends \Ep\Base\Application
 {
@@ -52,7 +52,7 @@ final class Application extends \Ep\Base\Application
         $factory = new ControllerFactory($config->controllerDirAndSuffix);
         try {
             return $factory->run($handler, $request);
-        } catch (RuntimeException $e) {
+        } catch (UnexpectedValueException $e) {
             return $factory->run($config->notFoundHandler, $request);
         }
     }

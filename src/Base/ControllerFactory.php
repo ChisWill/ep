@@ -8,7 +8,7 @@ use Ep;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ControllerInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use RuntimeException;
+use UnexpectedValueException;
 
 final class ControllerFactory
 {
@@ -40,7 +40,7 @@ final class ControllerFactory
     private function create(string $class): ControllerInterface
     {
         if (!class_exists($class)) {
-            throw new RuntimeException("{$class} is not found.");
+            throw new UnexpectedValueException("{$class} is not found.");
         }
         return Ep::getDi()->get($class);
     }
@@ -54,7 +54,7 @@ final class ControllerFactory
     {
         $action .= $this->config->actionSuffix;
         if (!is_callable([$controller, $action])) {
-            throw new RuntimeException(sprintf('%s::%s() is not found.', get_class($controller), $action));
+            throw new UnexpectedValueException(sprintf('%s::%s() is not found.', get_class($controller), $action));
         }
         $response = $controller->before($request);
         if ($response === true) {

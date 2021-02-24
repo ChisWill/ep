@@ -6,6 +6,7 @@ use DateInterval;
 use Ep;
 use Ep\Tests\Basic\Component\Controller;
 use Ep\Tests\Basic\Model\User;
+use Ep\Tests\Support\XEngine;
 use Ep\Web\ServerRequest;
 use Psr\Http\Message\ServerRequestInterface;
 use Yiisoft\Cookies\Cookie;
@@ -114,7 +115,7 @@ class DemoController extends Controller
     public function eventAction()
     {
         $dipatcher = Ep::getEventDispatcher();
-        $dipatcher->dispatch($this);
+        $dipatcher->dispatch(new XEngine(80));
     }
 
     public function redisAction()
@@ -184,8 +185,5 @@ class DemoController extends Controller
 
     public function testAction()
     {
-        echo 'test string';
-
-        return 'over';
     }
 }

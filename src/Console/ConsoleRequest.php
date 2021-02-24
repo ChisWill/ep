@@ -6,7 +6,6 @@ namespace Ep\Console;
 
 use Ep\Contract\ConsoleRequestInterface;
 use ErrorException;
-use RuntimeException;
 
 class ConsoleRequest implements ConsoleRequestInterface
 {

@@ -16,7 +16,7 @@ use Yiisoft\Validator\Validator;
 use Yiisoft\Validator\ValidationContext;
 use Yiisoft\Validator\Result;
 use Psr\Http\Message\ServerRequestInterface;
-use RuntimeException;
+use UnexpectedValueException;
 
 abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implements DataSetInterface
 {
@@ -38,7 +38,7 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
      * @param  int|string|array|ExpressionInterface $condition
      * 
      * @return static
-     * @throws RuntimeException
+     * @throws UnexpectedValueException
      */
     public static function findModel($condition)
     {
@@ -50,7 +50,7 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
             }
             $model = static::find()->where($condition)->one();
             if ($model === null) {
-                throw new RuntimeException("Data is not found.");
+                throw new UnexpectedValueException("Data is not found.");
             }
             return $model;
         }
@@ -115,7 +115,7 @@ abstract class ActiveRecord extends \Yiisoft\ActiveRecord\ActiveRecord implement
 
     protected function rule(callable $callback): Rule
     {
-        return new class ($callback) extends Rule
+        return new class($callback) extends Rule
         {
             /**
              * @param callback $callback
