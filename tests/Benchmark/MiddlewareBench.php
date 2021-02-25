@@ -18,6 +18,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Yiisoft\Middleware\Dispatcher\MiddlewareDispatcher;
+use Yiisoft\Middleware\Dispatcher\MiddlewareFactory;
+use Yiisoft\Middleware\Dispatcher\MiddlewareStack;
 
 /**
  * @Iterations(5)
@@ -33,48 +36,62 @@ class MiddlewareBench
         AddMiddleware::class,
     ];
 
+    private ServerRequestInterface $request;
+
     public function before()
     {
         Ep::init(require(dirname(__DIR__, 1) . '/AppBasic/config/main.php'));
-    }
 
-    public function benchHandle()
-    {
         $factory = new ServerRequestFactory;
-        $serverRequest = $factory->createServerRequest('POST', '/user/list');
-        $handler = Ep::getDi()->get(FoundHandler::class);
-        $list = $this->createMiddle();
-        foreach ($list as $middleware) {
-            $handler = $this->wrap($middleware, $handler);
-        }
-        return $handler->handle($serverRequest);
+        $this->request = $factory->createServerRequest('POST', '/user/list');
     }
 
     public function benchNormal()
     {
-        $factory = new ServerRequestFactory;
-        $serverRequest = $factory->createServerRequest('POST', '/user/list');
         $handler = Ep::getDi()->get(FoundHandler::class);
-        foreach ($this->middlewareList as $class) {
-            /** @var MiddlewareInterface $middle */
-            $middle = Ep::getDi()->get($class);
-            $middle->process($serverRequest, $handler);
+        $list = $this->createByNormal();
+        foreach ($list as $middleware) {
+            $handler = $this->wrap($middleware, $handler);
         }
+        return $handler->handle($this->request);
     }
 
-    public function benchNew()
+    public function benchYii()
     {
-        foreach ($this->middlewareList as $class) {
-            /** @var MiddlewareInterface $middle */
-            $middle = Ep::getDi()->get($class);
+        $handler = Ep::getDi()->get(FoundHandler::class);
+        $list = $this->createByYii();
+        foreach ($list as $middleware) {
+            $handler = $this->wrap($middleware, $handler);
         }
+        return $handler->handle($this->request);
     }
 
-    private function createMiddle()
+    public function benchFullYii()
+    {
+        $handler = Ep::getDi()->get(FoundHandler::class);
+
+        $factory = new MiddlewareFactory(Ep::getDi());
+        $stack = new MiddlewareStack(Ep::getEventDispatcher());
+        $dispatcher = new MiddlewareDispatcher($factory, $stack);
+        $dispatcher = $dispatcher->withMiddlewares($this->middlewareList);
+        return $dispatcher->dispatch($this->request, $handler);
+    }
+
+    private function createByNormal()
     {
         $list = [];
         foreach ($this->middlewareList as $class) {
             $list[] = Ep::getDi()->get($class);
+        }
+        return $list;
+    }
+
+    private function createByYii()
+    {
+        $list = [];
+        $factory = new MiddlewareFactory(Ep::getDi());
+        foreach ($this->middlewareList as $class) {
+            $list[] = $factory->create($class);
         }
         return $list;
     }

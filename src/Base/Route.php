@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
+use Ep\Contract\ConfigurableInterface;
 use Ep\Helper\Alias;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
@@ -12,29 +13,29 @@ use Closure;
 
 use function FastRoute\cachedDispatcher;
 
-class Route
+class Route implements ConfigurableInterface
 {
-    public bool $default = true;
+    use ConfigurableTrait;
+
+    public bool $enableDefaultRule = true;
 
     private Config $config;
     private string $baseUrl;
-    private ?Closure $rule;
+    private Closure $rule;
 
-    public function __construct(string $baseUrl, ?Closure $rule = null)
+    public function __construct(Closure $rule, string $baseUrl = '/')
     {
         $this->config = Ep::getConfig();
-        $this->baseUrl = $baseUrl;
         $this->rule = $rule;
+        $this->baseUrl = $baseUrl;
     }
 
     public function match(string $path, string $method = 'GET'): array
     {
         return $this->solveRouteInfo(
             cachedDispatcher(function (RouteCollector $route) {
-                $this->rule !== null && call_user_func($this->rule, $route);
-                if ($this->default) {
-                    $rule = $this->config->getRoute();
-                    $rule !== null && call_user_func($rule, $route);
+                call_user_func($this->rule, $route);
+                if ($this->enableDefaultRule) {
                     $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
                 }
             }, [

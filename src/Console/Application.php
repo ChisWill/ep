@@ -37,7 +37,7 @@ final class Application extends \Ep\Base\Application
     {
         $config = Ep::getConfig();
 
-        [$handler] = (new Route($config->baseUrl))->match($request->getRoute());
+        [$handler] = (new Route($config->getRoute(), $config->baseUrl))->match($request->getRoute());
 
         try {
             return (new ControllerFactory($config->commandDirAndSuffix))->run($handler, $request);

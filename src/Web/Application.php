@@ -43,7 +43,7 @@ final class Application extends \Ep\Base\Application
     {
         $config = Ep::getConfig();
 
-        [$handler, $params] = (new Route($config->baseUrl))->match(
+        [$handler, $params] = (new Route($config->getRoute(), $config->baseUrl))->match(
             $request->getUri()->getPath(),
             $request->getMethod()
         );

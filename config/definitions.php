@@ -3,6 +3,7 @@
 use Ep\Console\ConsoleRequest;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Helper\Alias;
+use Ep\Web\MiddlewareStack;
 use Ep\Web\ServerRequestFactory;
 use HttpSoft\Message\ResponseFactory;
 use HttpSoft\Message\ServerRequestFactory as HttpSoftServerRequestFactory;
@@ -21,6 +22,9 @@ use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target\File\FileRotator;
 use Yiisoft\Log\Target\File\FileTarget;
+use Yiisoft\Middleware\Dispatcher\MiddlewareFactory;
+use Yiisoft\Middleware\Dispatcher\MiddlewareFactoryInterface;
+use Yiisoft\Middleware\Dispatcher\MiddlewareStackInterface;
 use Yiisoft\Profiler\Profiler;
 use Yiisoft\Profiler\ProfilerInterface;
 use Yiisoft\Yii\Event\ListenerCollectionFactory;
@@ -39,6 +43,9 @@ $config = Ep::getConfig();
 return [
     // Console
     ConsoleRequestInterface::class => ConsoleRequest::class,
+    // HttpMiddleware
+    MiddlewareFactoryInterface::class => MiddlewareFactory::class,
+    MiddlewareStackInterface::class => MiddlewareStack::class,
     // ServerRequest
     ServerRequestFactoryInterface::class => [
         '__class' => ServerRequestFactory::class,

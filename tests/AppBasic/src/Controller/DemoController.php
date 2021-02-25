@@ -8,11 +8,16 @@ use DateInterval;
 use Ep;
 use Ep\Tests\Basic\Component\Controller;
 use Ep\Tests\Basic\Model\User;
+use Ep\Tests\Support\Middleware\AddMiddleware;
+use Ep\Tests\Support\Middleware\CheckMiddleware;
+use Ep\Tests\Support\Middleware\FilterMiddleware;
+use Ep\Tests\Support\RequestHandler\FoundHandler;
 use Ep\Web\ServerRequest;
 use Psr\Http\Message\ServerRequestInterface;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
 use Yiisoft\Http\Method;
+use Yiisoft\Middleware\Dispatcher\MiddlewareDispatcher;
 
 class DemoController extends Controller
 {
@@ -184,7 +189,20 @@ class DemoController extends Controller
         return $cookie->addToResponse($response);
     }
 
-    public function testAction()
+    public function middleAction(ServerRequest $serverRequest)
+    {
+        $dispatcher = Ep::getDi()->get(MiddlewareDispatcher::class);
+
+        $dispatcher = $dispatcher->withMiddlewares([
+            CheckMiddleware::class,
+            FilterMiddleware::class,
+            AddMiddleware::class,
+        ]);
+
+        return $dispatcher->dispatch($serverRequest, new FoundHandler($this->getService()));
+    }
+
+    public function testAction(ServerRequest $serverRequest)
     {
     }
 }
