@@ -1,6 +1,8 @@
 <?php
 
-namespace Ep\Tests\Support;
+declare(strict_types=1);
+
+namespace Ep\Tests\Support\Container;
 
 use Closure;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ep\Tests\Basic\Component;
 
 use Psr\Http\Message\ResponseInterface;

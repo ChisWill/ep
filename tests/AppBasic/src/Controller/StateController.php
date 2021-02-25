@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ep\Tests\Basic\Controller;
 
 use Ep\Tests\Basic\Component\Controller;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ep\Tests\Basic\Model;
 
 use Ep\Db\ActiveRecord;

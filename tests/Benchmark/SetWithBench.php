@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Tests\Benchmark;
 
-use Ep\Tests\Support\XEngine;
+use Ep\Tests\Support\Container\XEngine;
 use PhpBench\Benchmark\Metadata\Annotations\BeforeMethods;
 use PhpBench\Benchmark\Metadata\Annotations\Groups;
 use PhpBench\Benchmark\Metadata\Annotations\Iterations;

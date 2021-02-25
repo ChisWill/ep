@@ -1,11 +1,12 @@
 <?php
 
-namespace Ep\Tests\Support;
+declare(strict_types=1);
 
-class Benz implements CarInterface
+namespace Ep\Tests\Support\Container;
+
+class BMW implements CarInterface
 {
     public int $size;
-
     public EngineInterface $engine;
 
     public function __construct(EngineInterface $engine)
@@ -25,6 +26,6 @@ class Benz implements CarInterface
 
     public function drive(): void
     {
-        usleep(200);
+        usleep(100);
     }
 }

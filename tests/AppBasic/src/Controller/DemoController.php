@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ep\Tests\Basic\Controller;
 
 use DateInterval;
 use Ep;
 use Ep\Tests\Basic\Component\Controller;
 use Ep\Tests\Basic\Model\User;
-use Ep\Tests\Support\XEngine;
 use Ep\Web\ServerRequest;
 use Psr\Http\Message\ServerRequestInterface;
 use Yiisoft\Cookies\Cookie;
@@ -115,7 +116,7 @@ class DemoController extends Controller
     public function eventAction()
     {
         $dipatcher = Ep::getEventDispatcher();
-        $dipatcher->dispatch(new XEngine(80));
+        $dipatcher->dispatch($this);
     }
 
     public function redisAction()
