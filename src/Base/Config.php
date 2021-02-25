@@ -164,9 +164,9 @@ final class Config
         throw new InvalidArgumentException("The \"{$name}\" configuration is invalid.");
     }
 
-    public function getRoute(): ?Closure
+    public function getRoute(): Closure
     {
-        return $this->route;
+        return $this->route ?: fn () => true;
     }
 
     public function getDefinitions(): array

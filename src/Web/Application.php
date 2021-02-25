@@ -49,7 +49,7 @@ final class Application extends \Ep\Base\Application
         );
         $request = $request->withQueryParams($params);
 
-        $factory = new ControllerFactory($config->controllerDirAndSuffix);
+        $factory = Ep::getDi()->get(ControllerFactory::class)->clone(['suffix' => $config->controllerDirAndSuffix]);
         try {
             return $factory->run($handler, $request);
         } catch (UnexpectedValueException $e) {

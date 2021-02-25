@@ -5,20 +5,22 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
+use Ep\Contract\ConfigurableInterface;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ControllerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use UnexpectedValueException;
 
-final class ControllerFactory
+final class ControllerFactory implements ConfigurableInterface
 {
+    use ConfigurableTrait;
+
     private Config $config;
     private string $suffix;
 
-    public function __construct(string $suffix)
+    public function __construct()
     {
         $this->config = Ep::getConfig();
-        $this->suffix = $suffix;
     }
 
     /**

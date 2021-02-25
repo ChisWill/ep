@@ -46,7 +46,7 @@ final class Ep
 
     public static function getInjector(): Injector
     {
-        return new Injector(self::$di);
+        return self::$di->get(Injector::class);
     }
 
     public static function getDb(?string $id = null): Connection
