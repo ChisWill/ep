@@ -1,7 +1,9 @@
 <?php
 
+use Ep\Base\Route;
 use Ep\Console\ConsoleRequest;
 use Ep\Contract\ConsoleRequestInterface;
+use Ep\Contract\NotFoundHandlerInterface;
 use Ep\Helper\Alias;
 use Ep\Web\MiddlewareStack;
 use Ep\Web\ServerRequestFactory;
@@ -27,7 +29,10 @@ use Yiisoft\Middleware\Dispatcher\MiddlewareFactoryInterface;
 use Yiisoft\Middleware\Dispatcher\MiddlewareStackInterface;
 use Yiisoft\Profiler\Profiler;
 use Yiisoft\Profiler\ProfilerInterface;
+use Yiisoft\Session\Session;
+use Yiisoft\Session\SessionInterface;
 use Yiisoft\Yii\Event\ListenerCollectionFactory;
+use Yiisoft\Yii\Web\NotFoundHandler;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
@@ -46,14 +51,25 @@ return [
     // HttpMiddleware
     MiddlewareFactoryInterface::class => MiddlewareFactory::class,
     MiddlewareStackInterface::class => MiddlewareStack::class,
+    Route::class => static fn () => new Route($config->getRoute(), $config->baseUrl),
+    // Session
+    SessionInterface::class => [
+        '__class' => Session::class,
+        '__construct()' => [
+            ['cookie_secure' => 0]
+        ]
+    ],
     // ServerRequest
     ServerRequestFactoryInterface::class => [
         '__class' => ServerRequestFactory::class,
-        '__construct()' => [new HttpSoftServerRequestFactory()]
+        '__construct()' => [
+            new HttpSoftServerRequestFactory()
+        ]
     ],
     UriFactoryInterface::class => UriFactory::class,
     UploadedFileFactoryInterface::class => UploadedFileFactory::class,
     StreamFactoryInterface::class => StreamFactory::class,
+    NotFoundHandlerInterface::class => NotFoundHandler::class,
     // Response
     ResponseFactoryInterface::class => ResponseFactory::class,
     // Logger

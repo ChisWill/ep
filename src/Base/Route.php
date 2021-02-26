@@ -17,13 +17,17 @@ class Route implements ConfigurableInterface
 {
     use ConfigurableTrait;
 
-    public bool $enableDefaultRule = true;
-
     private Config $config;
-    private string $baseUrl;
+    /**
+     * 路由规则回调
+     */
     private Closure $rule;
+    /**
+     * 默认路由规则基于 `$baseUrl` ，如果设置为空字符串表示不启用
+     */
+    private string $baseUrl;
 
-    public function __construct(Closure $rule, string $baseUrl = '/')
+    public function __construct(Closure $rule, string $baseUrl = '')
     {
         $this->config = Ep::getConfig();
         $this->rule = $rule;
@@ -35,13 +39,14 @@ class Route implements ConfigurableInterface
         return $this->solveRouteInfo(
             cachedDispatcher(function (RouteCollector $route) {
                 call_user_func($this->rule, $route);
-                if ($this->enableDefaultRule) {
+                if ($this->baseUrl) {
                     $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
                 }
             }, [
                 'cacheFile' => Alias::get($this->config->runtimeDir . '/route.cache'),
                 'cacheDisabled' => $this->config->debug
-            ])->dispatch($method, rtrim($path, '/') ?: '/')
+            ])
+                ->dispatch($method, rtrim($path, '/') ?: '/')
         );
     }
 

@@ -40,7 +40,7 @@ abstract class Command implements ControllerInterface
     protected function getView(): View
     {
         if ($this->view === null) {
-            $this->view = new View($this, Ep::getConfig()->viewPath);
+            $this->view = new View(Ep::getConfig()->viewPath, $this);
         }
         return $this->view;
     }

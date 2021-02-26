@@ -31,7 +31,7 @@ class ErrorHandler extends \Ep\Base\ErrorHandler implements ContextInterface
     protected function getView(): View
     {
         if ($this->view === null) {
-            $this->view = new View($this, '@ep/views');
+            $this->view = new View('@ep/views', $this);
         }
         return $this->view;
     }
@@ -47,7 +47,12 @@ class ErrorHandler extends \Ep\Base\ErrorHandler implements ContextInterface
             http_response_code(Status::INTERNAL_SERVER_ERROR);
             return $this->getView()->renderPartial('exception', ['exception' => $e]);
         } else {
-            return (new ControllerFactory(Ep::getConfig()->controllerDirAndSuffix))->run(Ep::getConfig()->errorHandler, $request);
+            return Ep::getDi()
+                ->get(ControllerFactory::class)
+                ->run(
+                    Ep::getConfig()->errorHandler,
+                    $request
+                );
         }
     }
 

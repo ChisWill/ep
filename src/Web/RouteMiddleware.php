@@ -4,28 +4,25 @@ declare(strict_types=1);
 
 namespace Ep\Web;
 
-use Ep\Base\Config;
 use Ep\Base\ControllerFactory;
 use Ep\Base\Route;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use UnexpectedValueException;
 
 class RouteMiddleware implements MiddlewareInterface
 {
     private Route $route;
     private ControllerFactory $controllerFactory;
+    private Service $service;
 
-    public function __construct(Config $config, Route $route, ControllerFactory $controllerFactory)
+    public function __construct(Route $route, ControllerFactory $controllerFactory, Service $service)
     {
-        $this->route = $route->clone([
-            'rule' => $config->getRoute(),
-            'baseUrl' => $config->baseUrl
-        ]);
-        $this->controllerFactory = $controllerFactory->clone([
-            'suffix' => $config->controllerDirAndSuffix
-        ]);
+        $this->route = $route;
+        $this->controllerFactory = $controllerFactory;
+        $this->service = $service;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $requestHandler): ResponseInterface
@@ -40,7 +37,7 @@ class RouteMiddleware implements MiddlewareInterface
         }
 
         try {
-            return $this->controllerFactory->run($handler, $request);
+            return $this->service->toResponse($this->controllerFactory->run($handler, $request));
         } catch (UnexpectedValueException $e) {
             return $requestHandler->handle($request);
         }

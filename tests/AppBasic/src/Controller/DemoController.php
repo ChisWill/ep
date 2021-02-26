@@ -6,6 +6,7 @@ namespace Ep\Tests\Basic\Controller;
 
 use DateInterval;
 use Ep;
+use Ep\Base\View;
 use Ep\Tests\Basic\Component\Controller;
 use Ep\Tests\Basic\Model\User;
 use Ep\Tests\Support\Middleware\AddMiddleware;
@@ -18,6 +19,7 @@ use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
 use Yiisoft\Http\Method;
 use Yiisoft\Middleware\Dispatcher\MiddlewareDispatcher;
+use Yiisoft\Session\SessionInterface;
 
 class DemoController extends Controller
 {
@@ -200,6 +202,23 @@ class DemoController extends Controller
         ]);
 
         return $dispatcher->dispatch($serverRequest, new FoundHandler($this->getService()));
+    }
+
+    public function sessionAction(SessionInterface $session)
+    {
+        $session->set('title', 'sessionTest');
+
+        $r = $session->get('title');
+
+        return $this->json($r);
+    }
+
+    public function viewAction()
+    {
+        $view = new View('@root/views', 'index');
+        return $view->renderPartial('index', [
+            'message' => 'Only View'
+        ]);
     }
 
     public function testAction(ServerRequest $serverRequest)

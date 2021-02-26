@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Ep\Web;
 
 use Ep;
-use Ep\Base\ControllerFactory;
-use Ep\Base\Route;
+use Ep\Contract\NotFoundHandlerInterface;
 use Yiisoft\Http\Method;
+use Yiisoft\Middleware\Dispatcher\MiddlewareDispatcher;
 use Yiisoft\Yii\Web\SapiEmitter;
 use Yiisoft\Yii\Web\ServerRequestFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use UnexpectedValueException;
 
 final class Application extends \Ep\Base\Application
 {
@@ -41,37 +40,28 @@ final class Application extends \Ep\Base\Application
      */
     public function handleRequest($request)
     {
-        $config = Ep::getConfig();
-
-        [$handler, $params] = (new Route($config->getRoute(), $config->baseUrl))->match(
-            $request->getUri()->getPath(),
-            $request->getMethod()
-        );
-        $request = $request->withQueryParams($params);
-
-        $factory = Ep::getDi()->get(ControllerFactory::class)->clone(['suffix' => $config->controllerDirAndSuffix]);
-        try {
-            return $factory->run($handler, $request);
-        } catch (UnexpectedValueException $e) {
-            return $factory->run($config->notFoundHandler, $request);
-        }
+        return Ep::getDi()
+            ->get(
+                MiddlewareDispatcher::class
+            )
+            ->withMiddlewares(
+                Ep::getConfig()->httpMiddlewares
+            )
+            ->dispatch(
+                $request,
+                Ep::getDi()->get(NotFoundHandlerInterface::class)
+            );
     }
 
     /**
      * @param ServerRequestInterface $request
-     * @param mixed                  $response
+     * @param ResponseInterface      $response
      */
     public function send($request, $response): void
     {
-        if ($response instanceof ResponseInterface) {
-            (new SapiEmitter())->emit($response, $request->getMethod() === Method::HEAD);
-        } else {
-            $service = Ep::getDi()->get(Service::class);
-            if (is_string($response)) {
-                $this->send($request, $service->string($response));
-            } elseif (is_array($response)) {
-                $this->send($request, $service->json($response));
-            }
-        }
+        (new SapiEmitter())->emit(
+            $response,
+            $request->getMethod() === Method::HEAD
+        );
     }
 }

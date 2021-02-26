@@ -134,10 +134,8 @@ class TestRoute extends TestCase
         $route = Ep::getDi()->get(Route::class);
         foreach ($cases as $row) {
             $route->configure([
-                'baseUrl' => '/',
                 'rule' => $rule,
             ]);
-            $route->enableDefaultRule = false;
             [$handler, $params] = $route->match($row['path']);
             $this->assertSame($row['handler'], $handler, $row['path'] . ' is wrong.');
             $this->assertSame($row['params'], $params, $row['path'] . ' is wrong.');

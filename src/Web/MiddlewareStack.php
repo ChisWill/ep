@@ -8,8 +8,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use RuntimeException;
 use Yiisoft\Middleware\Dispatcher\MiddlewareStackInterface;
+use RuntimeException;
 
 final class MiddlewareStack implements MiddlewareStackInterface
 {
@@ -23,10 +23,8 @@ final class MiddlewareStack implements MiddlewareStackInterface
         foreach ($middlewares as $middleware) {
             $handler = $this->wrap($middleware, $handler);
         }
-
         $new = clone $this;
         $new->stack = $handler;
-
         return $new;
     }
 
@@ -35,8 +33,6 @@ final class MiddlewareStack implements MiddlewareStackInterface
         if ($this->isEmpty()) {
             throw new RuntimeException('Stack is empty.');
         }
-
-        /** @psalm-suppress PossiblyNullReference */
         return $this->stack->handle($request);
     }
 

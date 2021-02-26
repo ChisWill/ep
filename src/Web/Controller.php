@@ -49,7 +49,7 @@ abstract class Controller implements ControllerInterface
     protected function getView(): View
     {
         if ($this->view === null) {
-            $this->view = new View($this, Ep::getConfig()->viewPath);
+            $this->view = new View(Ep::getConfig()->viewPath, $this);
         }
         return $this->view;
     }
@@ -59,7 +59,10 @@ abstract class Controller implements ControllerInterface
         return $this->getService()->string($data, $statusCode);
     }
 
-    protected function json(array $data = []): ResponseInterface
+    /**
+     * @param mixed $data
+     */
+    protected function json($data = []): ResponseInterface
     {
         return $this->getService()->json($data);
     }

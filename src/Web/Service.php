@@ -18,7 +18,7 @@ class Service
         $this->responseFactory = $responseFactory;
     }
 
-    public function string(string $data, int $statusCode = Status::OK): ResponseInterface
+    public function string(string $data = '', int $statusCode = Status::OK): ResponseInterface
     {
         $response = $this->responseFactory
             ->createResponse($statusCode)
@@ -27,7 +27,10 @@ class Service
         return $response;
     }
 
-    public function json(array $data): ResponseInterface
+    /**
+     * @param mixed $data
+     */
+    public function json($data = []): ResponseInterface
     {
         $response = $this->responseFactory
             ->createResponse(Status::OK)
@@ -41,5 +44,21 @@ class Service
         return $this->responseFactory
             ->createResponse($statusCode)
             ->withHeader(Header::LOCATION, $url);
+    }
+
+    /**
+     * @param mixed $result
+     */
+    public function toResponse($result): ResponseInterface
+    {
+        if ($result instanceof ResponseInterface) {
+            return $result;
+        } elseif (is_array($result)) {
+            return $this->json($result);
+        } elseif (is_scalar($result)) {
+            return $this->string((string) $result);
+        } else {
+            return $this->string();
+        }
     }
 }

@@ -6,9 +6,7 @@ namespace Ep\Base;
 
 use Ep;
 use Ep\Contract\ConfigurableInterface;
-use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ControllerInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use UnexpectedValueException;
 
 final class ControllerFactory implements ConfigurableInterface
@@ -21,11 +19,12 @@ final class ControllerFactory implements ConfigurableInterface
     public function __construct()
     {
         $this->config = Ep::getConfig();
+        $this->suffix = $this->config->controllerDirAndSuffix;
     }
 
     /**
-     * @param  string|array $handler
-     * @param  ServerRequestInterface|ConsoleRequestInterface $request
+     * @param  mixed $handler
+     * @param  mixed $request
      * 
      * @return mixed
      */
@@ -48,7 +47,7 @@ final class ControllerFactory implements ConfigurableInterface
     }
 
     /**
-     * @param  ServerRequestInterface|ConsoleRequestInterface $request
+     * @param  mixed $request
      * 
      * @return mixed
      */
@@ -67,7 +66,7 @@ final class ControllerFactory implements ConfigurableInterface
     }
 
     /**
-     * @param string|array $handler
+     * @param mixed $handler
      */
     private function parseHandler($handler): array
     {

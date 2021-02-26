@@ -12,16 +12,24 @@ class View
 {
     public string $layout = 'main';
 
-    protected Config $config;
-    protected ContextInterface $context;
-
     private string $viewPath;
+    private string $layoutDir;
+    protected ?ContextInterface $context = null;
+    private string $contextId;
 
-    public function __construct(ContextInterface $context, string $viewPath)
+    /**
+     * @param ContextInterface|string $context
+     */
+    public function __construct(string $viewPath, $context)
     {
-        $this->config = Ep::getConfig();
-        $this->context = $context;
         $this->viewPath = $viewPath;
+        $this->layoutDir = Ep::getConfig()->layoutDir;
+        if ($context instanceof ContextInterface) {
+            $this->context = $context;
+            $this->contextId = $context->id;
+        } else {
+            $this->contextId = $context;
+        }
     }
 
     public function render(string $path, array $params = []): string
@@ -34,7 +42,7 @@ class View
     public function renderPartial(string $path, array $params = []): string
     {
         if (strpos($path, '/') !== 0) {
-            $path = '/' . $this->context->id . '/' . $path;
+            $path = '/' . $this->contextId . '/' . $path;
         }
         return $this->renderPhpFile($this->findViewFile($path), $params);
     }
@@ -42,7 +50,7 @@ class View
     protected function loadFile(string $file): string
     {
         if (strpos($file, '/') !== 0) {
-            $file = '/' . $this->context->id . '/' . $file;
+            $file = '/' . $this->contextId . '/' . $file;
         }
         return file_get_contents($this->findViewFile($file, false));
     }
@@ -50,12 +58,11 @@ class View
     private function renderLayout(string $layout, array $params = []): string
     {
         if (strpos($layout, '/') !== 0) {
-            $id = $this->context->id;
-            $pos = strrpos($id, '/');
+            $pos = strrpos($this->contextId, '/');
             if ($pos === false) {
-                $layout = '/' . $this->config->layoutDir . '/' . $layout;
+                $layout = '/' . $this->layoutDir . '/' . $layout;
             } else {
-                $layout = '/' . substr($id, 0, $pos) . '/' . $this->config->layoutDir . '/' . $layout;
+                $layout = '/' . substr($this->contextId, 0, $pos) . '/' . $this->layoutDir . '/' . $layout;
             }
         }
         return $this->renderPhpFile($this->findViewFile($layout), $params);

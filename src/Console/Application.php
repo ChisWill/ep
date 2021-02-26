@@ -35,12 +35,16 @@ final class Application extends \Ep\Base\Application
      */
     public function handleRequest($request)
     {
-        $config = Ep::getConfig();
-
-        [$handler] = (new Route($config->getRoute(), $config->baseUrl))->match($request->getRoute());
+        [$handler] = Ep::getDi()
+            ->get(Route::class)
+            ->clone(['baseUrl' => '/'])
+            ->match($request->getRoute());
 
         try {
-            return (new ControllerFactory($config->commandDirAndSuffix))->run($handler, $request);
+            return Ep::getDi()
+                ->get(ControllerFactory::class)
+                ->clone(['suffix' => Ep::getConfig()->commandDirAndSuffix])
+                ->run($handler, $request);
         } catch (RuntimeException $e) {
             $command = trim($handler, '/');
             echo <<<HELP

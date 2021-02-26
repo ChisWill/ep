@@ -6,7 +6,9 @@ namespace Ep\Base;
 
 use Yiisoft\Http\Method;
 use Closure;
+use Ep\Web\RouteMiddleware;
 use InvalidArgumentException;
+use Yiisoft\Session\SessionMiddleware;
 
 final class Config
 {
@@ -66,6 +68,13 @@ final class Config
      * Layout 目录名称
      */
     public string $layoutDir = '_layouts';
+    /**
+     * Http 中间件配置，执行顺序为先进后出
+     */
+    public array $httpMiddlewares = [
+        RouteMiddleware::class,
+        SessionMiddleware::class
+    ];
     /**
      * 页面未找到处理器
      */
