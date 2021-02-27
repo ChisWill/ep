@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Ep\Web;
 
 use Ep;
+use Ep\Base\Application as BaseApplication;
+use Ep\Base\ErrorHandler;
 use Ep\Contract\NotFoundHandlerInterface;
 use Yiisoft\Http\Method;
 use Yiisoft\Middleware\Dispatcher\MiddlewareDispatcher;
@@ -13,16 +15,28 @@ use Yiisoft\Yii\Web\ServerRequestFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class Application extends \Ep\Base\Application
+final class Application extends BaseApplication
 {
-    /**
-     * @return ServerRequestInterface
-     */
+    private ServerRequestFactory $serverRequestFactory;
+    private ErrorHandler $errorHandler;
+    private MiddlewareDispatcher $middlewareDispatcher;
+    private NotFoundHandlerInterface $notFoundHandler;
+
+    public function __construct(
+        ServerRequestFactory $serverRequestFactory,
+        ErrorHandler $errorHandler,
+        MiddlewareDispatcher $middlewareDispatcher,
+        NotFoundHandlerInterface $notFoundHandler
+    ) {
+        $this->serverRequestFactory = $serverRequestFactory;
+        $this->errorHandler = $errorHandler;
+        $this->middlewareDispatcher = $middlewareDispatcher;
+        $this->notFoundHandler = $notFoundHandler;
+    }
+
     public function createRequest(): ServerRequestInterface
     {
-        return Ep::getDi()
-            ->get(ServerRequestFactory::class)
-            ->createFromGlobals();
+        return $this->serverRequestFactory->createFromGlobals();
     }
 
     /**
@@ -30,7 +44,7 @@ final class Application extends \Ep\Base\Application
      */
     public function register($request): void
     {
-        Ep::getDi()->get(ErrorHandler::class)->register($request);
+        $this->errorHandler->register($request);
     }
 
     /**
@@ -40,16 +54,11 @@ final class Application extends \Ep\Base\Application
      */
     public function handleRequest($request)
     {
-        return Ep::getDi()
-            ->get(
-                MiddlewareDispatcher::class
-            )
-            ->withMiddlewares(
-                Ep::getConfig()->httpMiddlewares
-            )
+        return $this
+            ->middlewareDispatcher
             ->dispatch(
                 $request,
-                Ep::getDi()->get(NotFoundHandlerInterface::class)
+                $this->notFoundHandler
             );
     }
 

@@ -6,9 +6,7 @@ namespace Ep\Base;
 
 use Yiisoft\Http\Method;
 use Closure;
-use Ep\Web\RouteMiddleware;
 use InvalidArgumentException;
-use Yiisoft\Session\SessionMiddleware;
 
 final class Config
 {
@@ -69,24 +67,13 @@ final class Config
      */
     public string $layoutDir = '_layouts';
     /**
-     * Http 中间件配置，执行顺序为先进后出
-     */
-    public array $httpMiddlewares = [
-        RouteMiddleware::class,
-        SessionMiddleware::class
-    ];
-    /**
-     * 页面未找到处理器
-     */
-    public string $notFoundHandler = 'index/miss';
-    /**
-     * 错误处理器
-     */
-    public string $errorHandler = 'index/error';
-    /**
      * 默认路由规则
      */
     public array $defaultRoute = [[Method::GET, Method::POST], '{prefix:[\w/]*?}{controller:/?[a-zA-Z]\w*|}{action:/?[a-zA-Z]\w*|}', '<prefix>/<controller>/<action>'];
+    /**
+     * 事件配置
+     */
+    public array $events = [];
     /**
      * Mysql dsn
      */
@@ -116,7 +103,7 @@ final class Config
      */
     public ?string $redisPassword = null;
     /**
-     * 秘钥，必填
+     * 项目基础秘钥，必填
      */
     public string $secretKey = '';
     /**
@@ -126,7 +113,11 @@ final class Config
     /**
      * di 配置
      */
-    private array $definitions = [];
+    public array $definitions = [];
+    /**
+     * 常规配置项
+     */
+    public array $params = [];
     /**
      * 以匿名函数方式设置路由规则，具体方式参看示例
      * 
@@ -143,14 +134,6 @@ final class Config
      * ```
      */
     private ?Closure $route = null;
-    /**
-     * 事件配置
-     */
-    private array $events = [];
-    /**
-     * 常规配置项
-     */
-    private array $params = [];
 
     public function __construct(array $config = [])
     {
@@ -173,23 +156,8 @@ final class Config
         throw new InvalidArgumentException("The \"{$name}\" configuration is invalid.");
     }
 
-    public function getRoute(): Closure
+    public function getRouteRule(): Closure
     {
         return $this->route ?: fn () => true;
-    }
-
-    public function getDefinitions(): array
-    {
-        return $this->definitions;
-    }
-
-    public function getEvents(): array
-    {
-        return $this->events;
-    }
-
-    public function getParams(): array
-    {
-        return $this->params;
     }
 }

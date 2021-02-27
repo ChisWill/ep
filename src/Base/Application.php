@@ -8,13 +8,6 @@ use Ep;
 
 abstract class Application
 {
-    public function __construct(?array $config = null)
-    {
-        if ($config !== null) {
-            Ep::init($config);
-        }
-    }
-
     public function run(): void
     {
         $request = $this->createRequest();

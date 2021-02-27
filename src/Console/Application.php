@@ -5,19 +5,40 @@ declare(strict_types=1);
 namespace Ep\Console;
 
 use Ep;
+use Ep\Base\Config;
 use Ep\Base\ControllerFactory;
+use Ep\Base\ErrorHandler;
 use Ep\Base\Route;
 use Ep\Contract\ConsoleRequestInterface;
-use RuntimeException;
+use UnexpectedValueException;
 
 final class Application extends \Ep\Base\Application
 {
-    /**
-     * @return ConsoleRequestInterface
-     */
+    private Config $config;
+    private ConsoleRequestInterface $consoleRequest;
+    private ErrorHandler $errorHandler;
+    private ErrorRenderer $errorRenderer;
+    private Route $route;
+    private ControllerFactory $controllerFactory;
+
+    public function __construct(
+        ConsoleRequestInterface $consoleRequest,
+        ErrorHandler $errorHandler,
+        ErrorRenderer $errorRenderer,
+        Route $route,
+        ControllerFactory $controllerFactory
+    ) {
+        $this->config = Ep::getConfig();
+        $this->consoleRequest = $consoleRequest;
+        $this->errorHandler = $errorHandler;
+        $this->errorRenderer = $errorRenderer;
+        $this->route = $route;
+        $this->controllerFactory = $controllerFactory;
+    }
+
     public function createRequest(): ConsoleRequestInterface
     {
-        return Ep::getDi()->get(ConsoleRequestInterface::class);
+        return $this->consoleRequest;
     }
 
     /**
@@ -25,7 +46,11 @@ final class Application extends \Ep\Base\Application
      */
     public function register($request): void
     {
-        Ep::getDi()->get(ErrorHandler::class)->register($request);
+        $this->errorHandler
+            ->configure([
+                'errorRenderer' => $this->errorRenderer
+            ])
+            ->register($request);
     }
 
     /**
@@ -35,17 +60,15 @@ final class Application extends \Ep\Base\Application
      */
     public function handleRequest($request)
     {
-        [$handler] = Ep::getDi()
-            ->get(Route::class)
-            ->clone(['baseUrl' => '/'])
-            ->match($request->getRoute());
-
         try {
-            return Ep::getDi()
-                ->get(ControllerFactory::class)
-                ->clone(['suffix' => Ep::getConfig()->commandDirAndSuffix])
+            [$handler] = $this->route
+                ->configure(['baseUrl' => '/'])
+                ->match($request->getRoute());
+
+            return $this->controllerFactory
+                ->configure(['suffix' => $this->config->commandDirAndSuffix])
                 ->run($handler, $request);
-        } catch (RuntimeException $e) {
+        } catch (UnexpectedValueException $e) {
             $command = trim($handler, '/');
             echo <<<HELP
 Error: unknown command "{$command}"

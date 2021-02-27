@@ -7,7 +7,7 @@ namespace Ep\Console;
 use Ep\Contract\ConsoleRequestInterface;
 use ErrorException;
 
-class ConsoleRequest implements ConsoleRequestInterface
+final class ConsoleRequest implements ConsoleRequestInterface
 {
     /**
      * {@inheritDoc}

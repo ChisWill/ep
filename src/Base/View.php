@@ -73,12 +73,16 @@ class View
         return Alias::get($this->viewPath . $path . ($isPHPFile ? '.php' : ''));
     }
 
-    private function renderPhpFile(string $_file_, array $_params_ = []): string
+    /**
+     * @param string $file
+     * @param array  $params
+     */
+    private function renderPhpFile(): string
     {
         ob_start();
-        ob_implicit_flush(0);
-        extract($_params_, EXTR_OVERWRITE);
-        require($_file_);
+        PHP_VERSION_ID >= 80000 ? ob_implicit_flush(false) : ob_implicit_flush(0);
+        extract(func_get_arg(1), EXTR_OVERWRITE);
+        require(func_get_arg(0));
 
         return ob_get_clean();
     }

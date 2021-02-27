@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
-use Yiisoft\Yii\Web\SapiEmitter;
-use Psr\Log\LoggerInterface;
-use Psr\Http\Message\ResponseInterface;
+use Ep\Contract\ConfigurableInterface;
+use Ep\Contract\ErrorRendererInterface;
 use ErrorException;
 use Throwable;
 
-abstract class ErrorHandler
+final class ErrorHandler implements ConfigurableInterface
 {
-    private const ERROR_NAMES = [
+    use ConfigurableTrait;
+
+    private const ERRORS = [
         E_ERROR => 'PHP Fatal Error',
         E_WARNING => 'PHP Warning',
         E_PARSE => 'PHP Parse Error',
@@ -30,11 +31,11 @@ abstract class ErrorHandler
         E_USER_DEPRECATED => 'PHP User Deprecated Warning',
     ];
 
-    protected LoggerInterface $logger;
+    private ErrorRendererInterface $errorRenderer;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(ErrorRendererInterface $errorRenderer)
     {
-        $this->logger = $logger;
+        $this->errorRenderer = $errorRenderer;
     }
 
     /**
@@ -50,13 +51,13 @@ abstract class ErrorHandler
     /**
      * @param mixed $request
      */
-    public function handleException(Throwable $e, $request): void
+    public function handleException(Throwable $t, $request): void
     {
         $this->unregister();
 
-        $this->log($e, $request);
+        $this->errorRenderer->log($t, $request);
 
-        $this->send($this->renderException($e, $request));
+        echo $this->errorRenderer->render($t, $request);
         exit(1);
     }
 
@@ -87,16 +88,16 @@ abstract class ErrorHandler
         }
     }
 
-    public function getErrorName(int $severity): string
+    public static function convertToString(Throwable $t): string
     {
-        return self::ERROR_NAMES[$severity] ?? 'Error';
+        return "Exception '" . get_class($t) . "' with message '{$t->getMessage()}' \n\nin "
+            . $t->getFile() . ':' . $t->getLine() . "\n\n"
+            . "Stack trace:\n" . $t->getTraceAsString();
     }
 
-    protected function convertToString(Throwable $e): string
+    public static function getErrorName(int $severity): string
     {
-        return "Exception '" . get_class($e) . "' with message '{$e->getMessage()}' \n\nin "
-            . $e->getFile() . ':' . $e->getLine() . "\n\n"
-            . "Stack trace:\n" . $e->getTraceAsString();
+        return self::ERRORS[$severity] ?? 'Error';
     }
 
     private function isFatalError(array $error): bool
@@ -109,28 +110,4 @@ abstract class ErrorHandler
         restore_error_handler();
         restore_exception_handler();
     }
-
-    /**
-     * @param ResponseInterface|string $data
-     */
-    private function send($data): void
-    {
-        if (is_string($data)) {
-            echo $data;
-        } elseif ($data instanceof ResponseInterface) {
-            (new SapiEmitter())->emit($data);
-        }
-    }
-
-    /**
-     * @param  mixed $request
-     * 
-     * @return ResponseInterface|string
-     */
-    abstract protected function renderException(Throwable $e, $request);
-
-    /**
-     * @param mixed $request
-     */
-    abstract protected function log(Throwable $e, $request): void;
 }

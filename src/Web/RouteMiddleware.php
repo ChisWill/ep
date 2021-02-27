@@ -12,7 +12,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use UnexpectedValueException;
 
-class RouteMiddleware implements MiddlewareInterface
+final class RouteMiddleware implements MiddlewareInterface
 {
     private Route $route;
     private ControllerFactory $controllerFactory;
@@ -27,16 +27,16 @@ class RouteMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $requestHandler): ResponseInterface
     {
-        [$handler, $params] = $this->route->match(
-            $request->getUri()->getPath(),
-            $request->getMethod()
-        );
-
-        foreach ($params as $name => $value) {
-            $request = $request->withAttribute($name, $value);
-        }
-
         try {
+            [$handler, $params] = $this->route->match(
+                $request->getUri()->getPath(),
+                $request->getMethod()
+            );
+
+            foreach ($params as $name => $value) {
+                $request = $request->withAttribute($name, $value);
+            }
+
             return $this->service->toResponse($this->controllerFactory->run($handler, $request));
         } catch (UnexpectedValueException $e) {
             return $requestHandler->handle($request);

@@ -23,6 +23,7 @@ final class MiddlewareStack implements MiddlewareStackInterface
         foreach ($middlewares as $middleware) {
             $handler = $this->wrap($middleware, $handler);
         }
+
         $new = clone $this;
         $new->stack = $handler;
         return $new;
@@ -48,7 +49,7 @@ final class MiddlewareStack implements MiddlewareStackInterface
 
     private function wrap(MiddlewareInterface $middleware, RequestHandlerInterface $handler): RequestHandlerInterface
     {
-        return new class ($middleware, $handler) implements RequestHandlerInterface
+        return new class($middleware, $handler) implements RequestHandlerInterface
         {
             private MiddlewareInterface $middleware;
             private RequestHandlerInterface $handler;

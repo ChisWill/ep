@@ -44,9 +44,7 @@
     "autoload-dev": {
         "psr-4": {
             "Ep\\Tests\\": "tests",
-            "Ep\\Tests\\Basic\\": "tests/AppBasic/src",
-            "Ep\\Tests\\Advance\\": "tests/AppAdvance/src",
-            "Ep\\Tests\\Support\\": "tests/Support"
+            "Ep\\Tests\\App\\": "tests/App/src"
         }
     },
     "config": {

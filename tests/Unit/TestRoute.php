@@ -8,6 +8,7 @@ use Ep;
 use Ep\Base\Route;
 use FastRoute\RouteCollector;
 use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
 class TestRoute extends TestCase
 {
@@ -81,7 +82,7 @@ class TestRoute extends TestCase
                     ], [
                         'path' => '/api/v1/user',
                         'params' => [],
-                        'handler' => 'index/miss',
+                        'handler' => false,
                     ]
                 ]
             ], [
@@ -98,11 +99,11 @@ class TestRoute extends TestCase
                     ], [
                         'path' => '/api/v1/user/index',
                         'params' => [],
-                        'handler' => 'index/miss',
+                        'handler' => false,
                     ], [
                         'path' => '/api/tet/v1/user/',
                         'params' => [],
-                        'handler' => 'index/miss',
+                        'handler' => false,
                     ]
                 ]
             ], [
@@ -119,7 +120,7 @@ class TestRoute extends TestCase
                     ], [
                         'path' => '/user/index',
                         'params' => [],
-                        'handler' => 'index/miss',
+                        'handler' => false,
                     ]
                 ]
             ]
@@ -133,12 +134,18 @@ class TestRoute extends TestCase
     {
         $route = Ep::getDi()->get(Route::class);
         foreach ($cases as $row) {
-            $route->configure([
-                'rule' => $rule,
-            ]);
-            [$handler, $params] = $route->match($row['path']);
-            $this->assertSame($row['handler'], $handler, $row['path'] . ' is wrong.');
-            $this->assertSame($row['params'], $params, $row['path'] . ' is wrong.');
+            try {
+                [$handler, $params] = $route
+                    ->clone([
+                        'rule' => $rule,
+                        'baseUrl' => ''
+                    ])
+                    ->match($row['path']);
+                $this->assertSame($row['handler'], $handler, $row['path'] . ' is wrong.');
+                $this->assertSame($row['params'], $params, $row['path'] . ' is wrong.');
+            } catch (UnexpectedValueException $e) {
+                $this->assertSame($row['handler'], false);
+            }
         }
     }
 }

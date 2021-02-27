@@ -8,9 +8,9 @@ use Ep\Helper\Arr;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Redis\Connection as RedisConnection;
+use Yiisoft\Di\CompositeContainer;
 use Yiisoft\Di\Container;
 use Yiisoft\Injector\Injector;
-use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
@@ -18,7 +18,7 @@ final class Ep
 {
     private static Config $config;
 
-    private static ContainerInterface $di;
+    private static CompositeContainer $di;
 
     public static function init(array $config = []): void
     {
@@ -28,9 +28,12 @@ final class Ep
         Alias::set('@vendor', self::$config->vendorPath);
         Alias::set('@ep', dirname(__DIR__, 1));
 
-        self::$di = new Container(Arr::merge(
-            require(Alias::get('@ep/config/definitions.php')),
-            self::$config->getDefinitions()
+        self::$di = new CompositeContainer();
+        self::$di->attach(new Container(
+            Arr::merge(
+                require(Alias::get('@ep/config/definitions.php')),
+                self::$config->definitions
+            )
         ));
     }
 
@@ -39,7 +42,7 @@ final class Ep
         return self::$config;
     }
 
-    public static function getDi(): ContainerInterface
+    public static function getDi(): CompositeContainer
     {
         return self::$di;
     }
@@ -72,10 +75,5 @@ final class Ep
     public static function getEventDispatcher(?string $id = null): EventDispatcherInterface
     {
         return self::$di->get($id ?: EventDispatcherInterface::class);
-    }
-
-    public static function getParams(): array
-    {
-        return self::$config->getParams();
     }
 }

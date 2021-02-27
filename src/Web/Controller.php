@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\Web;
 
 use Ep;
+use Ep\Base\ContextTrait;
 use Ep\Base\View;
 use Ep\Contract\ControllerInterface;
 use Yiisoft\Http\Status;
@@ -13,6 +14,8 @@ use Psr\Http\Message\ResponseInterface;
 
 abstract class Controller implements ControllerInterface
 {
+    use ContextTrait;
+
     /**
      * @param  ServerRequestInterface $request
      * 
@@ -44,14 +47,9 @@ abstract class Controller implements ControllerInterface
         return $this->service;
     }
 
-    private ?View $view = null;
-
-    protected function getView(): View
+    public function getViewPath(): string
     {
-        if ($this->view === null) {
-            $this->view = new View(Ep::getConfig()->viewPath, $this);
-        }
-        return $this->view;
+        return Ep::getConfig()->viewPath;
     }
 
     protected function string(string $data = '', int $statusCode = Status::OK): ResponseInterface

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Ep\Db;
 
-class ActiveQuery extends \Yiisoft\ActiveRecord\ActiveQuery
+use Yiisoft\ActiveRecord\ActiveQuery as YiiActiveQuery;
+
+class ActiveQuery extends YiiActiveQuery
 {
     public function getRawSql(): string
     {

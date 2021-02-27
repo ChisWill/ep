@@ -10,23 +10,21 @@ use Ep\Helper\Alias;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use Closure;
+use UnexpectedValueException;
 
 use function FastRoute\cachedDispatcher;
 
-class Route implements ConfigurableInterface
+final class Route implements ConfigurableInterface
 {
     use ConfigurableTrait;
 
     private Config $config;
-    /**
-     * 路由规则回调
-     */
     private Closure $rule;
-    /**
-     * 默认路由规则基于 `$baseUrl` ，如果设置为空字符串表示不启用
-     */
     private string $baseUrl;
 
+    /**
+     * @param string $baseUrl 默认路由规则基于 `$baseUrl` ，如果设置为空字符表示不启用
+     */
     public function __construct(Closure $rule, string $baseUrl = '')
     {
         $this->config = Ep::getConfig();
@@ -34,6 +32,9 @@ class Route implements ConfigurableInterface
         $this->baseUrl = $baseUrl;
     }
 
+    /**
+     * @throws UnexpectedValueException
+     */
     public function match(string $path, string $method = 'GET'): array
     {
         return $this->solveRouteInfo(
@@ -56,14 +57,8 @@ class Route implements ConfigurableInterface
             case Dispatcher::FOUND:
                 [$handler, $params] = $this->replaceHandler($routeInfo[1], $routeInfo[2]);
                 break;
-            case Dispatcher::NOT_FOUND:
-                $params = [];
-                $handler = $this->config->notFoundHandler;
-                break;
             default:
-                $params = [];
-                $handler = $this->config->notFoundHandler;
-                break;
+                throw new UnexpectedValueException(PHP_SAPI === 'cli' ? 'Command is not exists.' : 'Page is not found.');
         }
         return [$handler, $params];
     }

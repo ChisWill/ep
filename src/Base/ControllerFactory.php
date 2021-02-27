@@ -7,7 +7,9 @@ namespace Ep\Base;
 use Ep;
 use Ep\Contract\ConfigurableInterface;
 use Ep\Contract\ControllerInterface;
+use Psr\Container\ContainerInterface;
 use UnexpectedValueException;
+use Yiisoft\Injector\Injector;
 
 final class ControllerFactory implements ConfigurableInterface
 {
@@ -15,10 +17,14 @@ final class ControllerFactory implements ConfigurableInterface
 
     private Config $config;
     private string $suffix;
+    private ContainerInterface $container;
+    private Injector $injector;
 
-    public function __construct()
+    public function __construct(ContainerInterface $container, Injector $injector)
     {
         $this->config = Ep::getConfig();
+        $this->container = $container;
+        $this->injector = $injector;
         $this->suffix = $this->config->controllerDirAndSuffix;
     }
 
@@ -27,6 +33,7 @@ final class ControllerFactory implements ConfigurableInterface
      * @param  mixed $request
      * 
      * @return mixed
+     * @throws UnexpectedValueException
      */
     public function run($handler, $request)
     {
@@ -43,7 +50,7 @@ final class ControllerFactory implements ConfigurableInterface
         if (!class_exists($class)) {
             throw new UnexpectedValueException("{$class} is not found.");
         }
-        return Ep::getDi()->get($class);
+        return $this->container->get($class);
     }
 
     /**
@@ -59,7 +66,7 @@ final class ControllerFactory implements ConfigurableInterface
         }
         $response = $controller->before($request);
         if ($response === true) {
-            $response = Ep::getInjector()->invoke([$controller, $action], [$request]);
+            $response = $this->injector->invoke([$controller, $action], [$request]);
             $response = $controller->after($request, $response);
         }
         return $response;

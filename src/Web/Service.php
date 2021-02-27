@@ -9,7 +9,7 @@ use Yiisoft\Http\Status;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class Service
+final class Service
 {
     private ResponseFactoryInterface $responseFactory;
 

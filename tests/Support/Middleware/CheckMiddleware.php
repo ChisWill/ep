@@ -28,8 +28,8 @@ class CheckMiddleware implements MiddlewareInterface
                 throw new Exception("age could not smaller than 50");
             }
             return $handler->handle($request);
-        } catch (Throwable $e) {
-            $request = $request->withParsedBody([$e->getMessage()]);
+        } catch (Throwable $t) {
+            $request = $request->withParsedBody([$t->getMessage()]);
             return Ep::getDi()->get(ErrorHandler::class)->handle($request);
         }
     }
