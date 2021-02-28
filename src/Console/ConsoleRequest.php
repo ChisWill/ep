@@ -9,12 +9,20 @@ use ErrorException;
 
 final class ConsoleRequest implements ConsoleRequestInterface
 {
+    private array $options;
+
+    public function __construct()
+    {
+        getopt('', [], $optind);
+        $this->options = array_slice($_SERVER['argv'], $optind);
+    }
+
     /**
      * {@inheritDoc}
      */
     public function getRoute(): string
     {
-        return '/' . ($_SERVER['argv'][1] ?? '');
+        return '/' . ($this->options[0] ?? '');
     }
 
     private ?array $params = null;
@@ -26,19 +34,19 @@ final class ConsoleRequest implements ConsoleRequestInterface
     {
         if ($this->params === null) {
             $this->params = [];
-            $count = count($_SERVER['argv']);
-            if ($count > 2) {
-                for ($i = 2; $i < $count; $i++) {
+            $count = count($this->options);
+            if ($count > 1) {
+                for ($i = 1; $i < $count; $i++) {
                     try {
-                        if (strpos($_SERVER['argv'][$i], '-') === 0) {
-                            $this->params[substr($_SERVER['argv'][$i], 1)] = true;
+                        if (strpos($this->options[$i], '-') === 0) {
+                            $this->params[substr($this->options[$i], 1)] = true;
                         } else {
-                            [$k, $v] = explode('=', $_SERVER['argv'][$i]);
+                            [$k, $v] = explode('=', $this->options[$i]);
                             $this->params[$k] = $v;
                         }
                     } catch (ErrorException $e) {
                         echo <<<HELP
-Error: invalid param "{$_SERVER['argv'][$i]}"
+Error: invalid param "{$this->options[$i]}"
 HELP;
                         exit(1);
                     }

@@ -12,13 +12,14 @@ interface ConsoleRequestInterface
     public function getRoute(): string;
 
     /**
-     * 参数输入格式为：-d -force p1=v1 p2=v2
+     * 参数输入格式为：-d p1=v1 -force p2=v2
      * 返回格式为：
+     * 
      * ```
      * [
      *     'd' => true,
-     *     'force' => true,
      *     'p1' => 'v1',
+     *     'force' => true,
      *     'p2' => 'v2',
      * ]
      * ```

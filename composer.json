@@ -47,6 +47,9 @@
             "Ep\\Tests\\App\\": "tests/App/src"
         }
     },
+    "bin": [
+        "bin/ep"
+    ],
     "config": {
         "sort-packages": true
     }

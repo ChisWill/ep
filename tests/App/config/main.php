@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'appNamespace' => 'Ep\Tests\App',
     'rootPath' => dirname(__DIR__, 1),

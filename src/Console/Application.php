@@ -83,8 +83,10 @@ HELP;
      */
     public function send($request, $response): void
     {
-        if (is_string($response)) {
+        if (is_scalar($response)) {
             echo $response;
+        } elseif (is_array($response)) {
+            echo json_encode($response, JSON_UNESCAPED_UNICODE);
         }
     }
 }

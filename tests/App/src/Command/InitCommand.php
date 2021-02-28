@@ -10,11 +10,11 @@ use Ep\Contract\ConsoleRequestInterface;
 
 class InitCommand extends Command
 {
-    public function indexAction(ConsoleRequestInterface $request)
+    public function indexAction()
     {
         $message = 'Welcome Basic';
 
-        tes($message, $request->getParams());
+        return $message;
     }
 
     public function logAction()
@@ -22,5 +22,13 @@ class InitCommand extends Command
         Ep::getLogger()->info('log info', ['act' => self::class]);
 
         return 'ok';
+    }
+
+    public function requestAction(ConsoleRequestInterface $request)
+    {
+        return [
+            'route' => $request->getRoute(),
+            'params' => $request->getParams()
+        ];
     }
 }
