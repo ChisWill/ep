@@ -7,8 +7,10 @@ namespace Ep\Base;
 use Ep;
 use Ep\Contract\ConfigurableInterface;
 use Ep\Contract\ControllerInterface;
+use Ep\Contract\ModuleInterface;
 use Yiisoft\Injector\Injector;
 use Psr\Container\ContainerInterface;
+use InvalidArgumentException;
 use UnexpectedValueException;
 
 final class ControllerFactory implements ConfigurableInterface
@@ -37,10 +39,11 @@ final class ControllerFactory implements ConfigurableInterface
      */
     public function run($handler, $request)
     {
-        [$class, $action] = $this->parseHandler($handler);
+        [$prefix, $class, $action] = $this->parseHandler($handler);
+
+        $this->runModule($prefix, $request);
 
         $controller = $this->create($class);
-        $controller->id = $this->getContextId($controller);
 
         return $this->runAction($controller, $action, $request);
     }
@@ -50,7 +53,25 @@ final class ControllerFactory implements ConfigurableInterface
         if (!class_exists($class)) {
             throw new UnexpectedValueException("{$class} is not found.");
         }
-        return $this->container->get($class);
+        $controller = $this->container->get($class);
+        $controller->id = $this->generateContextId($controller);
+        return $controller;
+    }
+
+    private function runModule(string $prefix, $request): void
+    {
+        $prefix = str_replace('/', '\\', $prefix);
+        if (strpos($prefix, '\\\\') !== false) {
+            $prefix = explode('\\\\', $prefix)[0];
+        }
+        $moduleClass = $this->config->appNamespace . '\\' . ($prefix ? $prefix . '\\' : '') . $this->config->moduleName;
+        if (class_exists($moduleClass)) {
+            $module = $this->container->get($moduleClass);
+            if (!$module instanceof ModuleInterface) {
+                throw new InvalidArgumentException("The class {$moduleClass} must implement the interface Ep\Contract\ModuleInterface.");
+            }
+            $module->bootstrap($request);
+        }
     }
 
     /**
@@ -77,9 +98,37 @@ final class ControllerFactory implements ConfigurableInterface
      */
     private function parseHandler($handler): array
     {
-        if (is_array($handler)) {
-            return $handler;
+        switch (gettype($handler)) {
+            case 'array':
+                return $this->parseArrayHandler($handler);
+            case 'string':
+                return $this->parseStringHandler($handler);
+            default:
+                throw new InvalidArgumentException('The route handler is invalid.');
         }
+    }
+
+    private function parseArrayHandler(array $handler): array
+    {
+        switch (count($handler)) {
+            case 0:
+                $handler = ['', $this->config->defaultController, $this->config->defaultAction];
+                break;
+            case 1:
+                array_push($handler, $this->config->defaultAction);
+            case 2:
+                array_unshift($handler, '');
+                break;
+            case 3:
+                break;
+            default:
+                throw new InvalidArgumentException('The route handler is not in the correct format.');
+        }
+        return $handler;
+    }
+
+    private function parseStringHandler(string $handler): array
+    {
         $pieces = explode('/', $handler);
         $prefix = '';
         switch (count($pieces)) {
@@ -103,10 +152,10 @@ final class ControllerFactory implements ConfigurableInterface
             $ns = $this->suffix;
         }
         $class = sprintf('%s\\%s\\%s', $this->config->appNamespace, $ns, ucfirst($controller) . $this->suffix);
-        return [$class, $action];
+        return [$prefix, $class, $action];
     }
 
-    private function getContextId(ControllerInterface $controller): string
+    private function generateContextId(ControllerInterface $controller): string
     {
         return implode('/', array_filter(
             array_map('lcfirst', explode(

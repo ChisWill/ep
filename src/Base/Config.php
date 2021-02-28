@@ -31,6 +31,10 @@ final class Config
      */
     public string $env = 'prod';
     /**
+     * 模块类名
+     */
+    public string $moduleName = 'Module';
+    /**
      * Web 控制器所在目录名以及类名后缀，强制统一
      */
     public string $controllerDirAndSuffix = 'Controller';
