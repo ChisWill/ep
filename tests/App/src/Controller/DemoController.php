@@ -7,6 +7,7 @@ namespace Ep\Tests\App\Controller;
 use DateInterval;
 use Ep;
 use Ep\Base\View;
+use Ep\Db\Query;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Model\User;
 use Ep\Tests\Support\Middleware\AddMiddleware;
@@ -219,6 +220,19 @@ class DemoController extends Controller
         return $view->renderPartial('index', [
             'message' => 'Only View'
         ]);
+    }
+
+    public function paginateAction(ServerRequest $serverRequest)
+    {
+        $page = $serverRequest->getQueryParams()['page'] ?? 1;
+        $query = User::find()->asArray();
+        $count = $query->count();
+
+        return [
+            'count' => $count,
+            'all' => $query->getPaginator((int) $page, 3)->all(),
+            'data' => $query->paginate((int) $page, 3)
+        ];
     }
 
     public function testAction(ServerRequest $serverRequest)

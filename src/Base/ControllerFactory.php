@@ -7,9 +7,9 @@ namespace Ep\Base;
 use Ep;
 use Ep\Contract\ConfigurableInterface;
 use Ep\Contract\ControllerInterface;
+use Yiisoft\Injector\Injector;
 use Psr\Container\ContainerInterface;
 use UnexpectedValueException;
-use Yiisoft\Injector\Injector;
 
 final class ControllerFactory implements ConfigurableInterface
 {

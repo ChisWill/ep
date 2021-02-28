@@ -27,7 +27,7 @@ class Str
      * 
      * @return string
      */
-    public static function caseToId(string $input, string $separator = '_', bool $strict = false): string
+    public static function camelToId(string $input, string $separator = '_', bool $strict = false): string
     {
         return mb_strtolower(trim(preg_replace('/[^\pL\pN]+/u', $separator, preg_replace($strict ? '/[A-Z]/' : '/(?<![A-Z])[A-Z]/', addslashes($separator) . '\0', $input)), $separator));
     }

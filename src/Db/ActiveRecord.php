@@ -6,7 +6,7 @@ namespace Ep\Db;
 
 use Ep;
 use Ep\Helper\Date;
-use Yiisoft\ActiveRecord\ActiveRecord as YiiActiveRecord;
+use Yiisoft\ActiveRecord\ActiveRecord as BaseActiveRecord;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Http\Method;
@@ -19,7 +19,7 @@ use Yiisoft\Validator\Result;
 use Psr\Http\Message\ServerRequestInterface;
 use UnexpectedValueException;
 
-abstract class ActiveRecord extends YiiActiveRecord implements DataSetInterface
+abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
 {
     public const PK = 'id';
     public const CREATED_AT = 'created_at';

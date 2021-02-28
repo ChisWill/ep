@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Ep\Db;
 
-use Yiisoft\ActiveRecord\ActiveQuery as YiiActiveQuery;
+use Yiisoft\ActiveRecord\ActiveQuery as BaseActiveQuery;
 
-class ActiveQuery extends YiiActiveQuery
+class ActiveQuery extends BaseActiveQuery
 {
-    public function getRawSql(): string
-    {
-        return $this->createCommand()->getRawSql();
-    }
+    use QueryTrait;
 }
