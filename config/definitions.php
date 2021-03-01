@@ -9,6 +9,7 @@ use Ep\Contract\ErrorRendererInterface;
 use Ep\Contract\NotFoundHandlerInterface;
 use Ep\Helper\Alias;
 use Ep\Web\ErrorRenderer;
+use Ep\Web\InterceptorMiddleware;
 use Ep\Web\MiddlewareStack;
 use Ep\Web\RouteMiddleware;
 use Ep\Web\ServerRequestFactory;
@@ -67,7 +68,8 @@ return [
             ->withMiddlewares(
                 [
                     RouteMiddleware::class,
-                    SessionMiddleware::class
+                    SessionMiddleware::class,
+                    InterceptorMiddleware::class
                 ]
             );
     },
