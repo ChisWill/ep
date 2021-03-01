@@ -6,7 +6,6 @@ namespace Ep\Console;
 
 use Ep;
 use Ep\Base\ContextTrait;
-use Ep\Base\View;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ControllerInterface;
 

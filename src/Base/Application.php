@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
-use Ep;
-
 abstract class Application
 {
     public function run(): void

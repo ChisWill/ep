@@ -7,7 +7,6 @@ namespace Ep\Tests\App\Controller;
 use DateInterval;
 use Ep;
 use Ep\Base\View;
-use Ep\Db\Query;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Model\User;
 use Ep\Tests\Support\Middleware\AddMiddleware;

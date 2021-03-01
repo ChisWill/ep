@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ep\Widget;
 
 use Yiisoft\Db\Query\QueryInterface;
-use InvalidArgumentException;
 
 final class Paginator
 {

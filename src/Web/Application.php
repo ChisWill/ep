@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Web;
 
-use Ep;
 use Ep\Base\Application as BaseApplication;
 use Ep\Base\ErrorHandler;
 use Ep\Contract\NotFoundHandlerInterface;

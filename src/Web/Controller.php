@@ -6,7 +6,6 @@ namespace Ep\Web;
 
 use Ep;
 use Ep\Base\ContextTrait;
-use Ep\Base\View;
 use Ep\Contract\ControllerInterface;
 use Yiisoft\Http\Status;
 use Psr\Http\Message\ServerRequestInterface;

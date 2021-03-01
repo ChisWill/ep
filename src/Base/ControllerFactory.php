@@ -62,7 +62,7 @@ final class ControllerFactory implements ConfigurableInterface
     {
         $prefix = str_replace('/', '\\', $prefix);
         if (strpos($prefix, '\\\\') !== false) {
-            $prefix = explode('\\\\', $prefix)[0];
+            $prefix = explode('\\\\', trim($prefix, '\\'))[0];
         }
         $moduleClass = $this->config->appNamespace . '\\' . ($prefix ? $prefix . '\\' : '') . $this->config->moduleName;
         if (class_exists($moduleClass)) {
@@ -111,13 +111,14 @@ final class ControllerFactory implements ConfigurableInterface
     private function parseArrayHandler(array $handler): array
     {
         switch (count($handler)) {
-            case 0:
-                $handler = ['', $this->config->defaultController, $this->config->defaultAction];
-                break;
             case 1:
                 array_push($handler, $this->config->defaultAction);
             case 2:
-                array_unshift($handler, '');
+                array_unshift($handler, str_replace(
+                    $this->config->appNamespace . '\\',
+                    '',
+                    substr($handler[0], 0, strpos($handler[0], $this->suffix) - 1)
+                ));
                 break;
             case 3:
                 break;

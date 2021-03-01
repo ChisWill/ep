@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Command;
 
-use Closure;
 use Ep;
-use Ep\Base\Config;
-use Ep\Helper\Alias;
 use Ep\Helper\File;
 use Ep\Helper\Str;
 use Yiisoft\Db\Connection\Connection;
@@ -17,16 +14,15 @@ use Yiisoft\Db\Schema\TableSchema;
 use Yiisoft\Strings\StringHelper;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Closure;
 use InvalidArgumentException;
 
 final class GenerateService
 {
-    private Config $config;
     private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
-        $this->config = Ep::getConfig();
         $this->container = $container;
     }
 

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Contract;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 interface ControllerInterface extends ContextInterface
 {
     /**
