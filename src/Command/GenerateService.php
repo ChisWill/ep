@@ -62,7 +62,7 @@ final class GenerateService
 
     public function getNamespace(): string
     {
-        return sprintf('%s\\%s', $this->appNamespace, implode('/', array_map([Str::class, 'toPascalCase'], explode('/', $this->prefix))));
+        return sprintf('%s\\%s', $this->appNamespace, implode('\\', array_map([Str::class, 'toPascalCase'], explode('/', $this->prefix))));
     }
 
     public function getTableName(): string

@@ -25,10 +25,10 @@ final class RouteMiddleware implements MiddlewareInterface
         $this->service = $service;
     }
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $requestHandler): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
-            [$handler, $params] = $this->route->match(
+            [$result, $params] = $this->route->match(
                 $request->getUri()->getPath(),
                 $request->getMethod()
             );
@@ -37,9 +37,9 @@ final class RouteMiddleware implements MiddlewareInterface
                 $request = $request->withAttribute($name, $value);
             }
 
-            return $this->service->toResponse($this->controllerFactory->run($handler, $request));
+            return $this->service->toResponse($this->controllerFactory->run($result, $request));
         } catch (UnexpectedValueException $e) {
-            return $requestHandler->handle($request);
+            return $handler->handle($request);
         }
     }
 }
