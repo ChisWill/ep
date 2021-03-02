@@ -12,20 +12,12 @@ use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\TableSchema;
 use Yiisoft\Strings\StringHelper;
-use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Closure;
 use InvalidArgumentException;
 
 final class GenerateService
 {
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
     private string $autoloadPath;
     private string $appNamespace;
     private string $appPath;
@@ -34,30 +26,29 @@ final class GenerateService
     private Connection $db;
     private ?TableSchema $schema;
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function validateModel($params)
     {
         $this->autoloadPath = $params['autoloadPath'];
         $this->appNamespace = $params['appNamespace'];
-        try {
-            $this->appPath = $this->getAppPath();
-        } catch (InvalidArgumentException $e) {
-            return $e->getMessage();
-        }
+        $this->appPath = $this->getAppPath();
         $this->table = $params['table'] ?? '';
         if (!$this->table) {
-            return $this->required('table');
+            $this->required('table');
         }
-        $this->prefix = $params['prefix'] ?? 'Model';
+        $this->prefix = $params['prefix'] ?? $params['generate.model.prefix'] ?? 'Model';
         try {
-            $this->db = $this->getDb($params['db'] ?? null);
+            $db = $params['db'] ?? $params['generate.model.db'] ?? $params['common.db'] ?? '';
+            $this->db = $this->getDb($db ?: null);
         } catch (NotFoundExceptionInterface $e) {
-            return $this->invalid($params['db']);
+            $this->invalid('db', $db);
         }
         $this->schema = $this->db->getTableSchema($this->table);
         if (!$this->schema) {
-            return $this->invalid($this->table);
+            $this->invalid('table', $this->table);
         }
-        return true;
     }
 
     public function getNamespace(): string
@@ -225,13 +216,19 @@ final class GenerateService
         return Ep::getDb($id);
     }
 
-    private function required(string $option): string
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function required(string $option)
     {
-        return "The \"{$option}\" option is required.";
+        throw new InvalidArgumentException("The \"{$option}\" option is required.");
     }
 
-    private function invalid(string $value): string
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function invalid(string $option, string $value)
     {
-        return "The value \"{$value}\" is invalid.";
+        throw new InvalidArgumentException("The value \"{$value}\" of the option \"{$option}\" is invalid.");
     }
 }

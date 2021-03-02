@@ -10,6 +10,14 @@ use Ep\Contract\ConsoleRequestInterface;
 
 class InitCommand extends Command
 {
+    protected function alias(): array
+    {
+        return [
+            'table' => 1,
+            'field' => 3
+        ];
+    }
+
     public function indexAction()
     {
         $message = 'Welcome Basic';

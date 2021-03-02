@@ -1,0 +1,7 @@
+autoload=./vendor/autoload.php
+config=./tests/App/config/main.php
+
+common.db=
+
+generate.model.db=
+generate.model.prefix=Model

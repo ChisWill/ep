@@ -6,6 +6,7 @@ namespace Ep\Command;
 
 use Ep\Console\Command;
 use Ep\Console\ConsoleRequest;
+use Throwable;
 
 final class GenerateCommand extends Command
 {
@@ -16,11 +17,19 @@ final class GenerateCommand extends Command
         $this->service = $service;
     }
 
+    protected function alias(): array
+    {
+        return [
+            'table' => 1
+        ];
+    }
+
     public function modelAction(ConsoleRequest $request): string
     {
-        $result = $this->service->validateModel($request->getParams());
-        if ($result !== true) {
-            return $result;
+        try {
+            $this->service->validateModel($request->getParams());
+        } catch (Throwable $t) {
+            return $t->getMessage();
         }
 
         $data = [

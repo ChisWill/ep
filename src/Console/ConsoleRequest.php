@@ -38,7 +38,10 @@ final class ConsoleRequest implements ConsoleRequestInterface
             if ($count > 1) {
                 for ($i = 1; $i < $count; $i++) {
                     try {
-                        if (strpos($this->options[$i], '-') === 0) {
+                        $result = array_search($i, $this->alias, true);
+                        if ($result !== false) {
+                            $this->params[$result] = $this->options[$i];
+                        } elseif (strpos($this->options[$i], '-') === 0) {
                             $this->params[substr($this->options[$i], 1)] = true;
                         } else {
                             [$k, $v] = explode('=', $this->options[$i]);
@@ -54,5 +57,13 @@ HELP;
             }
         }
         return $this->params;
+    }
+
+    private array $alias = [];
+
+    public function setAlias(array $alias): void
+    {
+        $this->alias = $alias;
+        $this->params = null;
     }
 }

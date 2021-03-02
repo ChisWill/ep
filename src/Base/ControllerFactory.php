@@ -18,9 +18,9 @@ final class ControllerFactory implements ConfigurableInterface
     use ConfigurableTrait;
 
     private Config $config;
-    private string $suffix;
     private ContainerInterface $container;
     private Injector $injector;
+    private string $suffix;
 
     public function __construct(ContainerInterface $container, Injector $injector)
     {
@@ -43,12 +43,12 @@ final class ControllerFactory implements ConfigurableInterface
 
         $this->runModule($prefix, $request);
 
-        $controller = $this->create($class);
+        $controller = $this->createController($class);
 
         return $this->runAction($controller, $action, $request);
     }
 
-    private function create(string $class): ControllerInterface
+    private function createController(string $class): ControllerInterface
     {
         if (!class_exists($class)) {
             throw new UnexpectedValueException("{$class} is not found.");

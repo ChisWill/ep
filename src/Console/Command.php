@@ -20,6 +20,8 @@ abstract class Command implements ControllerInterface
      */
     public function before($request)
     {
+        $request->setAlias($this->alias());
+
         return true;
     }
 
@@ -32,6 +34,11 @@ abstract class Command implements ControllerInterface
     public function after($request, $response)
     {
         return $response;
+    }
+
+    protected function alias(): array
+    {
+        return [];
     }
 
     public function getViewPath(): string

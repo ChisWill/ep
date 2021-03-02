@@ -7,45 +7,66 @@ use Ep\Console\Application;
 
 (static function () {
     $cwd = getcwd();
-
-    $possibleAutoloadPaths = [
-        // running from project root
-        $cwd . '/vendor/autoload.php',
-        // running from project bin
-        dirname($cwd) . '/autoload.php'
-    ];
-
-    $autoloadPath = null;
-    foreach ($possibleAutoloadPaths as $possibleAutoloadPath) {
-        if (file_exists($possibleAutoloadPath)) {
-            $autoloadPath = $possibleAutoloadPath;
-            break;
+    if (file_exists($cwd . '/.ep')) {
+        $content = str_replace("\r\n", "\n", file_get_contents($cwd . '/.ep'));
+        $result = explode("\n", $content);
+        $params = [];
+        foreach ($result as $row) {
+            $pieces = explode('=', $row);
+            if (count($pieces) == 2) {
+                $params[trim($pieces[0])] = trim($pieces[1]);
+            }
         }
+    } else {
+        $params = [];
     }
+
+    $autoloadPath = $params['autoload'] ?? null;
+
     if ($autoloadPath === null) {
-        $message = "Unable to find vendor/autoload.php in your current directory.\n";
-        $message .= "You should:\n";
-        $message .= "- run ./bin/ep from project root.\n";
-        $message .= "- run ./ep from vendor/bin.\n";
-        fwrite(STDERR, $message);
-        exit(1);
+        $possibleAutoloadPaths = [
+            $cwd . '/vendor/autoload.php',
+            dirname($cwd) . '/autoload.php'
+        ];
+        foreach ($possibleAutoloadPaths as $path) {
+            if (file_exists($path)) {
+                $autoloadPath = $path;
+                break;
+            }
+        }
+        if ($autoloadPath === null) {
+            $message = "Unable to find vendor/autoload.php in your current directory.\n";
+            $message .= "You should:\n";
+            $message .= "- run ./bin/ep from project root.\n";
+            $message .= "- run ./ep from vendor/bin.\n";
+            fwrite(STDERR, $message);
+            exit(1);
+        }
     }
     require_once $autoloadPath;
 
-    $options = getopt('', ['config:'], $optind);
-    $configPath = $options['config'] ?? dirname($autoloadPath, 2) . '/config/main.php';
+    $configPath = $params['config'] ?? null;
+
+    if ($configPath === null) {
+        $options = getopt('', ['config:']);
+        $configPath = $options['config'] ?? dirname($autoloadPath, 2) . '/config/main.php';
+    }
     if (!file_exists($configPath)) {
         $message = "Unable to find config path in \"{$configPath}\".\n";
         fwrite(STDERR, $message);
         exit(1);
     }
-
     $config = require($configPath);
+
+    unset($params['autoload'], $params['config']);
     $_SERVER['argv'][] = 'appNamespace=' . $config['appNamespace'] ?? 'App';
-    $_SERVER['argv'][] = 'autoloadPath=' . $autoloadPath;
+    $_SERVER['argv'][] = 'autoloadPath=' . realpath($autoloadPath);
+    foreach ($params as $k => $v) {
+        $_SERVER['argv'][] = $k . '=' . $v;
+    }
     $config['appNamespace'] = 'Ep';
+
     Ep::init($config);
-    $params = array_slice($_SERVER['argv'], $optind);
 
     Ep::getDi()->get(Application::class)->run();
 

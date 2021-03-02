@@ -15,6 +15,7 @@ use Ep\Tests\Support\Middleware\CheckMiddleware;
 use Ep\Tests\Support\Middleware\FilterMiddleware;
 use Ep\Tests\Support\RequestHandler\FoundHandler;
 use Ep\Web\ServerRequest;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
@@ -121,9 +122,8 @@ class DemoController extends Controller
         return $result;
     }
 
-    public function eventAction()
+    public function eventAction(EventDispatcherInterface $dipatcher)
     {
-        $dipatcher = Ep::getEventDispatcher();
         $dipatcher->dispatch($this);
     }
 

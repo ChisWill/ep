@@ -10,8 +10,6 @@ use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Redis\Connection as RedisConnection;
 use Yiisoft\Di\CompositeContainer;
 use Yiisoft\Di\Container;
-use Yiisoft\Injector\Injector;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 final class Ep
@@ -47,11 +45,6 @@ final class Ep
         return self::$di;
     }
 
-    public static function getInjector(): Injector
-    {
-        return self::$di->get(Injector::class);
-    }
-
     public static function getDb(?string $id = null): Connection
     {
         return self::$di->get($id ?: Connection::class);
@@ -70,10 +63,5 @@ final class Ep
     public static function getLogger(?string $id = null): LoggerInterface
     {
         return self::$di->get($id ?: LoggerInterface::class);
-    }
-
-    public static function getEventDispatcher(?string $id = null): EventDispatcherInterface
-    {
-        return self::$di->get($id ?: EventDispatcherInterface::class);
     }
 }
