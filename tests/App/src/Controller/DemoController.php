@@ -8,6 +8,7 @@ use DateInterval;
 use Ep;
 use Ep\Base\View;
 use Ep\Tests\App\Component\Controller;
+use Ep\Tests\App\Form\TestForm;
 use Ep\Tests\App\Model\User;
 use Ep\Tests\Support\Middleware\AddMiddleware;
 use Ep\Tests\Support\Middleware\CheckMiddleware;
@@ -150,7 +151,20 @@ class DemoController extends Controller
         }
     }
 
-    public function formAction(ServerRequestInterface $request)
+    public function formAction(ServerRequestInterface $request, TestForm $form)
+    {
+        if ($form->load($request->getParsedBody())) {
+            if ($form->validate()) {
+                return $this->success($form->getAttributes());
+            } else {
+                return $this->error($form->getErrors());
+            }
+        }
+
+        return $this->render('form');
+    }
+
+    public function arformAction(ServerRequestInterface $request)
     {
         $user = User::findModel($request->getQueryParams()['id'] ?? 0);
         if ($user->load($request)) {
@@ -166,7 +180,7 @@ class DemoController extends Controller
                 return $this->error($user->getErrors());
             }
         }
-        return $this->render('form', compact('user'));
+        return $this->render('arform', compact('user'));
     }
 
     public function wsAction()

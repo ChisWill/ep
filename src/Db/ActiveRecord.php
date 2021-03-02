@@ -6,24 +6,26 @@ namespace Ep\Db;
 
 use Ep;
 use Ep\Helper\Date;
+use Ep\Widget\FormTrait;
 use Yiisoft\ActiveRecord\ActiveRecord as BaseActiveRecord;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Http\Method;
 use Yiisoft\Validator\DataSetInterface;
-use Yiisoft\Validator\Rule;
 use Yiisoft\Strings\StringHelper;
-use Yiisoft\Validator\Validator;
-use Yiisoft\Validator\ValidationContext;
-use Yiisoft\Validator\Result;
 use Psr\Http\Message\ServerRequestInterface;
 use UnexpectedValueException;
 
 abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
 {
+    use FormTrait;
+
     public const PK = 'id';
     public const CREATED_AT = 'created_at';
     public const UPDATED_AT = 'updated_at';
+
+    public const YES = 1;
+    public const NO = -1;
 
     public function __construct(?ConnectionInterface $db = null)
     {
@@ -82,7 +84,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
         return parent::update($attributeNames);
     }
 
-    public function load(ServerRequestInterface $request, ?string $scope = null): bool
+    public function load(ServerRequestInterface $request, string $scope = null): bool
     {
         if ($request->getMethod() === Method::POST) {
             if ($scope === '') {
@@ -97,24 +99,6 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
         }
     }
 
-    private array $_errors = [];
-
-    public function validate(): bool
-    {
-        $this->_errors = [];
-        foreach ((new Validator)->validate($this, $this->rules()) as $attribute => $result) {
-            if (!$result->isValid()) {
-                $this->_errors[$attribute] = $result->getErrors();
-            }
-        }
-        return empty($this->_errors);
-    }
-
-    public function getErrors(): array
-    {
-        return $this->_errors;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -122,32 +106,4 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     {
         return $this->getAttribute($attribute);
     }
-
-    protected function rule(callable $callback): Rule
-    {
-        return new class ($callback) extends Rule
-        {
-            /**
-             * @param callback $callback
-             */
-            private $callback;
-
-            public function __construct(callable $callback)
-            {
-                $this->callback = $callback;
-            }
-
-            protected function validateValue($value, ?ValidationContext $context = null): Result
-            {
-                $result = new Result;
-                call_user_func($this->callback, $value, $result, $context);
-                return $result;
-            }
-        };
-    }
-
-    /**
-     * @return Rule[][] $rules
-     */
-    abstract protected function rules(): array;
 }

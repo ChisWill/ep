@@ -92,6 +92,9 @@ final class GenerateService
         $types = [];
         $ruleNs = 'Yiisoft\Validator\Rule\\';
         foreach ($this->getColumns() as $field => $column) {
+            if ($column->isPrimaryKey()) {
+                continue;
+            }
             switch ($column->getType()) {
                 case Schema::TYPE_TINYINT:
                 case Schema::TYPE_SMALLINT:
