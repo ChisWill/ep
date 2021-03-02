@@ -57,6 +57,15 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
         }
     }
 
+    public function save(?array $attributeNames = null): bool
+    {
+        if ($this->validate()) {
+            return parent::save($attributeNames);
+        } else {
+            return false;
+        }
+    }
+
     public function insert(?array $attributes = null): bool
     {
         foreach (array_intersect($this->attributes(), [static::CREATED_AT, static::UPDATED_AT]) as $field) {
@@ -116,7 +125,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
 
     protected function rule(callable $callback): Rule
     {
-        return new class($callback) extends Rule
+        return new class ($callback) extends Rule
         {
             /**
              * @param callback $callback
