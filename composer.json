@@ -35,7 +35,7 @@
     "autoload": {
         "files": [
             "src\\Ep.php",
-            "src\\Base\\functions.php"
+            "src\\functions.php"
         ],
         "psr-4": {
             "Ep\\": "src"
