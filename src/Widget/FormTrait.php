@@ -29,29 +29,6 @@ trait FormTrait
         return $this->_errors;
     }
 
-    protected function rule(callable $callback): Rule
-    {
-        return new class ($callback) extends Rule
-        {
-            /**
-             * @param callback $callback
-             */
-            private $callback;
-
-            public function __construct(callable $callback)
-            {
-                $this->callback = $callback;
-            }
-
-            protected function validateValue($value, ?ValidationContext $context = null): Result
-            {
-                $result = new Result;
-                call_user_func($this->callback, $value, $result, $context);
-                return $result;
-            }
-        };
-    }
-
     /**
      * @return Rule[][] $rules
      */

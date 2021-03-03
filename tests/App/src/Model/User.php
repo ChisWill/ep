@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Ep\Tests\App\Model;
 
 use Ep\Db\ActiveRecord;
+use Ep\Helper\Date;
 use Yiisoft\Validator\Result;
+use Yiisoft\Validator\Rule\Callback;
 use Yiisoft\Validator\Rule\HasLength;
 use Yiisoft\Validator\Rule\InRange;
 use Yiisoft\Validator\Rule\MatchRegularExpression;
@@ -34,14 +36,16 @@ class User extends ActiveRecord
             ],
             'username' => [(new HasLength)->max(8)->min(2)->tooLongMessage('用户名最多8个字')->tooShortMessage('最少2个字')],
             'password' => [(new HasLength)->max(6)->tooLongMessage('最多6个'), (new MatchRegularExpression('/^[a-z\d]{4,6}$/i'))->message('4-8个字符')],
-            'birthday' => [$this->rule([self::class, 'checkDate'])]
+            'birthday' => [new Callback([self::class, 'checkDate'])]
         ];
     }
 
-    public static function checkDate($value, Result $result, ?ValidationContext $context = null): void
+    public static function checkDate($value, ?ValidationContext $context = null): Result
     {
+        $result = new Result();
         if (strtotime($value) === false) {
             $result->addError('生日时间格式不正确');
         }
+        return $result;
     }
 }
