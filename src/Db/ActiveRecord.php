@@ -59,7 +59,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
         }
     }
 
-    public function validateSave(?array $attributeNames = null): bool
+    public function save(?array $attributeNames = null): bool
     {
         if ($this->validate()) {
             return parent::save($attributeNames);
