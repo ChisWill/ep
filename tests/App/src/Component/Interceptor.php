@@ -6,6 +6,9 @@ namespace Ep\Tests\App\Component;
 
 use Ep;
 use Ep\Contract\InterceptorInterface;
+use Ep\Tests\App\Filter\DemoFilter;
+use Ep\Tests\App\Filter\OtherFilter;
+use Ep\Tests\App\Filter\RootFilter;
 use Ep\Web\ServerRequest;
 use Ep\Web\Service;
 use Psr\Http\Message\ResponseInterface;
@@ -15,30 +18,15 @@ class Interceptor implements InterceptorInterface
     public function includePath(): array
     {
         return [
-            ['/', [$this, 'testRoot']],
-            ['/te', [$this, 'testShop']],
+            ['/', RootFilter::class],
+            ['/demo', DemoFilter::class],
         ];
     }
 
     public function excludePath(): array
     {
         return [
-            ['/test', [$this, 'textExclude']]
+            ['/test', OtherFilter::class]
         ];
-    }
-
-    public function testRoot(ServerRequest $request)
-    {
-        return true;
-    }
-
-    public function testShop(ServerRequest $request)
-    {
-        return true;
-    }
-
-    public function textExclude()
-    {
-        return true;
     }
 }

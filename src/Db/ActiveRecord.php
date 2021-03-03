@@ -6,6 +6,7 @@ namespace Ep\Db;
 
 use Ep;
 use Ep\Helper\Date;
+use Ep\Helper\System;
 use Ep\Widget\FormTrait;
 use Yiisoft\ActiveRecord\ActiveQuery as BaseActiveQuery;
 use Yiisoft\ActiveRecord\ActiveRecord as BaseActiveRecord;
@@ -65,9 +66,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
      */
     public function hasOne($class, array $link): BaseActiveQuery
     {
-        $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
-        preg_match('/^get(\w+)$/', $method, $match);
-        return parent::hasOne($class, $link)->alias(lcfirst($match[1]));
+        return parent::hasOne($class, $link)->alias(lcfirst(System::getCallerName('get')));
     }
 
     /**
@@ -75,9 +74,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
      */
     public function hasMany($class, array $link): BaseActiveQuery
     {
-        $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
-        preg_match('/^get(\w+)$/', $method, $match);
-        return parent::hasMany($class, $link)->alias(lcfirst($match[1]));
+        return parent::hasMany($class, $link)->alias(lcfirst(System::getCallerName('get')));
     }
 
     public function save(?array $attributeNames = null): bool

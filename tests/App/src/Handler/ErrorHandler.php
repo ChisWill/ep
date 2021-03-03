@@ -6,11 +6,11 @@ namespace Ep\Tests\App\Handler;
 
 use Ep;
 use Ep\Base\ContextTrait;
-use Ep\Contract\ErrorHandlerInterface;
+use Ep\Contract\WebErrorHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
-class ErrorHandler implements ErrorHandlerInterface
+class ErrorHandler implements WebErrorHandlerInterface
 {
     use ContextTrait;
 

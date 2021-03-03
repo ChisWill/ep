@@ -9,11 +9,11 @@ class Number
     /**
      * 判断是否是质数
      * 
-     * @param  int  $number
+     * @param  int $number
      * 
      * @return bool
      */
-    function isPrime(int $number): bool
+    public static function isPrime(int $number): bool
     {
         if ($number < 2) {
             return false;

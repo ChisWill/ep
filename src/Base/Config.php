@@ -19,9 +19,9 @@ final class Config
      */
     public string $rootPath = '';
     /**
-     * 默认路由的根 URL，必须以 / 开头
+     * 默认路由的根 URL
      */
-    public string $baseUrl = '/';
+    public string $baseUrl = '';
     /**
      * 是否开启调试模式
      */

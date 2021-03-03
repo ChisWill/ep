@@ -18,13 +18,12 @@ final class Route implements ConfigurableInterface
 {
     use ConfigurableTrait;
 
+    public bool $defaultRoute = true;
+
     private Config $config;
     private Closure $rule;
     private string $baseUrl;
 
-    /**
-     * @param string $baseUrl 默认路由规则基于 `$baseUrl` ，如果设置为空字符表示不启用
-     */
     public function __construct(Closure $rule, string $baseUrl = '')
     {
         $this->config = Ep::getConfig();
@@ -39,8 +38,8 @@ final class Route implements ConfigurableInterface
     {
         return $this->solveRouteInfo(
             cachedDispatcher(function (RouteCollector $route) {
-                call_user_func($this->rule, $route);
-                if ($this->baseUrl) {
+                $route->addGroup($this->baseUrl, $this->rule);
+                if ($this->defaultRoute) {
                     $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
                 }
             }, [

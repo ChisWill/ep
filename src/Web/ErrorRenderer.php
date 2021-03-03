@@ -9,7 +9,7 @@ use Ep\Base\Config;
 use Ep\Base\ContextTrait;
 use Ep\Base\ErrorHandler;
 use Ep\Contract\ContextInterface;
-use Ep\Contract\ErrorHandlerInterface;
+use Ep\Contract\WebErrorHandlerInterface;
 use Ep\Contract\ErrorRendererInterface;
 use Ep\Helper\Alias;
 use Ep\Helper\Date;
@@ -71,9 +71,9 @@ final class ErrorRenderer implements ErrorRendererInterface, ContextInterface
                     'request' => $request
                 ]);
         } else {
-            if ($this->container->has(ErrorHandlerInterface::class)) {
+            if ($this->container->has(WebErrorHandlerInterface::class)) {
                 return $this->container
-                    ->get(ErrorHandlerInterface::class)
+                    ->get(WebErrorHandlerInterface::class)
                     ->render($t, $request);
             } else {
                 return $this->getView()->renderPartial('production');

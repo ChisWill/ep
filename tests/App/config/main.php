@@ -6,7 +6,7 @@ return [
     'appNamespace' => 'Ep\Tests\App',
     'rootPath' => dirname(__DIR__, 1),
     'vendorPath' => dirname(__DIR__, 3) . '/vendor',
-    'baseUrl' => '/',
+    'baseUrl' => '',
     'mysqlDsn' => 'mysql:host=127.0.0.1;dbname=test',
     'mysqlUsername' => 'root',
     'mysqlPassword' => '',
