@@ -144,7 +144,7 @@ final class ControllerFactory implements ConfigurableInterface
             default:
                 $action = array_pop($pieces) ?: $this->config->defaultAction;
                 $controller = array_pop($pieces) ?: $this->config->defaultController;
-                $prefix = implode('\\', $pieces);
+                $prefix = implode('\\', array_map('ucfirst', $pieces));
                 break;
         }
         if ($prefix) {
