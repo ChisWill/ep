@@ -248,7 +248,7 @@ class DemoController extends Controller
     public function paginateAction(ServerRequest $serverRequest)
     {
         $page = $serverRequest->getQueryParams()['page'] ?? 1;
-        $query = User::find()->asArray();
+        $query = User::find();
         $count = $query->count();
 
         return [

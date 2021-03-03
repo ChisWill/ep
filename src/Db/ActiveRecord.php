@@ -7,6 +7,7 @@ namespace Ep\Db;
 use Ep;
 use Ep\Helper\Date;
 use Ep\Widget\FormTrait;
+use Yiisoft\ActiveRecord\ActiveQuery as BaseActiveQuery;
 use Yiisoft\ActiveRecord\ActiveRecord as BaseActiveRecord;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
@@ -15,7 +16,6 @@ use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Strings\StringHelper;
 use Psr\Http\Message\ServerRequestInterface;
 use UnexpectedValueException;
-use Yiisoft\ActiveRecord\ActiveQueryInterface;
 
 abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
 {
@@ -63,7 +63,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     /**
      * {@inheritDoc}
      */
-    public function hasOne($class, array $link): ActiveQueryInterface
+    public function hasOne($class, array $link): BaseActiveQuery
     {
         $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
         preg_match('/^get(\w+)$/', $method, $match);
@@ -73,7 +73,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     /**
      * {@inheritDoc}
      */
-    public function hasMany($class, array $link): ActiveQueryInterface
+    public function hasMany($class, array $link): BaseActiveQuery
     {
         $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
         preg_match('/^get(\w+)$/', $method, $match);
