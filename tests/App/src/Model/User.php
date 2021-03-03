@@ -48,4 +48,9 @@ class User extends ActiveRecord
         }
         return $result;
     }
+
+    public function getParent()
+    {
+        return $this->hasOne(UserParent::class, ['id' => 'pid']);
+    }
 }

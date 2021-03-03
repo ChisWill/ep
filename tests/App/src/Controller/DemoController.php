@@ -151,6 +151,16 @@ class DemoController extends Controller
         }
     }
 
+    public function getUserAction()
+    {
+        $data = User::find()
+            ->joinWith('parent')
+            ->asArray()
+            ->one();
+
+        return $this->success($data);
+    }
+
     public function formAction(ServerRequestInterface $request, TestForm $form)
     {
         if ($form->load($request->getParsedBody())) {

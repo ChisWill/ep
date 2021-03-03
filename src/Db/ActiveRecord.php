@@ -15,6 +15,7 @@ use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Strings\StringHelper;
 use Psr\Http\Message\ServerRequestInterface;
 use UnexpectedValueException;
+use Yiisoft\ActiveRecord\ActiveQueryInterface;
 
 abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
 {
@@ -57,6 +58,26 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
             }
             return $model;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function hasOne($class, array $link): ActiveQueryInterface
+    {
+        $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
+        preg_match('/^get(\w+)$/', $method, $match);
+        return parent::hasOne($class, $link)->alias(lcfirst($match[1]));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function hasMany($class, array $link): ActiveQueryInterface
+    {
+        $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
+        preg_match('/^get(\w+)$/', $method, $match);
+        return parent::hasMany($class, $link)->alias(lcfirst($match[1]));
     }
 
     public function save(?array $attributeNames = null): bool
