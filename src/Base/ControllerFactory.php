@@ -45,7 +45,7 @@ class ControllerFactory implements ConfigurableInterface
 
         $controller = $this->createController($class);
 
-        if ($module) {
+        if ($module instanceof FilterInterface) {
             $response = $module->before($request);
             if ($response === true) {
                 return $module->after($request, $this->runAction($controller, $action, $request));
