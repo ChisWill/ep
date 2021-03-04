@@ -56,6 +56,19 @@ final class GenerateService
         return sprintf('%s\\%s', $this->appNamespace, implode('\\', array_map([Str::class, 'toPascalCase'], explode('/', $this->prefix))));
     }
 
+    public function getPrimaryKey(): string
+    {
+        $primaryKeys = $this->schema->getPrimaryKey();
+        switch (count($primaryKeys)) {
+            case 0:
+                return "''";
+            case 1:
+                return "'{$primaryKeys[0]}'";
+            default:
+                return sprintf("['%s']", implode("', '", $primaryKeys));
+        }
+    }
+
     public function getTableName(): string
     {
         return preg_replace('/' . $this->db->getTablePrefix() . '/', '', $this->table, 1);

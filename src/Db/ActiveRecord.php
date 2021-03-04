@@ -48,9 +48,9 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     public static function findModel($condition)
     {
         if (empty($condition)) {
-            return new static;
+            return new static();
         } else {
-            if (is_scalar($condition)) {
+            if (is_scalar($condition) && is_string(static::PK)) {
                 $condition = [static::PK => $condition];
             }
             $model = static::find()->where($condition)->one();

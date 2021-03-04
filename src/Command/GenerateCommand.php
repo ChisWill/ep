@@ -34,6 +34,7 @@ final class GenerateCommand extends Command
 
         $data = [
             'namespace' => $this->service->getNamespace(),
+            'primaryKey' => $this->service->getPrimaryKey(),
             'tableName' => $this->service->getTableName(),
             'className' => $this->service->getClassName(),
             'columns' => $this->service->getColumns(),

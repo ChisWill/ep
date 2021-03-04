@@ -17,7 +17,7 @@ class System
     public static function getCallerName(string $prefix = '', string $suffix = ''): string
     {
         $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'] ?? '';
-        preg_match(sprintf('/^%s(\w+)%s$/', $prefix, $suffix), $method, $match);
+        preg_match("/^{$prefix}(\w+){$suffix}$/", $method, $match);
         return $match[1] ?? '';
     }
 }

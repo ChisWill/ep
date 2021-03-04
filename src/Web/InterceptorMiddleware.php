@@ -16,8 +16,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 final class InterceptorMiddleware implements MiddlewareInterface
 {
     private ContainerInterface $container;
-    private array $includePath;
-    private array $excludePath;
+    private array $includePath = [];
+    private array $excludePath = [];
 
     public function __construct(ContainerInterface $container, InterceptorInterface $interceptor = null)
     {

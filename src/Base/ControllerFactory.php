@@ -7,13 +7,13 @@ namespace Ep\Base;
 use Ep;
 use Ep\Contract\ConfigurableInterface;
 use Ep\Contract\ControllerInterface;
-use Ep\Contract\ModuleInterface;
+use Ep\Contract\FilterInterface;
 use Yiisoft\Injector\Injector;
 use Psr\Container\ContainerInterface;
 use InvalidArgumentException;
 use UnexpectedValueException;
 
-final class ControllerFactory implements ConfigurableInterface
+class ControllerFactory implements ConfigurableInterface
 {
     use ConfigurableTrait;
 
@@ -41,11 +41,20 @@ final class ControllerFactory implements ConfigurableInterface
     {
         [$prefix, $class, $action] = $this->parseHandler($handler);
 
-        $this->runModule($prefix, $request);
+        $module = $this->createModule($prefix);
 
         $controller = $this->createController($class);
 
-        return $this->runAction($controller, $action, $request);
+        if ($module) {
+            $response = $module->before($request);
+            if ($response === true) {
+                return $module->after($request, $this->runAction($controller, $action, $request));
+            } else {
+                return $response;
+            }
+        } else {
+            return $this->runAction($controller, $action, $request);
+        }
     }
 
     private function createController(string $class): ControllerInterface
@@ -58,7 +67,10 @@ final class ControllerFactory implements ConfigurableInterface
         return $controller;
     }
 
-    private function runModule(string $prefix, $request): void
+    /**
+     * @return FilterInterface|null
+     */
+    private function createModule(string $prefix)
     {
         $prefix = str_replace('/', '\\', $prefix);
         if (strpos($prefix, '\\\\') !== false) {
@@ -66,11 +78,9 @@ final class ControllerFactory implements ConfigurableInterface
         }
         $moduleClass = $this->config->appNamespace . '\\' . ($prefix ? $prefix . '\\' : '') . $this->config->moduleName;
         if (class_exists($moduleClass)) {
-            $module = $this->container->get($moduleClass);
-            if (!$module instanceof ModuleInterface) {
-                throw new InvalidArgumentException("The class {$moduleClass} must implement the interface Ep\Contract\ModuleInterface.");
-            }
-            $module->bootstrap($request);
+            return $this->container->get($moduleClass);
+        } else {
+            return null;
         }
     }
 
@@ -87,10 +97,10 @@ final class ControllerFactory implements ConfigurableInterface
         }
         $response = $controller->before($request);
         if ($response === true) {
-            $response = $this->injector->invoke([$controller, $action], [$request]);
-            $response = $controller->after($request, $response);
+            return $controller->after($request, $this->injector->invoke([$controller, $action], [$request]));
+        } else {
+            return $response;
         }
-        return $response;
     }
 
     /**

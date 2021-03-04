@@ -13,6 +13,8 @@ use Ep\Db\ActiveRecord;
 <?php endforeach ?> */
 class <?= $className ?> extends ActiveRecord
 {
+    public const PK = <?= $primaryKey ?>;
+
     public function tableName(): string
     {
         return '{{%<?= $tableName ?>}}';
