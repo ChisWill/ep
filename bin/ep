@@ -59,7 +59,7 @@ use Ep\Console\Application;
     $config = require($configPath);
 
     unset($params['autoload'], $params['config']);
-    $_SERVER['argv'][] = 'appNamespace=' . $config['appNamespace'] ?? 'App';
+    $_SERVER['argv'][] = 'appNamespace=' . ($config['appNamespace'] ?? 'App');
     $_SERVER['argv'][] = 'autoloadPath=' . realpath($autoloadPath);
     foreach ($params as $k => $v) {
         $_SERVER['argv'][] = $k . '=' . $v;
