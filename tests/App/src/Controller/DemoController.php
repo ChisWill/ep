@@ -7,6 +7,7 @@ namespace Ep\Tests\App\Controller;
 use DateInterval;
 use Ep;
 use Ep\Base\View;
+use Ep\Db\Query;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Form\TestForm;
 use Ep\Tests\App\Model\User;
@@ -114,12 +115,40 @@ class DemoController extends Controller
         $query = User::find()->where(['like', 'username', 'Peter%', false]);
         $result['RawSql'] = $query->getRawSql();
         $user = $query->one();
-        $result['Model Attributes'] = $user->getAttributes();
+        if ($user) {
+            $result['Model Attributes'] = $user->getAttributes();
+        }
         $result['Count'] = $query->count();
         $list = $query->asArray()->all();
         $result['All'] = $list;
 
         return $result;
+    }
+
+    public function curdAction()
+    {
+        $insert = 0;
+        $update = 0;
+        $batchInsert = 0;
+        $upsert = 0;
+        $delete = 0;
+
+        $insert = Query::find()->insert('user', [
+            'pid' => 1,
+            'username' => 'a'
+        ]);
+        $insert = Query::find()->insert('user', Query::find()->from('user')->select(['username', 'age'])->where('id=69'));
+        $update =  Query::find()->update('user', ['username' => 'mary-bob-' . mt_rand()], 'id=:id', [':id' => 76]);
+
+        $batchInsert = Query::find()->batchInsert('user', ['username', 'age'], [
+            ['a1', 11],
+            ['b1', 22],
+            ['c1', 33],
+        ]);
+        $upsert = Query::find()->upsert('user', ['id' => 72, 'username' => 'julia', 'age' => 99], ['age' => 33]);
+        $delete = Query::find()->delete('user', ['id' => 75]);
+
+        return compact('insert', 'update', 'batchInsert', 'upsert', 'delete');
     }
 
     public function eventAction(EventDispatcherInterface $dipatcher)
