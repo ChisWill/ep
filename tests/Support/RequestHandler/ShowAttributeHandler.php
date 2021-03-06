@@ -9,7 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class ErrorHandler implements RequestHandlerInterface
+class ShowAttributeHandler implements RequestHandlerInterface
 {
     private Service $service;
 
@@ -20,11 +20,6 @@ class ErrorHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        return $this->service->json(
-            [
-                'attributes' => $request->getAttributes(),
-                'error' => $request->getParsedBody()
-            ]
-        );
+        return $this->service->json($request->getAttributes());
     }
 }

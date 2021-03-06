@@ -17,12 +17,20 @@ use Ep\Tests\Support\Container\EngineInterface;
 use Ep\Tests\Support\Container\MegaBird;
 use Ep\Tests\Support\Container\WingInterface;
 use Ep\Tests\Support\Container\XEngine;
+use Ep\Tests\Support\Middleware\AddMiddleware;
+use Ep\Tests\Support\Middleware\CheckMiddleware;
+use Ep\Tests\Support\Middleware\FilterMiddleware;
+use Ep\Tests\Support\Middleware\InitMiddleware;
+use Ep\Tests\Support\RequestHandler\FoundHandler;
+use Ep\Tests\Support\RequestHandler\ShowAttributeHandler;
 use Ep\Web\ErrorHandler;
 use Ep\Web\ErrorRenderer;
+use Ep\Web\ServerRequest;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Yiisoft\Di\CompositeContainer;
 use Yiisoft\Di\Container;
+use Yiisoft\Middleware\Dispatcher\MiddlewareDispatcher;
 
 class TestController extends Controller
 {
@@ -33,6 +41,19 @@ class TestController extends Controller
         $message = 'test';
 
         return $this->render('/index/index', compact('message'));
+    }
+
+    public function middleAction(ServerRequest $serverRequest)
+    {
+        $dispatcher = Ep::getDi()->get(MiddlewareDispatcher::class);
+
+        $dispatcher = $dispatcher->withMiddlewares([
+            CheckMiddleware::class,
+            AddMiddleware::class,
+            InitMiddleware::class
+        ]);
+
+        return $dispatcher->dispatch($serverRequest, Ep::getDi()->get(ShowAttributeHandler::class));
     }
 
     public function diAction()

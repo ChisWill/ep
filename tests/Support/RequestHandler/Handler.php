@@ -6,10 +6,9 @@ namespace Ep\Tests\Support\RequestHandler;
 
 use Ep\Web\Service;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class FoundHandler implements RequestHandlerInterface
+final class Handler
 {
     private Service $service;
 
@@ -18,8 +17,8 @@ class FoundHandler implements RequestHandlerInterface
         $this->service = $service;
     }
 
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function do(ServerRequestInterface $request, RequestHandlerInterface $handler)
     {
-        return $this->service->json($request->getQueryParams());
+        return $this->service->string('I am working.');
     }
 }

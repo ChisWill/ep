@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ep\Web;
+namespace Ep\Web\Middleware;
 
 use Ep;
 use Ep\Contract\FilterInterface;

@@ -17,15 +17,13 @@ class CheckMiddleware implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $query = $request->getQueryParams();
+        $attributes = $request->getAttributes();
         try {
-            $sex = $query['sex'] ?? 0;
-            if ($sex == 1) {
-                throw new Exception("sex could not be 1");
-            }
-            $age = $query['age'] ?? 60;
-            if ($age < 50) {
-                throw new Exception("age could not smaller than 50");
+            $age = $attributes['age'] ?? 0;
+            if ($age >= 120) {
+                throw new Exception('You are died.');
+            } elseif ($age == 0) {
+                throw new Exception('You haven\'t been born yet.');
             }
             return $handler->handle($request);
         } catch (Throwable $t) {

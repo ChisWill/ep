@@ -11,17 +11,12 @@ use Ep\Db\Query;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Form\TestForm;
 use Ep\Tests\App\Model\User;
-use Ep\Tests\Support\Middleware\AddMiddleware;
-use Ep\Tests\Support\Middleware\CheckMiddleware;
-use Ep\Tests\Support\Middleware\FilterMiddleware;
-use Ep\Tests\Support\RequestHandler\FoundHandler;
 use Ep\Web\ServerRequest;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
 use Yiisoft\Http\Method;
-use Yiisoft\Middleware\Dispatcher\MiddlewareDispatcher;
 use Yiisoft\Session\SessionInterface;
 
 class DemoController extends Controller
@@ -242,19 +237,6 @@ class DemoController extends Controller
         $cookie = $cookie->withMaxAge(new DateInterval('PT10S'))->withSecure(false);
         $response = $this->string('ok');
         return $cookie->addToResponse($response);
-    }
-
-    public function middleAction(ServerRequest $serverRequest)
-    {
-        $dispatcher = Ep::getDi()->get(MiddlewareDispatcher::class);
-
-        $dispatcher = $dispatcher->withMiddlewares([
-            CheckMiddleware::class,
-            FilterMiddleware::class,
-            AddMiddleware::class,
-        ]);
-
-        return $dispatcher->dispatch($serverRequest, new FoundHandler($this->getService()));
     }
 
     public function sessionAction(SessionInterface $session)

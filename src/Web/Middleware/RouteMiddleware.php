@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ep\Web;
+namespace Ep\Web\Middleware;
 
 use Ep\Base\ControllerFactory;
 use Ep\Base\Route;
 use Ep\Contract\NotFoundException;
+use Ep\Web\Service;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
