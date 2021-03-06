@@ -18,17 +18,11 @@ final class ServerRequest implements ServerRequestInterface
         $this->request = $request;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function isPost(): bool
     {
         return $this->request->getMethod() === Method::POST;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function isAjax(): bool
     {
         return ($this->request->getServerParams()['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';

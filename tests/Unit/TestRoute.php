@@ -6,9 +6,9 @@ namespace Ep\Tests\Unit;
 
 use Ep;
 use Ep\Base\Route;
+use Ep\Contract\NotFoundException;
 use FastRoute\RouteCollector;
 use PHPUnit\Framework\TestCase;
-use UnexpectedValueException;
 
 class TestRoute extends TestCase
 {
@@ -143,7 +143,7 @@ class TestRoute extends TestCase
                     ->match($row['path']);
                 $this->assertSame($row['handler'], $handler, $row['path'] . ' is wrong.');
                 $this->assertSame($row['params'], $params, $row['path'] . ' is wrong.');
-            } catch (UnexpectedValueException $e) {
+            } catch (NotFoundException $e) {
                 $this->assertSame($row['handler'], false);
             }
         }

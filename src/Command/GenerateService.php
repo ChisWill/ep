@@ -22,6 +22,7 @@ final class GenerateService
     private string $appNamespace;
     private string $appPath;
     private string $table;
+    private string $path;
     private string $prefix;
     private Connection $db;
     private ?TableSchema $schema;
@@ -38,7 +39,8 @@ final class GenerateService
         if (!$this->table) {
             $this->required('table');
         }
-        $this->prefix = $params['prefix'] ?? $params['generate.model.prefix'] ?? 'Model';
+        $this->path = $params['path'] ?? $params['generate.model.path'] ?? 'Model';
+        $this->prefix = $params['prefix'] ?? $params['generate.model.prefix'] ?? '';
         try {
             $db = $params['db'] ?? $params['generate.model.db'] ?? $params['common.db'] ?? '';
             $this->db = $this->getDb($db ?: null);
@@ -53,7 +55,7 @@ final class GenerateService
 
     public function getNamespace(): string
     {
-        return sprintf('%s\\%s', $this->appNamespace, implode('\\', array_map([Str::class, 'toPascalCase'], explode('/', $this->prefix))));
+        return sprintf('%s\\%s', $this->appNamespace, implode('\\', array_map([Str::class, 'toPascalCase'], explode('/', $this->path))));
     }
 
     public function getPrimaryKey(): string
@@ -71,12 +73,12 @@ final class GenerateService
 
     public function getTableName(): string
     {
-        return preg_replace('/' . $this->db->getTablePrefix() . '/', '', $this->table, 1);
+        return substr($this->table, strlen($this->db->getTablePrefix()));
     }
 
     public function getClassName(): string
     {
-        return Str::toPascalCase($this->getTableName());
+        return Str::toPascalCase(substr($this->getTableName(), strlen($this->prefix)));
     }
 
     /**
@@ -186,7 +188,7 @@ final class GenerateService
 
     public function createModel(string $content): string
     {
-        $filePath = sprintf('%s/%s/%s', dirname($this->autoloadPath, 2), $this->appPath, $this->prefix);
+        $filePath = sprintf('%s/%s/%s', dirname($this->autoloadPath, 2), $this->appPath, $this->path);
         if (!file_exists($filePath)) {
             File::mkdir($filePath);
         }

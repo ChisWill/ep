@@ -8,10 +8,10 @@ use Ep;
 use Ep\Contract\ConfigurableInterface;
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\FilterInterface;
+use Ep\Contract\NotFoundException;
 use Yiisoft\Injector\Injector;
 use Psr\Container\ContainerInterface;
 use InvalidArgumentException;
-use UnexpectedValueException;
 
 class ControllerFactory implements ConfigurableInterface
 {
@@ -35,7 +35,7 @@ class ControllerFactory implements ConfigurableInterface
      * @param  mixed $request
      * 
      * @return mixed
-     * @throws UnexpectedValueException
+     * @throws NotFoundException
      */
     public function run($handler, $request)
     {
@@ -57,16 +57,6 @@ class ControllerFactory implements ConfigurableInterface
         }
     }
 
-    private function createController(string $class): ControllerInterface
-    {
-        if (!class_exists($class)) {
-            throw new UnexpectedValueException("{$class} is not found.");
-        }
-        $controller = $this->container->get($class);
-        $controller->id = $this->generateContextId($controller);
-        return $controller;
-    }
-
     /**
      * @return FilterInterface|null
      */
@@ -84,6 +74,16 @@ class ControllerFactory implements ConfigurableInterface
         }
     }
 
+    private function createController(string $class): ControllerInterface
+    {
+        if (!class_exists($class)) {
+            throw new NotFoundException("{$class} is not found.");
+        }
+        $controller = $this->container->get($class);
+        $controller->id = $this->generateContextId($controller);
+        return $controller;
+    }
+
     /**
      * @param  mixed $request
      * 
@@ -93,7 +93,7 @@ class ControllerFactory implements ConfigurableInterface
     {
         $action .= $this->config->actionSuffix;
         if (!is_callable([$controller, $action])) {
-            throw new UnexpectedValueException(sprintf('%s::%s() is not found.', get_class($controller), $action));
+            throw new NotFoundException(sprintf('%s::%s() is not found.', get_class($controller), $action));
         }
         $response = $controller->before($request);
         if ($response === true) {

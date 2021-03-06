@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\Db;
 
 use Ep;
+use Ep\Contract\NotFoundException;
 use Ep\Helper\Date;
 use Ep\Helper\System;
 use Ep\Widget\FormTrait;
@@ -16,7 +17,6 @@ use Yiisoft\Http\Method;
 use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Strings\StringHelper;
 use Psr\Http\Message\ServerRequestInterface;
-use UnexpectedValueException;
 
 abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
 {
@@ -43,7 +43,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
      * @param  int|string|array|ExpressionInterface $condition
      * 
      * @return static
-     * @throws UnexpectedValueException
+     * @throws NotFoundException
      */
     public static function findModel($condition)
     {
@@ -55,7 +55,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
             }
             $model = static::find()->where($condition)->one();
             if ($model === null) {
-                throw new UnexpectedValueException("Data is not found.");
+                throw new NotFoundException("Data is not found.");
             }
             return $model;
         }

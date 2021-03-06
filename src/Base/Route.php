@@ -6,11 +6,11 @@ namespace Ep\Base;
 
 use Ep;
 use Ep\Contract\ConfigurableInterface;
+use Ep\Contract\NotFoundException;
 use Ep\Helper\Alias;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use Closure;
-use UnexpectedValueException;
 
 use function FastRoute\cachedDispatcher;
 
@@ -32,7 +32,7 @@ final class Route implements ConfigurableInterface
     }
 
     /**
-     * @throws UnexpectedValueException
+     * @throws NotFoundException
      */
     public function match(string $path, string $method = 'GET'): array
     {
@@ -57,7 +57,7 @@ final class Route implements ConfigurableInterface
                 [$handler, $params] = $this->replaceHandler($routeInfo[1], $routeInfo[2]);
                 break;
             default:
-                throw new UnexpectedValueException(PHP_SAPI === 'cli' ? 'Command is not exists.' : 'Page is not found.');
+                throw new NotFoundException(PHP_SAPI === 'cli' ? 'Command is not exists.' : 'Page is not found.');
         }
         return [$handler, $params];
     }

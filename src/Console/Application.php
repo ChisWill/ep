@@ -10,7 +10,7 @@ use Ep\Base\ControllerFactory;
 use Ep\Base\ErrorHandler;
 use Ep\Base\Route;
 use Ep\Contract\ConsoleRequestInterface;
-use UnexpectedValueException;
+use Ep\Contract\NotFoundException;
 
 final class Application extends \Ep\Base\Application
 {
@@ -68,7 +68,7 @@ final class Application extends \Ep\Base\Application
             return $this->controllerFactory
                 ->configure(['suffix' => $this->config->commandDirAndSuffix])
                 ->run($handler, $request);
-        } catch (UnexpectedValueException $e) {
+        } catch (NotFoundException $e) {
             $command = trim($handler, '/');
             echo <<<HELP
 Error: unknown command "{$command}"

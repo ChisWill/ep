@@ -6,11 +6,11 @@ namespace Ep\Web;
 
 use Ep\Base\ControllerFactory;
 use Ep\Base\Route;
+use Ep\Contract\NotFoundException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use UnexpectedValueException;
 
 final class RouteMiddleware implements MiddlewareInterface
 {
@@ -38,7 +38,7 @@ final class RouteMiddleware implements MiddlewareInterface
             }
 
             return $this->service->toResponse($this->controllerFactory->run($result, $request));
-        } catch (UnexpectedValueException $e) {
+        } catch (NotFoundException $e) {
             return $handler->handle($request);
         }
     }
