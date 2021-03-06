@@ -19,6 +19,7 @@ final class Handler
 
     public function do(ServerRequestInterface $request, RequestHandlerInterface $handler)
     {
-        return $this->service->string('I am working.');
+        $request = $request->withAttribute('job', 'I am a soldier.');
+        return $handler->handle($request);
     }
 }

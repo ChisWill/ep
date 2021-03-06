@@ -6,7 +6,7 @@ namespace Ep\Console;
 
 use Ep;
 use Ep\Base\Config;
-use Ep\Base\ControllerFactory;
+use Ep\Base\ControllerRunner;
 use Ep\Base\ErrorHandler;
 use Ep\Base\Route;
 use Ep\Contract\ConsoleRequestInterface;
@@ -19,21 +19,21 @@ final class Application extends \Ep\Base\Application
     private ErrorHandler $errorHandler;
     private ErrorRenderer $errorRenderer;
     private Route $route;
-    private ControllerFactory $controllerFactory;
+    private ControllerRunner $controllerRunner;
 
     public function __construct(
         ConsoleRequestInterface $consoleRequest,
         ErrorHandler $errorHandler,
         ErrorRenderer $errorRenderer,
         Route $route,
-        ControllerFactory $controllerFactory
+        ControllerRunner $controllerRunner
     ) {
         $this->config = Ep::getConfig();
         $this->consoleRequest = $consoleRequest;
         $this->errorHandler = $errorHandler;
         $this->errorRenderer = $errorRenderer;
         $this->route = $route;
-        $this->controllerFactory = $controllerFactory;
+        $this->controllerRunner = $controllerRunner;
     }
 
     public function createRequest(): ConsoleRequestInterface
@@ -65,7 +65,7 @@ final class Application extends \Ep\Base\Application
                 ->configure(['baseUrl' => '/'])
                 ->match($request->getRoute());
 
-            return $this->controllerFactory
+            return $this->controllerRunner
                 ->configure(['suffix' => $this->config->commandDirAndSuffix])
                 ->run($handler, $request);
         } catch (NotFoundException $e) {

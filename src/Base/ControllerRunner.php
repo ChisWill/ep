@@ -13,14 +13,14 @@ use Yiisoft\Injector\Injector;
 use Psr\Container\ContainerInterface;
 use InvalidArgumentException;
 
-class ControllerFactory implements ConfigurableInterface
+class ControllerRunner implements ConfigurableInterface
 {
     use ConfigurableTrait;
 
-    private Config $config;
-    private ContainerInterface $container;
-    private Injector $injector;
-    private string $suffix;
+    protected Config $config;
+    protected ContainerInterface $container;
+    protected Injector $injector;
+    protected string $suffix;
 
     public function __construct(ContainerInterface $container, Injector $injector)
     {
@@ -44,6 +44,8 @@ class ControllerFactory implements ConfigurableInterface
         $module = $this->createModule($prefix);
 
         $controller = $this->createController($class);
+        $controller->actionId = $action;
+        $action .= $this->config->actionSuffix;
 
         if ($module instanceof FilterInterface) {
             $response = $module->before($request);
@@ -89,9 +91,8 @@ class ControllerFactory implements ConfigurableInterface
      * 
      * @return mixed
      */
-    private function runAction(ControllerInterface $controller, string $action, $request)
+    protected function runAction(ControllerInterface $controller, string $action, $request)
     {
-        $action .= $this->config->actionSuffix;
         if (!is_callable([$controller, $action])) {
             throw new NotFoundException(sprintf('%s::%s() is not found.', get_class($controller), $action));
         }

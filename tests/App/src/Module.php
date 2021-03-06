@@ -24,7 +24,6 @@ final class Module implements FilterInterface
     public function after($request, $response)
     {
         if ($response instanceof ResponseInterface) {
-            $response = $response->withStatus(404);
         }
         return $response;
     }

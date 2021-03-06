@@ -16,7 +16,7 @@ trait FormTrait
     public function validate(): bool
     {
         $this->_errors = [];
-        foreach ((new Validator)->validate($this, $this->rules()) as $attribute => $result) {
+        foreach ((new Validator())->validate($this, $this->rules()) as $attribute => $result) {
             if (!$result->isValid()) {
                 $this->_errors[$attribute] = $result->getErrors();
             }

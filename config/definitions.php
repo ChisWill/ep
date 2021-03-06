@@ -31,10 +31,6 @@ use Yiisoft\Injector\Injector;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target\File\FileRotator;
 use Yiisoft\Log\Target\File\FileTarget;
-use Yiisoft\Middleware\Dispatcher\MiddlewareDispatcher;
-use Yiisoft\Middleware\Dispatcher\MiddlewareFactory;
-use Yiisoft\Middleware\Dispatcher\MiddlewareFactoryInterface;
-use Yiisoft\Middleware\Dispatcher\MiddlewareStackInterface;
 use Yiisoft\Profiler\Profiler;
 use Yiisoft\Profiler\ProfilerInterface;
 use Yiisoft\Session\Session;
@@ -60,19 +56,7 @@ return [
     // Console
     ConsoleRequestInterface::class => ConsoleRequest::class,
     // HttpMiddleware
-    MiddlewareFactoryInterface::class => MiddlewareFactory::class,
-    MiddlewareStackInterface::class => MiddlewareStack::class,
     Route::class => static fn () => new Route($config->getRouteRule(), $config->baseUrl),
-    MiddlewareDispatcher::class => static function (Injector $injector): MiddlewareDispatcher {
-        return ($injector->make(MiddlewareDispatcher::class))
-            ->withMiddlewares(
-                [
-                    RouteMiddleware::class,
-                    SessionMiddleware::class,
-                    InterceptorMiddleware::class
-                ]
-            );
-    },
     // Session
     SessionInterface::class => [
         '__class' => Session::class,

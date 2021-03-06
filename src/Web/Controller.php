@@ -36,6 +36,18 @@ abstract class Controller implements ControllerInterface
         return $response;
     }
 
+    private array $middlewares = [];
+
+    public function setMiddlewares(array $middlewares): void
+    {
+        $this->middlewares = $middlewares;
+    }
+
+    public function getMiddlewares(): array
+    {
+        return $this->middlewares;
+    }
+
     private ?Service $service = null;
 
     protected function getService(): Service

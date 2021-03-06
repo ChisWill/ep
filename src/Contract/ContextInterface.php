@@ -7,7 +7,7 @@ namespace Ep\Contract;
 use Ep\Base\View;
 
 /**
- * @property string $id 上下文代号
+ * @property string $id
  */
 interface ContextInterface
 {

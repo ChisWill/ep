@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Ep\Web\Middleware;
 
-use Ep\Base\ControllerFactory;
 use Ep\Base\Route;
 use Ep\Contract\NotFoundException;
+use Ep\Web\ControllerRunner;
 use Ep\Web\Service;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -16,13 +16,13 @@ use Psr\Http\Server\RequestHandlerInterface;
 final class RouteMiddleware implements MiddlewareInterface
 {
     private Route $route;
-    private ControllerFactory $controllerFactory;
+    private ControllerRunner $controllerRunner;
     private Service $service;
 
-    public function __construct(Route $route, ControllerFactory $controllerFactory, Service $service)
+    public function __construct(Route $route, ControllerRunner $controllerRunner, Service $service)
     {
         $this->route = $route;
-        $this->controllerFactory = $controllerFactory;
+        $this->controllerRunner = $controllerRunner;
         $this->service = $service;
     }
 
@@ -38,7 +38,7 @@ final class RouteMiddleware implements MiddlewareInterface
                 $request = $request->withAttribute($name, $value);
             }
 
-            return $this->service->toResponse($this->controllerFactory->run($result, $request));
+            return $this->service->toResponse($this->controllerRunner->run($result, $request));
         } catch (NotFoundException $e) {
             return $handler->handle($request);
         }

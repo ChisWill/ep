@@ -14,11 +14,13 @@ use Psr\Http\Server\RequestHandlerInterface;
 final class RequestHandlerFactory
 {
     private ContainerInterface $container;
+    private Injector $injector;
     private Service $service;
 
-    public function __construct(ContainerInterface $container, Service $service)
+    public function __construct(ContainerInterface $container, Injector $injector, Service $service)
     {
         $this->container = $container;
+        $this->injector = $injector;
         $this->service = $service;
     }
 
@@ -28,6 +30,28 @@ final class RequestHandlerFactory
             $handler = $this->wrapRequestHandler($middleware, $handler);
         }
         return $handler;
+    }
+
+    public function create(callable $callback): RequestHandlerInterface
+    {
+        return new class($callback, $this->injector, $this->service) implements RequestHandlerInterface
+        {
+            private $callback;
+            private Injector $injector;
+            private Service $service;
+
+            public function __construct(callable $callback, Injector $injector, Service $service)
+            {
+                $this->callback = $callback;
+                $this->injector = $injector;
+                $this->service = $service;
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                return $this->service->toResponse($this->injector->invoke($this->callback, [$request]));
+            }
+        };
     }
 
     private function buildMiddlewares(array $middlewares): iterable
@@ -41,24 +65,24 @@ final class RequestHandlerFactory
         }
     }
 
-    private function wrapMiddleware($callback): MiddlewareInterface
+    private function wrapMiddleware(callable $callback): MiddlewareInterface
     {
-        return new class($callback, $this->container, $this->service) implements MiddlewareInterface
+        return new class($callback, $this->injector, $this->service) implements MiddlewareInterface
         {
             private $callback;
-            private ContainerInterface $container;
+            private Injector $injector;
             private Service $service;
 
-            public function __construct(callable $callback, ContainerInterface $container, Service $service)
+            public function __construct(callable $callback, Injector $injector, Service $service)
             {
                 $this->callback = $callback;
-                $this->container = $container;
+                $this->injector = $injector;
                 $this->service = $service;
             }
 
             public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
             {
-                return $this->service->toResponse((new Injector($this->container))->invoke($this->callback, [$request, $handler]));
+                return $this->service->toResponse($this->injector->invoke($this->callback, [$request, $handler]));
             }
         };
     }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Ep\Web;
 
+use Ep;
 use Ep\Base\Application as BaseApplication;
+use Ep\Base\Config;
 use Ep\Base\ErrorHandler;
 use Ep\Contract\NotFoundHandlerInterface;
 use Yiisoft\Http\Method;
@@ -16,21 +18,26 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class Application extends BaseApplication
 {
+    private Config $config;
     private ServerRequestFactory $serverRequestFactory;
     private ErrorHandler $errorHandler;
-    private MiddlewareDispatcher $middlewareDispatcher;
+    private RequestHandlerFactory $requestHandlerFactory;
     private NotFoundHandlerInterface $notFoundHandler;
+    private SapiEmitter $sapiEmitter;
 
     public function __construct(
         ServerRequestFactory $serverRequestFactory,
         ErrorHandler $errorHandler,
-        MiddlewareDispatcher $middlewareDispatcher,
-        NotFoundHandlerInterface $notFoundHandler
+        RequestHandlerFactory $requestHandlerFactory,
+        NotFoundHandlerInterface $notFoundHandler,
+        SapiEmitter $sapiEmitter
     ) {
+        $this->config = Ep::getConfig();
         $this->serverRequestFactory = $serverRequestFactory;
         $this->errorHandler = $errorHandler;
-        $this->middlewareDispatcher = $middlewareDispatcher;
+        $this->requestHandlerFactory = $requestHandlerFactory;
         $this->notFoundHandler = $notFoundHandler;
+        $this->sapiEmitter = $sapiEmitter;
     }
 
     public function createRequest(): ServerRequestInterface
@@ -54,11 +61,9 @@ final class Application extends BaseApplication
     public function handleRequest($request)
     {
         return $this
-            ->middlewareDispatcher
-            ->dispatch(
-                $request,
-                $this->notFoundHandler
-            );
+            ->requestHandlerFactory
+            ->wrap($this->config->webMiddlewares, $this->notFoundHandler)
+            ->handle($request);
     }
 
     /**
@@ -67,7 +72,7 @@ final class Application extends BaseApplication
      */
     public function send($request, $response): void
     {
-        (new SapiEmitter())->emit(
+        $this->sapiEmitter->emit(
             $response,
             $request->getMethod() === Method::HEAD
         );
