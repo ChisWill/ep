@@ -21,6 +21,7 @@ use Ep\Tests\Support\Middleware\AddMiddleware;
 use Ep\Tests\Support\Middleware\CheckMiddleware;
 use Ep\Tests\Support\Middleware\FilterMiddleware;
 use Ep\Tests\Support\Middleware\InitMiddleware;
+use Ep\Tests\Support\Middleware\MultipleMiddleware;
 use Ep\Tests\Support\RequestHandler\ShowAttributeHandler;
 use Ep\Web\ErrorHandler;
 use Ep\Web\ErrorRenderer;
@@ -38,7 +39,8 @@ class TestController extends Controller
     public function __construct()
     {
         $this->setMiddlewares([
-            InitMiddleware::class
+            FilterMiddleware::class,
+            MultipleMiddleware::class
         ]);
     }
 
@@ -100,6 +102,10 @@ class TestController extends Controller
         return [
             'result' => $composite->get(MegaBird::class)
         ];
+    }
+
+    public function emptyAction()
+    {
     }
 
     public function stringAction()

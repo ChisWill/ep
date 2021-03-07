@@ -6,6 +6,7 @@ namespace Ep\Web;
 
 use Ep;
 use Ep\Base\ContextTrait;
+use Ep\Base\FilterTrait;
 use Ep\Contract\ControllerInterface;
 use Yiisoft\Http\Status;
 use Psr\Http\Message\ServerRequestInterface;
@@ -13,7 +14,7 @@ use Psr\Http\Message\ResponseInterface;
 
 abstract class Controller implements ControllerInterface
 {
-    use ContextTrait;
+    use ContextTrait, FilterTrait;
 
     /**
      * @param  ServerRequestInterface $request
@@ -34,18 +35,6 @@ abstract class Controller implements ControllerInterface
     public function after($request, $response)
     {
         return $response;
-    }
-
-    private array $middlewares = [];
-
-    public function setMiddlewares(array $middlewares): void
-    {
-        $this->middlewares = $middlewares;
-    }
-
-    public function getMiddlewares(): array
-    {
-        return $this->middlewares;
     }
 
     private ?Service $service = null;

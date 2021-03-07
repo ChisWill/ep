@@ -61,7 +61,7 @@ final class Application extends \Ep\Base\Application
     public function handleRequest($request)
     {
         try {
-            [$handler] = $this->route
+            [, $handler] = $this->route
                 ->configure(['baseUrl' => '/'])
                 ->match($request->getRoute());
 

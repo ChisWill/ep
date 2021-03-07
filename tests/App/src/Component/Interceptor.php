@@ -19,14 +19,14 @@ class Interceptor implements InterceptorInterface
     {
         return [
             ['/', RootFilter::class],
-            ['/demo', DemoFilter::class],
+            ['/test', DemoFilter::class],
         ];
     }
 
     public function excludePath(): array
     {
         return [
-            ['/test', OtherFilter::class]
+            ['/other', OtherFilter::class]
         ];
     }
 }

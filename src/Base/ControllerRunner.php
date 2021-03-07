@@ -7,7 +7,7 @@ namespace Ep\Base;
 use Ep;
 use Ep\Contract\ConfigurableInterface;
 use Ep\Contract\ControllerInterface;
-use Ep\Contract\FilterInterface;
+use Ep\Contract\ModuleInterface;
 use Ep\Contract\NotFoundException;
 use Yiisoft\Injector\Injector;
 use Psr\Container\ContainerInterface;
@@ -47,22 +47,14 @@ class ControllerRunner implements ConfigurableInterface
         $controller->actionId = $action;
         $action .= $this->config->actionSuffix;
 
-        if ($module instanceof FilterInterface) {
-            $response = $module->before($request);
-            if ($response === true) {
-                return $module->after($request, $this->runAction($controller, $action, $request));
-            } else {
-                return $response;
-            }
+        if ($module instanceof ModuleInterface) {
+            return $this->runModule($module, $controller, $action, $request);
         } else {
             return $this->runAction($controller, $action, $request);
         }
     }
 
-    /**
-     * @return FilterInterface|null
-     */
-    private function createModule(string $prefix)
+    private function createModule(string $prefix): ?ModuleInterface
     {
         $prefix = str_replace('/', '\\', $prefix);
         if (strpos($prefix, '\\\\') !== false) {
@@ -84,6 +76,21 @@ class ControllerRunner implements ConfigurableInterface
         $controller = $this->container->get($class);
         $controller->id = $this->generateContextId($controller);
         return $controller;
+    }
+
+    /**
+     * @param  mixed $request
+     * 
+     * @return mixed
+     */
+    protected function runModule(ModuleInterface $module, ControllerInterface $controller, string $action, $request)
+    {
+        $response = $module->before($request);
+        if ($response === true) {
+            return $module->after($request, $this->runAction($controller, $action, $request));
+        } else {
+            return $response;
+        }
     }
 
     /**

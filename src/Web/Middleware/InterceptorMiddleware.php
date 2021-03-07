@@ -7,6 +7,8 @@ namespace Ep\Web\Middleware;
 use Ep;
 use Ep\Contract\FilterInterface;
 use Ep\Contract\InterceptorInterface;
+use Ep\Web\Service;
+use Yiisoft\Http\Status;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -16,15 +18,17 @@ use Psr\Http\Server\RequestHandlerInterface;
 final class InterceptorMiddleware implements MiddlewareInterface
 {
     private ContainerInterface $container;
+    private Service $service;
     private array $includePath = [];
     private array $excludePath = [];
 
-    public function __construct(ContainerInterface $container, InterceptorInterface $interceptor = null)
+    public function __construct(ContainerInterface $container, Service $service, InterceptorInterface $interceptor = null)
     {
         if ($interceptor === null) {
             return;
         }
         $this->container = $container;
+        $this->service = $service;
         $baseUrl = Ep::getConfig()->baseUrl;
         $this->includePath = $interceptor->includePath();
         $this->excludePath = $interceptor->excludePath();
@@ -44,15 +48,15 @@ final class InterceptorMiddleware implements MiddlewareInterface
 
         foreach ($this->includePath as [$path, $class]) {
             if (strpos($uri, $path) === 0) {
-                $result = $this->invoke($class, $request, $stack);
-                if ($result instanceof ResponseInterface) {
+                $result = $this->before($class, $request, $stack);
+                if ($result !== true) {
                     return $result;
                 }
             }
         }
         foreach ($this->excludePath as [$path, $class]) {
             if (strpos($uri, $path) !== 0) {
-                $result = $this->invoke($class, $request, $stack);
+                $result = $this->before($class, $request, $stack);
                 if ($result instanceof ResponseInterface) {
                     return $result;
                 }
@@ -69,11 +73,19 @@ final class InterceptorMiddleware implements MiddlewareInterface
         return $response;
     }
 
-    private function invoke(string $class, ServerRequestInterface $request, array &$stack)
+    /**
+     * @return true|ResponseInterface
+     */
+    private function before(string $class, ServerRequestInterface $request, array &$stack)
     {
         /** @var FilterInterface $filter */
         $filter = $this->container->get($class);
         $stack[] = $filter;
         $result = $filter->before($request);
+        if ($result === true || $result instanceof ResponseInterface) {
+            return $result;
+        } else {
+            return $this->service->status(Status::NOT_ACCEPTABLE);
+        }
     }
 }

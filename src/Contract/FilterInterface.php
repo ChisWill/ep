@@ -20,4 +20,8 @@ interface FilterInterface
      * @return mixed
      */
     public function after($request, $response);
+
+    public function setMiddlewares(array $middlewares): void;
+
+    public function getMiddlewares(): array;
 }

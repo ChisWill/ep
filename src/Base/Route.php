@@ -54,12 +54,12 @@ final class Route implements ConfigurableInterface
     {
         switch ($routeInfo[0]) {
             case Dispatcher::FOUND:
-                [$handler, $params] = $this->replaceHandler($routeInfo[1], $routeInfo[2]);
-                break;
+                return $this->replaceHandler($routeInfo[1], $routeInfo[2]);
+            case Dispatcher::METHOD_NOT_ALLOWED:
+                return [false, null, null];
             default:
-                throw new NotFoundException(PHP_SAPI === 'cli' ? 'Command is not exists.' : 'Page is not found.');
+                throw new NotFoundException('Page is not found.');
         }
-        return [$handler, $params];
     }
 
     /**
@@ -80,6 +80,6 @@ final class Route implements ConfigurableInterface
             $captureParams['<' . $key . '>'] = trim($value, '/');
         }
         $handler = strtr($handler, $captureParams);
-        return [$handler, $params];
+        return [true, $handler, $params];
     }
 }

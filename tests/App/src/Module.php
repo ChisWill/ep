@@ -4,27 +4,23 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App;
 
-use Ep\Contract\FilterInterface;
+use Ep\Base\Module as BaseModule;
+use Ep\Tests\Support\Middleware\AddMiddleware;
+use Ep\Tests\Support\Middleware\FilterMiddleware;
+use Ep\Tests\Support\Middleware\InitMiddleware;
 use Ep\Web\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 
-final class Module implements FilterInterface
+final class Module extends BaseModule
 {
-    public function before($request)
-    {
-        if ($request instanceof ServerRequest) {
-            // Web
-        } else {
-            // Console
-        }
+    private array $middlewares = [];
 
-        return true;
-    }
-
-    public function after($request, $response)
+    public function __construct()
     {
-        if ($response instanceof ResponseInterface) {
-        }
-        return $response;
+        $this->setMiddlewares([
+            FilterMiddleware::class,
+            AddMiddleware::class,
+            InitMiddleware::class
+        ]);
     }
 }

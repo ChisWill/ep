@@ -8,6 +8,7 @@ use Ep\Base\Route;
 use Ep\Contract\NotFoundException;
 use Ep\Web\ControllerRunner;
 use Ep\Web\Service;
+use Yiisoft\Http\Status;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -29,10 +30,13 @@ final class RouteMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
-            [$result, $params] = $this->route->match(
+            [$allowed, $result, $params] = $this->route->match(
                 $request->getUri()->getPath(),
                 $request->getMethod()
             );
+            if (!$allowed) {
+                return $this->service->status(Status::METHOD_NOT_ALLOWED);
+            }
 
             foreach ($params as $name => $value) {
                 $request = $request->withAttribute($name, $value);
@@ -40,7 +44,7 @@ final class RouteMiddleware implements MiddlewareInterface
 
             return $this->service->toResponse($this->controllerRunner->run($result, $request));
         } catch (NotFoundException $e) {
-            return $handler->handle($request);
+            return $handler->handle($request->withAttribute('exception', $e));
         }
     }
 }

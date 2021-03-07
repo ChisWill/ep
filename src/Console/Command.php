@@ -6,12 +6,13 @@ namespace Ep\Console;
 
 use Ep;
 use Ep\Base\ContextTrait;
+use Ep\Base\FilterTrait;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ControllerInterface;
 
 abstract class Command implements ControllerInterface
 {
-    use ContextTrait;
+    use ContextTrait, FilterTrait;
 
     /**
      * @param  ConsoleRequestInterface $request

@@ -12,6 +12,7 @@ use Ep\Web\ErrorRenderer;
 use Ep\Web\Middleware\InterceptorMiddleware;
 use Ep\Web\Middleware\RouteMiddleware;
 use Ep\Web\MiddlewareStack;
+use Ep\Web\NotFoundHandler;
 use Ep\Web\ServerRequestFactory;
 use HttpSoft\Message\ResponseFactory;
 use HttpSoft\Message\ServerRequestFactory as HttpSoftServerRequestFactory;
@@ -37,7 +38,6 @@ use Yiisoft\Session\Session;
 use Yiisoft\Session\SessionInterface;
 use Yiisoft\Session\SessionMiddleware;
 use Yiisoft\Yii\Event\ListenerCollectionFactory;
-use Yiisoft\Yii\Web\NotFoundHandler;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
@@ -95,13 +95,7 @@ return [
     // Default ErrorRenderer
     ErrorRendererInterface::class => ErrorRenderer::class,
     // Default NotFoundHandler
-    NotFoundHandlerInterface::class => static fn () => new class implements NotFoundHandlerInterface
-    {
-        public function handle(ServerRequestInterface $request): ResponseInterface
-        {
-            return Ep::getDi()->get(NotFoundHandler::class)->handle($request);
-        }
-    },
+    NotFoundHandlerInterface::class => NotFoundHandler::class,
     // Default DB
     Connection::class => static function (ContainerInterface $container) use ($config): Connection {
         $connection = new MysqlConnection(

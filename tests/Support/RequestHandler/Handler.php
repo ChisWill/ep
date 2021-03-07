@@ -19,7 +19,8 @@ final class Handler
 
     public function do(ServerRequestInterface $request, RequestHandlerInterface $handler)
     {
-        $request = $request->withAttribute('job', 'I am a soldier.');
+        $age = $request->getAttribute('age', 0);
+        $request = $request->withAttribute('job' . $age, "I am a soldier for {$age} years old.");
         return $handler->handle($request);
     }
 }

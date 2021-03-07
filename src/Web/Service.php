@@ -46,6 +46,12 @@ final class Service
             ->withHeader(Header::LOCATION, $url);
     }
 
+    public function status(int $statusCode): ResponseInterface
+    {
+        return $this->responseFactory
+            ->createResponse($statusCode);
+    }
+
     /**
      * @param mixed $result
      */

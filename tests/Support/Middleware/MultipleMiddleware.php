@@ -9,14 +9,14 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class AddMiddleware implements MiddlewareInterface
+class MultipleMiddleware implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $attributes = $request->getAttributes();
         foreach ($attributes as $name => $value) {
             if (is_numeric($value)) {
-                $request = $request->withAttribute($name, $value + 5);
+                $request = $request->withAttribute($name, $value * 2);
             }
         }
 
