@@ -19,8 +19,7 @@ final class Module extends BaseModule
     {
         $this->setMiddlewares([
             FilterMiddleware::class,
-            AddMiddleware::class,
-            InitMiddleware::class
+            AddMiddleware::class
         ]);
     }
 }

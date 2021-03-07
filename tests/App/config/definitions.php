@@ -9,5 +9,5 @@ use Ep\Tests\App\Handler\ErrorHandler;
 
 return [
     WebErrorHandlerInterface::class => ErrorHandler::class,
-    // InterceptorInterface::class => Interceptor::class
+    InterceptorInterface::class => Interceptor::class
 ];

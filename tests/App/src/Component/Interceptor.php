@@ -19,7 +19,7 @@ class Interceptor implements InterceptorInterface
     {
         return [
             ['/', RootFilter::class],
-            ['/test', DemoFilter::class],
+            // ['/test', DemoFilter::class],
         ];
     }
 

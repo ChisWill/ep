@@ -128,8 +128,6 @@ class DemoController extends Controller
         $upsert = 0;
         $delete = 0;
 
-        Query::find()->where(['>', 'name', 23])->andWhere('id=:id', [':id' => 123])->dump();
-
         $insert = Query::find()->insert('user', [
             'pid' => 1,
             'username' => 'a'

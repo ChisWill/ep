@@ -9,6 +9,7 @@ use Ep\Base\ContextTrait;
 use Ep\Base\FilterTrait;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ControllerInterface;
+use LogicException;
 
 abstract class Command implements ControllerInterface
 {
@@ -45,5 +46,21 @@ abstract class Command implements ControllerInterface
     public function getViewPath(): string
     {
         return Ep::getConfig()->viewPath;
+    }
+
+    /**
+     * @throws LogicException
+     */
+    public function setMiddlewares(array $middlewares): void
+    {
+        throw new LogicException('Console command doesn\'t have middlewares yet.');
+    }
+
+    /**
+     * @throws LogicException
+     */
+    public function getMiddlewares(): array
+    {
+        throw new LogicException('Console command doesn\'t have middlewares yet.');
     }
 }

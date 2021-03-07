@@ -78,8 +78,7 @@ class TestController extends Controller
             ->get(RequestHandlerFactory::class)
             ->wrap([
                 CheckMiddleware::class,
-                AddMiddleware::class,
-                InitMiddleware::class
+                MultipleMiddleware::class
             ], $handler)
             ->handle($serverRequest);
     }

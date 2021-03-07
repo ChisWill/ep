@@ -6,20 +6,33 @@ namespace Ep\Tests\App\Filter;
 
 use Ep\Base\FilterTrait;
 use Ep\Contract\FilterInterface;
+use Ep\Tests\Support\Middleware\AddMiddleware;
+use Ep\Tests\Support\Middleware\FilterMiddleware;
+use Ep\Tests\Support\Middleware\InitMiddleware;
+use Ep\Tests\Support\Middleware\MultipleMiddleware;
 
 class OtherFilter implements FilterInterface
 {
     use FilterTrait;
 
+    public function __construct()
+    {
+        $this->setMiddlewares([
+            FilterMiddleware::class,
+            AddMiddleware::class,
+            InitMiddleware::class
+        ]);
+    }
+
     public function before($request)
     {
-        tes('other start');
+        // tes('other start');
         return true;
     }
 
     public function after($request, $response)
     {
-        tes('other over');
+        // tes('other over');
 
         return $response;
     }

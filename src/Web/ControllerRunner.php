@@ -23,7 +23,7 @@ final class ControllerRunner extends BaseControllerRunner
         $middlewares = $module->getMiddlewares();
         if ($middlewares) {
             $requestHandlerFactory = $this->container->get(RequestHandlerFactory::class);
-            return $this->container->get(RequestHandlerFactory::class)
+            return $requestHandlerFactory
                 ->wrap($middlewares, $requestHandlerFactory->create($this->wrapModule($module, $controller, $action)))
                 ->handle($request);
         } else {
@@ -42,7 +42,7 @@ final class ControllerRunner extends BaseControllerRunner
         $middlewares = $controller->getMiddlewares();
         if ($middlewares) {
             $requestHandlerFactory = $this->container->get(RequestHandlerFactory::class);
-            return $this->container->get(RequestHandlerFactory::class)
+            return $requestHandlerFactory
                 ->wrap($middlewares, $requestHandlerFactory->create($this->wrapController($controller, $action)))
                 ->handle($request);
         } else {
