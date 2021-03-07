@@ -6,6 +6,7 @@ namespace Ep\Db;
 
 use Ep;
 use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\Query as BaseQuery;
 
 class Query extends BaseQuery
@@ -62,5 +63,18 @@ class Query extends BaseQuery
     public function delete(string $table, $condition = '', array $params = []): int
     {
         return $this->createCommand()->delete($table, $condition, $params)->execute();
+    }
+
+    /**
+     * @param array|string $condition
+     */
+    public function increment(string $table, array $columns, $condition = '', array $params): int
+    {
+        foreach ($columns as $field => &$value) {
+            if (is_numeric($value)) {
+                $value = new Expression("`{$field}` + {$value}");
+            }
+        }
+        return $this->update($table, $columns, $condition, $params);
     }
 }

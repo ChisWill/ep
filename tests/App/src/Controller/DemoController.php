@@ -128,6 +128,8 @@ class DemoController extends Controller
         $upsert = 0;
         $delete = 0;
 
+        Query::find()->where(['>', 'name', 23])->andWhere('id=:id', [':id' => 123])->dump();
+
         $insert = Query::find()->insert('user', [
             'pid' => 1,
             'username' => 'a'
@@ -143,7 +145,9 @@ class DemoController extends Controller
         $upsert = Query::find()->upsert('user', ['id' => 72, 'username' => 'julia', 'age' => 99], ['age' => 33]);
         $delete = Query::find()->delete('user', ['id' => 75]);
 
-        return compact('insert', 'update', 'batchInsert', 'upsert', 'delete');
+        $increment = Query::find()->increment('user', ['age' => -1, 'name' => 'peter'], 'id=:id', [':id' => 9]);
+
+        return compact('insert', 'update', 'batchInsert', 'upsert', 'delete', 'increment');
     }
 
     public function eventAction(EventDispatcherInterface $dipatcher)

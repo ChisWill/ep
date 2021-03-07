@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App\Controller;
 
+use Closure;
 use Ep;
 use Ep\Contract\ErrorRendererInterface;
+use Ep\Db\Query;
+use Ep\Helper\Str;
+use Ep\Helper\System;
 use Ep\Tests\App\Component\Controller;
+use Ep\Tests\App\Model\User;
 use Ep\Tests\Support\Container\AngelWing;
 use Ep\Tests\Support\Container\Benz;
 use Ep\Tests\Support\Container\Bird;
@@ -27,8 +32,11 @@ use Ep\Web\ErrorHandler;
 use Ep\Web\ErrorRenderer;
 use Ep\Web\RequestHandlerFactory;
 use Ep\Web\ServerRequest;
+use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
+use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Redis\Connection;
 use Yiisoft\Di\CompositeContainer;
 use Yiisoft\Di\Container;
 
@@ -102,6 +110,46 @@ class TestController extends Controller
         return [
             'result' => $composite->get(MegaBird::class)
         ];
+    }
+
+    public function lockAction(Connection $redis)
+    {
+        $r = $this->lock(function () {
+            Query::find()->update('user', ['age' => new Expression('age+1')], ['AND', ['id' => 2], ['<', 'age', 100]]);
+        }, 1000);
+
+        return [
+            'r' => $r
+        ];
+    }
+
+    private function lock(callable $callback, int $expire = 1, int $count = 1)
+    {
+        /** @var Connection */
+        $redis = Ep::getDi()->get(Connection::class);
+
+        $key = self::class . System::getCallerName();
+        $value = Str::random();
+        $times = 10;
+        do {
+            $ok = $redis->set($key, $value, 'NX', 'PX', $expire * 1000);
+            if ($ok) {
+                $callback();
+                $script = <<<SCRIPT
+    if redis.call('get', KEYS[1]) == ARGV[1] then 
+        return redis.call('del', KEYS[1])
+    else
+        return 0
+    end
+    SCRIPT;
+                $redis->eval($script, 1, $key, $value);
+            } else {
+                $times--;
+                usleep(50 * 1000);
+            }
+        } while (!$ok && $times > 0);
+
+        return !!$ok;
     }
 
     public function emptyAction()

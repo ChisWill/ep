@@ -25,4 +25,9 @@ trait QueryTrait
     {
         return $this->createCommand()->getRawSql();
     }
+
+    public function dump(): void
+    {
+        test($this->getRawSql(), $this->createCommand()->getParams());
+    }
 }
