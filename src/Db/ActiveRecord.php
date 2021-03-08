@@ -66,7 +66,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
      */
     public function hasOne($class, array $link): BaseActiveQuery
     {
-        return parent::hasOne($class, $link)->alias(lcfirst(System::getCallerName('get')));
+        return parent::hasOne($class, $link)->alias(lcfirst(System::getCallerMethod('get')));
     }
 
     /**
@@ -74,7 +74,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
      */
     public function hasMany($class, array $link): BaseActiveQuery
     {
-        return parent::hasMany($class, $link)->alias(lcfirst(System::getCallerName('get')));
+        return parent::hasMany($class, $link)->alias(lcfirst(System::getCallerMethod('get')));
     }
 
     public function save(?array $attributeNames = null): bool
