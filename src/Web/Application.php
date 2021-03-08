@@ -10,7 +10,6 @@ use Ep\Base\Config;
 use Ep\Base\ErrorHandler;
 use Ep\Contract\NotFoundHandlerInterface;
 use Yiisoft\Http\Method;
-use Yiisoft\Middleware\Dispatcher\MiddlewareDispatcher;
 use Yiisoft\Yii\Web\SapiEmitter;
 use Yiisoft\Yii\Web\ServerRequestFactory;
 use Psr\Http\Message\ResponseInterface;

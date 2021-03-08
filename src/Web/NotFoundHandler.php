@@ -10,6 +10,7 @@ use Ep\Contract\NotFoundHandlerInterface;
 use Yiisoft\Http\Status;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use InvalidArgumentException;
 
 final class NotFoundHandler implements NotFoundHandlerInterface, ContextInterface
 {

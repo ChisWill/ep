@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Widget;
 
-use Yiisoft\Validator\Result;
 use Yiisoft\Validator\Rule;
-use Yiisoft\Validator\ValidationContext;
 use Yiisoft\Validator\Validator;
 
 trait FormTrait
