@@ -21,6 +21,20 @@ trait QueryTrait
             ->all();
     }
 
+    public function map(string $key, string $value): array
+    {
+        if (strpos($key, '.') === false) {
+            $column = $key;
+        } else {
+            $column = explode('.', $key)[1];
+        }
+        return $this
+            ->select([$value, $key])
+            ->indexBy($column)
+            ->asArray()
+            ->column();
+    }
+
     public function getRawSql(): string
     {
         return $this->createCommand()->getRawSql();

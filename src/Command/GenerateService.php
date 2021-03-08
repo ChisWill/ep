@@ -81,12 +81,13 @@ final class GenerateService
         return Str::toPascalCase(substr($this->getTableName(), strlen($this->prefix)));
     }
 
-    /**
-     * @return ColumnSchema[]
-     */
-    public function getColumns(): array
+    public function getProperty(): string
     {
-        return $this->schema->getColumns();
+        $property = '';
+        foreach ($this->getColumns() as $field => $column) {
+            $property .= ' * @property ' . $this->typecast($column->getPhpType()) . ' $' . $field . ($column->getComment() ? ' ' . $column->getComment() : '') . "\n";
+        }
+        return $property;
     }
 
     /**
@@ -172,31 +173,55 @@ final class GenerateService
         return [$use, $rules];
     }
 
-    public function typecast(): Closure
+    public function hasModel(): bool
     {
-        return function (string $type): string {
-            switch ($type) {
-                case 'integer':
-                    return 'int';
-                case 'boolean':
-                    return 'bool';
-                default:
-                    return $type;
-            }
-        };
+        return file_exists($this->getFileName());
     }
 
     public function createModel(string $content): string
     {
-        $filePath = sprintf('%s/%s/%s', dirname($this->autoloadPath, 2), $this->appPath, $this->path);
+        $filePath = $this->getFilePath();
         if (!file_exists($filePath)) {
             File::mkdir($filePath);
         }
-        if (@file_put_contents($filePath . '/' . $this->getClassName() . '.php', $content)) {
+        if (@file_put_contents($this->getFileName(), $content)) {
             return sprintf('%s.php has been created in %s', $this->getClassName(), $filePath);
         } else {
             return 'Generate model failed.';
         }
+    }
+
+    public function updateModel(): string
+    {
+        $filename = $this->getFileName();
+        $rules = [
+            '~(/\*\*\s).+( \*/\sclass)~s' => '$1' . $this->getProperty() . '$2',
+            '~(public const PK = ).+(;)~' => '$1' . $this->getPrimaryKey() . '$2',
+        ];
+        $content = preg_replace(array_keys($rules), array_values($rules), file_get_contents($filename));
+        if (@file_put_contents($filename, $content)) {
+            return sprintf('%s.php has been overrided in %s', $this->getClassName(), $this->getFilePath());
+        } else {
+            return 'Overwrite model failed.';
+        }
+    }
+
+    private function getFilePath(): string
+    {
+        return sprintf('%s/%s/%s', dirname($this->autoloadPath, 2), $this->appPath, $this->path);
+    }
+
+    private function getFileName(): string
+    {
+        return $this->getFilePath() . '/' . $this->getClassName() . '.php';
+    }
+
+    /**
+     * @return ColumnSchema[]
+     */
+    private function getColumns(): array
+    {
+        return $this->schema->getColumns();
     }
 
     /**
@@ -221,6 +246,18 @@ final class GenerateService
             throw new InvalidArgumentException('You should set the "autoload[psr-4]" configuration in your composer.json first.');
         }
         return $appPath;
+    }
+
+    private function typecast(string $type): string
+    {
+        switch ($type) {
+            case 'integer':
+                return 'int';
+            case 'boolean':
+                return 'bool';
+            default:
+                return $type;
+        }
     }
 
     /**

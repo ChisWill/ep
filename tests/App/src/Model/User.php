@@ -15,13 +15,20 @@ use Yiisoft\Validator\Rule\Number;
 use Yiisoft\Validator\ValidationContext;
 
 /**
- * @property int $id
+ * @property string $id
+ * @property int $pid
+ * @property string $name 名字
  * @property string $username
- * @property int $age
+ * @property string $password
+ * @property int $sex 性别
  * @property string $birthday
+ * @property string $age 年龄
+ * @property string $email 邮箱
  */
 class User extends ActiveRecord
 {
+    public const PK = 'id';
+
     public function tableName(): string
     {
         return 'user';

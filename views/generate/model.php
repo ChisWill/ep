@@ -8,9 +8,8 @@ use Ep\Db\ActiveRecord;
 <?= $rules[0] ?>
 
 /**
-<?php foreach ($columns as $field => $column): ?>
-<?= ' * @property ' . $typecast($column->getPhpType()) . ' $' . $field . ($column->getComment() ? ' ' . $column->getComment() : '') . "\n" ?>
-<?php endforeach ?> */
+<?= $property ?>
+ */
 class <?= $className ?> extends ActiveRecord
 {
     public const PK = <?= $primaryKey ?>;

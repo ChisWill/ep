@@ -32,14 +32,17 @@ final class GenerateCommand extends Command
             return $t->getMessage();
         }
 
+        if ($this->service->hasModel()) {
+            return $this->service->updateModel();
+        }
+
         $data = [
             'namespace' => $this->service->getNamespace(),
             'primaryKey' => $this->service->getPrimaryKey(),
             'tableName' => $this->service->getTableName(),
             'className' => $this->service->getClassName(),
-            'columns' => $this->service->getColumns(),
-            'rules' => $this->service->getRules(),
-            'typecast' => $this->service->typecast()
+            'property' => $this->service->getProperty(),
+            'rules' => $this->service->getRules()
         ];
 
         return $this->service->createModel(

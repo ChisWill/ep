@@ -111,6 +111,14 @@ class TestController extends Controller
         ];
     }
 
+    public function mapAction()
+    {
+        return User::find()
+            ->joinWith('parent')
+            ->where('user.age > 100')
+            ->map('parent.id', 'user.age');
+    }
+
     public function lockAction(Connection $redis)
     {
         $r = $this->lock(function () {

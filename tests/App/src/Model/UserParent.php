@@ -12,6 +12,7 @@ use Yiisoft\Validator\Rule\{
 
 /**
  * @property int $id
+ * @property int $gid
  * @property string $username
  * @property int $age
  */
