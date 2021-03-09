@@ -68,7 +68,7 @@ class Query extends BaseQuery
     /**
      * @param array|string $condition
      */
-    public function increment(string $table, array $columns, $condition = '', array $params): int
+    public function increment(string $table, array $columns, $condition = '', array $params = []): int
     {
         foreach ($columns as $field => &$value) {
             if (is_numeric($value)) {
