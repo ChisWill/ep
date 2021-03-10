@@ -67,19 +67,18 @@ final class Route implements ConfigurableInterface
      */
     private function replaceHandler($handler, array $params): array
     {
-        if (is_array($handler)) {
-            return [$handler, $params];
+        if (is_string($handler)) {
+            preg_match_all('/<(\w+)>/', $handler, $matches);
+            $match = array_flip($matches[1]);
+            $intersect = array_intersect_key($params, $match);
+            $params = array_diff_key($params, $match);
+            $captureParams = [];
+            foreach ($intersect as $key => &$value) {
+                $value = strtolower($value);
+                $captureParams['<' . $key . '>'] = trim($value, '/');
+            }
+            $handler = strtr($handler, $captureParams);
         }
-        preg_match_all('/<(\w+)>/', $handler, $matches);
-        $match = array_flip($matches[1]);
-        $intersect = array_intersect_key($params, $match);
-        $params = array_diff_key($params, $match);
-        $captureParams = [];
-        foreach ($intersect as $key => &$value) {
-            $value = strtolower($value);
-            $captureParams['<' . $key . '>'] = trim($value, '/');
-        }
-        $handler = strtr($handler, $captureParams);
         return [true, $handler, $params];
     }
 }
