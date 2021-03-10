@@ -12,6 +12,7 @@ use Ep\Helper\Str;
 use Ep\Helper\System;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Model\User;
+use Ep\Tests\App\Model\UserParent;
 use Ep\Tests\Support\Container\AngelWing;
 use Ep\Tests\Support\Container\Benz;
 use Ep\Tests\Support\Container\Bird;
@@ -39,6 +40,7 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Redis\Connection;
 use Yiisoft\Di\CompositeContainer;
 use Yiisoft\Di\Container;
+use Yiisoft\Strings\StringHelper;
 
 class TestController extends Controller
 {

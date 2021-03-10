@@ -9,13 +9,13 @@
 
 <form method="post" id="form">
     账号：
-    <input type="text" name="User[username]" value="<?= $user->username ?>">
+    <input type="text" name="user[username]" value="<?= $user->username ?>">
     密码：
-    <input type="text" name="User[password]" value="<?= $user->password ?>">
+    <input type="text" name="user[password]" value="<?= $user->password ?>">
     年龄：
-    <input type="text" name="User[age]" value="<?= $user->age ?>">
+    <input type="text" name="user[age]" value="<?= $user->age ?>">
     出生年月：
-    <input type="text" name="User[birthday]" value="<?= $user->birthday ?>">
+    <input type="text" name="user[birthday]" value="<?= $user->birthday ?>">
 
     <input type="submit" id="btn">
 </form>

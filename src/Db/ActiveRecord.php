@@ -36,7 +36,8 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
 
     public static function find(?ConnectionInterface $db = null): ActiveQuery
     {
-        return new ActiveQuery(static::class, $db ?: Ep::getDb());
+        return (new ActiveQuery(static::class, $db ?: Ep::getDb()))
+            ->alias(static::getAlias());
     }
 
     /**
@@ -108,13 +109,18 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
             if ($scope === '') {
                 $this->setAttributes($request->getParsedBody());
             } else {
-                $scope ??= StringHelper::baseName(static::class);
+                $scope ??= static::getAlias();
                 $this->setAttributes($request->getParsedBody()[$scope] ?? []);
             }
             return true;
         } else {
             return false;
         }
+    }
+
+    public static function getAlias(): string
+    {
+        return lcfirst(StringHelper::baseName(static::class));
     }
 
     /**
