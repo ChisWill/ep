@@ -103,7 +103,7 @@ return [
     // Default Redis
     RedisConnection::class => [
         '__class' => RedisConnection::class,
-        'host()' => [$config->redisHost],
+        'hostname()' => [$config->redisHost],
         'port()' => [$config->rediPort],
         'database()' => [$config->redisDatabase],
         'password()' => [$config->redisPassword]
