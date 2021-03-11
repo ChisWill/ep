@@ -28,6 +28,31 @@ final class ServerRequest implements ServerRequestInterface
         return ($this->request->getServerParams()['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
     }
 
+    public function getCurrentUrl(string $path = '', array $params = []): string
+    {
+        $uri = $this->request->getUri();
+        if ($path || $params) {
+            $url = '';
+            if (($scheme = $uri->getScheme()) !== '') {
+                $url .= $scheme . ':';
+            }
+            if (($authority = $uri->getAuthority()) !== '') {
+                $url .= '//' . $authority;
+            }
+            if ($path || ($path = $uri->getPath()) !== '') {
+                $url .= $path;
+            }
+            if ($params) {
+                $url .= '?' . http_build_query($params);
+            } elseif (($query = $uri->getQuery()) !== '') {
+                $url .= '?' . $query;
+            }
+            return $url;
+        } else {
+            return $uri->__toString();
+        }
+    }
+
     /**
      * {@inheritDoc}
      */

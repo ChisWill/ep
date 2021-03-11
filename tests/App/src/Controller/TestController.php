@@ -66,6 +66,16 @@ class TestController extends Controller
         return $this->render('/index/index', compact('message'));
     }
 
+    public function tAction(ServerRequest $serverRequest)
+    {
+        return [
+            $serverRequest->getCurrentUrl(),
+            $serverRequest->getCurrentUrl('/test/shop/admin'),
+            $serverRequest->getCurrentUrl('', ['a' => 1, 'b' => 'abc']),
+            $serverRequest->getCurrentUrl('/test/shop/admin', ['a' => 1, 'b' => 'abc'])
+        ];
+    }
+
     public function attrAction(ServerRequest $serverRequest)
     {
         $attributes = $serverRequest->getAttributes();
