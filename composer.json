@@ -7,9 +7,9 @@
     "prefer-stable": true,
     "require": {
         "php": ">=7.4",
-        "ext-curl": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
+        "chiswill/ep-helper": "*",
         "httpsoft/http-message": "^1.0.5",
         "nikic/fast-route": "^1.3",
         "yiisoft/active-record": "dev-master",
@@ -34,8 +34,7 @@
     },
     "autoload": {
         "files": [
-            "src/Ep.php",
-            "src/functions.php"
+            "src/Ep.php"
         ],
         "psr-4": {
             "Ep\\": "src"
