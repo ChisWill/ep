@@ -31,6 +31,9 @@ class Query extends BaseQuery
 
     public function batchInsert(string $table, array $columns, iterable $rows): int
     {
+        if (empty($rows)) {
+            return 0;
+        }
         return $this->createCommand()->batchInsert($table, $columns, $rows)->execute();
     }
 
