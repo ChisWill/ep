@@ -28,10 +28,7 @@ final class Ep
 
         self::$di = new CompositeContainer();
         self::$di->attach(new Container(
-            Arr::merge(
-                require(Alias::get('@ep/config/definitions.php')),
-                self::$config->getDefinitions()
-            )
+            self::$config->getDefinitions() + require(Alias::get('@ep/config/definitions.php'))
         ));
     }
 
