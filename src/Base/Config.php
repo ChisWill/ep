@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
+use Ep\Helper\Alias;
 use Ep\Web\Middleware\InterceptorMiddleware;
 use Ep\Web\Middleware\RouteMiddleware;
 use Yiisoft\Http\Method;
@@ -126,13 +127,13 @@ final class Config
      */
     public string $language = 'zh-CN';
     /**
-     * di 配置
-     */
-    public array $definitions = [];
-    /**
      * 常规配置项
      */
     public array $params = [];
+    /**
+     * di 配置文件地址
+     */
+    private string $definitions = '@root/config/definitions.php';
     /**
      * 以匿名函数方式设置路由规则，具体方式参看示例
      * 
@@ -169,6 +170,16 @@ final class Config
     public function __set(string $name, $value)
     {
         throw new InvalidArgumentException("The \"{$name}\" configuration is invalid.");
+    }
+
+    public function getDefinitions(): array
+    {
+        $filename = Alias::get($this->definitions);
+        if (file_exists($filename)) {
+            return require($filename);
+        } else {
+            return [];
+        }
     }
 
     public function getRouteRule(): Closure

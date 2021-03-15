@@ -30,7 +30,7 @@ final class Ep
         self::$di->attach(new Container(
             Arr::merge(
                 require(Alias::get('@ep/config/definitions.php')),
-                self::$config->definitions
+                self::$config->getDefinitions()
             )
         ));
     }
