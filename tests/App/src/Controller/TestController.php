@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App\Controller;
 
-use Closure;
 use Ep;
 use Ep\Contract\ErrorRendererInterface;
 use Ep\Db\Query;
@@ -15,7 +14,6 @@ use Ep\Tests\App\Model\User;
 use Ep\Tests\App\Model\UserParent;
 use Ep\Tests\Support\Container\AngelWing;
 use Ep\Tests\Support\Container\Benz;
-use Ep\Tests\Support\Container\Bird;
 use Ep\Tests\Support\Container\BMW;
 use Ep\Tests\Support\Container\CarInterface;
 use Ep\Tests\Support\Container\DragoonEngine;
@@ -67,6 +65,10 @@ class TestController extends Controller
     }
 
     public function tAction(ServerRequest $serverRequest)
+    {
+    }
+
+    public function testUrlAction(ServerRequest $serverRequest)
     {
         return [
             $serverRequest->getCurrentUrl(),

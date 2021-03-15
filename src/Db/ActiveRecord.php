@@ -41,6 +41,16 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     }
 
     /**
+     * @param  mixed $pk
+     * 
+     * @return static|null
+     */
+    public static function findOne($pk)
+    {
+        return static::find()->where([static::PK => $pk])->one();
+    }
+
+    /**
      * @param  int|string|array|ExpressionInterface $condition
      * 
      * @return static

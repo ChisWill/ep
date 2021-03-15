@@ -9,6 +9,7 @@ use Ep\Contract\ConfigurableInterface;
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\ModuleInterface;
 use Ep\Contract\NotFoundException;
+use Ep\Helper\Str;
 use Yiisoft\Injector\Injector;
 use Psr\Container\ContainerInterface;
 use InvalidArgumentException;
@@ -170,7 +171,7 @@ class ControllerRunner implements ConfigurableInterface
         } else {
             $ns = $this->suffix;
         }
-        $class = sprintf('%s\\%s\\%s', $this->config->appNamespace, $ns, ucfirst($controller) . $this->suffix);
+        $class = sprintf('%s\\%s\\%s', $this->config->appNamespace, $ns, Str::toPascalCase($controller, '-') . $this->suffix);
         return [$prefix, $class, $action];
     }
 
