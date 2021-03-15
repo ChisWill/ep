@@ -17,13 +17,14 @@ use HttpSoft\Message\StreamFactory;
 use HttpSoft\Message\UploadedFileFactory;
 use HttpSoft\Message\UriFactory;
 use Yiisoft\Cache\Cache;
-use Yiisoft\Cache\CacheInterface;
+use Yiisoft\Cache\CacheInterface as YiiCacheInterface;
 use Yiisoft\Cache\File\FileCache;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Connection\LazyConnectionDependencies;
 use Yiisoft\Db\Mysql\Connection as MysqlConnection;
 use Yiisoft\Db\Redis\Connection as RedisConnection;
 use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
+use Yiisoft\EventDispatcher\Provider\ListenerCollection;
 use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target\File\FileRotator;
@@ -42,6 +43,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 
 $config = Ep::getConfig();
 
@@ -79,11 +81,13 @@ return [
     ],
     LoggerInterface::class => static fn (FileTarget $fileTarget): LoggerInterface => new Logger([$fileTarget]),
     // Cache
-    CacheInterface::class => static fn (): CacheInterface => new Cache(new FileCache(Alias::get($config->runtimeDir . '/cache'))),
+    CacheInterface::class => static fn (): CacheInterface => new FileCache(Alias::get($config->runtimeDir . '/cache')),
+    YiiCacheInterface::class => Cache::class,
     // Profiler
     ProfilerInterface::class => Profiler::class,
     // Event
-    ListenerProviderInterface::class => static fn (ContainerInterface $container): ListenerProviderInterface => new Provider($container->get(ListenerCollectionFactory::class)->create($config->events)),
+    ListenerCollection::class => static fn (ContainerInterface $container): ListenerCollection => $container->get(ListenerCollectionFactory::class)->create($config->events),
+    ListenerProviderInterface::class => Provider::class,
     EventDispatcherInterface::class => Dispatcher::class,
     // Default ErrorRenderer
     ErrorRendererInterface::class => ErrorRenderer::class,

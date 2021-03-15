@@ -86,7 +86,7 @@ class DemoController extends Controller
 
         $r = $cache->getOrSet('name', fn () => mt_rand(0, 100), 5);
 
-        return $this->string($r);
+        return $this->string((string) $r);
     }
 
     public function saveAction()

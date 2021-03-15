@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Ep\Base\Config;
 use Ep\Helper\Alias;
-use Ep\Helper\Arr;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Redis\Connection as RedisConnection;
