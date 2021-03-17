@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\Console;
 
 use Ep;
+use Ep\Base\Application as BaseApplication;
 use Ep\Base\Config;
 use Ep\Base\ControllerRunner;
 use Ep\Base\ErrorHandler;
@@ -12,7 +13,7 @@ use Ep\Base\Route;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\NotFoundException;
 
-final class Application extends \Ep\Base\Application
+final class Application extends BaseApplication
 {
     private Config $config;
     private ConsoleRequestInterface $consoleRequest;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Web;
 
-use Ep\Base\ContextTrait;
+use Ep\Contract\ContextTrait;
 use Ep\Contract\ContextInterface;
 use Ep\Contract\NotFoundHandlerInterface;
 use Yiisoft\Http\Status;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ep\Base;
+namespace Ep\Contract;
 
 trait FilterTrait
 {

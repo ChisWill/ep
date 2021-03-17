@@ -6,7 +6,7 @@ namespace Ep\Web;
 
 use Ep;
 use Ep\Base\Config;
-use Ep\Base\ContextTrait;
+use Ep\Contract\ContextTrait;
 use Ep\Base\ErrorHandler;
 use Ep\Contract\ContextInterface;
 use Ep\Contract\WebErrorHandlerInterface;
@@ -14,7 +14,6 @@ use Ep\Contract\ErrorRendererInterface;
 use Ep\Helper\Alias;
 use Ep\Helper\Date;
 use Yiisoft\Http\Method;
-use Yiisoft\Http\Status;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -63,7 +62,6 @@ final class ErrorRenderer implements ErrorRendererInterface, ContextInterface
     public function render(Throwable $t, $request = null): string
     {
         if ($this->config->debug) {
-            http_response_code(Status::INTERNAL_SERVER_ERROR);
             return $this
                 ->getView()
                 ->renderPartial('development', [

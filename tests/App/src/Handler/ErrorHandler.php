@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ep\Tests\App\Handler;
 
 use Ep;
-use Ep\Base\ContextTrait;
+use Ep\Contract\ContextTrait;
 use Ep\Contract\WebErrorHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;

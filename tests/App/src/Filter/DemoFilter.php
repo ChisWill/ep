@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App\Filter;
 
-use Ep\Base\FilterTrait;
 use Ep\Contract\FilterInterface;
+use Ep\Contract\FilterTrait;
 
 class DemoFilter implements FilterInterface
 {

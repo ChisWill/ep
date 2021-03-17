@@ -6,6 +6,7 @@ namespace Ep\Base;
 
 use Ep;
 use Ep\Contract\ConfigurableInterface;
+use Ep\Contract\ConfigurableTrait;
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\ModuleInterface;
 use Ep\Contract\NotFoundException;

@@ -150,6 +150,7 @@ class DemoController extends Controller
 
     public function eventAction(EventDispatcherInterface $dipatcher)
     {
+        1 / 0;
         $dipatcher->dispatch($this);
     }
 

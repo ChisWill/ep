@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Ep\Web;
 
 use Ep;
-use Ep\Base\ContextTrait;
-use Ep\Base\FilterTrait;
+use Ep\Contract\ContextTrait;
 use Ep\Contract\ControllerInterface;
+use Ep\Contract\FilterTrait;
 use Yiisoft\Http\Status;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;

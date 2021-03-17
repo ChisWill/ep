@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Ep\Tests\App\Filter;
 
 use Ep;
-use Ep\Base\FilterTrait;
 use Ep\Contract\FilterInterface;
-use Ep\Tests\Support\Middleware\AddMiddleware;
+use Ep\Contract\FilterTrait;
 use Ep\Tests\Support\Middleware\FilterMiddleware;
 use Ep\Tests\Support\Middleware\InitMiddleware;
 use Ep\Tests\Support\Middleware\MultipleMiddleware;
-use Ep\Web\Service;
 
 class RootFilter implements FilterInterface
 {

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Ep\Console;
 
 use Ep;
-use Ep\Base\ContextTrait;
-use Ep\Base\FilterTrait;
+use Ep\Contract\ContextTrait;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ControllerInterface;
+use Ep\Contract\FilterTrait;
 use LogicException;
 
 abstract class Command implements ControllerInterface
