@@ -77,7 +77,7 @@ final class Config
     /**
      * 默认路由规则
      */
-    public array $defaultRoute = [[Method::GET, Method::POST], '{prefix:[\w/]*?}{controller:/?[a-zA-Z][\w-]*|}{action:/?[a-zA-Z]\w*|}', '<prefix>/<controller>/<action>'];
+    public array $defaultRoute = [Method::ALL, '{prefix:[\w/-]*?}{controller:/?[a-zA-Z][\w-]*|}{action:/?[a-zA-Z][\w-]*|}', '<prefix>/<controller>/<action>'];
     /**
      * Web 中间件
      */

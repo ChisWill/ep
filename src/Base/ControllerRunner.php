@@ -164,7 +164,7 @@ class ControllerRunner implements ConfigurableInterface
             default:
                 $action = array_pop($pieces) ?: $this->config->defaultAction;
                 $controller = array_pop($pieces) ?: $this->config->defaultController;
-                $prefix = implode('\\', array_map('ucfirst', $pieces));
+                $prefix = implode('\\', array_map([Str::class, 'toPascalCase'], $pieces));
                 break;
         }
         if ($prefix) {

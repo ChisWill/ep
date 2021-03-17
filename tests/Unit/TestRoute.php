@@ -18,7 +18,7 @@ class TestRoute extends TestCase
             [
                 'rule' => function (RouteCollector $route) {
                     $rule = Ep::getConfig()->defaultRoute;
-                    $route->addGroup('/', fn (RouteCollector $r) => $r->addRoute(...$rule));
+                    $route->addGroup(Ep::getConfig()->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$rule));
                 },
                 'cases' => [
                     [
@@ -32,13 +32,23 @@ class TestRoute extends TestCase
                         'params' => []
                     ],
                     [
+                        'path' => '/ctrl-suffix',
+                        'handler' => '/ctrl-suffix/',
+                        'params' => []
+                    ],
+                    [
                         'path' => '/ctrl/act',
                         'handler' => '/ctrl/act',
                         'params' => []
                     ],
                     [
-                        'path' => '/pre/ctrl/act',
-                        'handler' => 'pre/ctrl/act',
+                        'path' => '/ctrl-suffix/act-suf',
+                        'handler' => '/ctrl-suffix/act-suf',
+                        'params' => []
+                    ],
+                    [
+                        'path' => '/pre-s/ctrl-f/act-x',
+                        'handler' => 'pre-s/ctrl-f/act-x',
                         'params' => []
                     ],
                     [
@@ -52,20 +62,15 @@ class TestRoute extends TestCase
                         'params' => []
                     ],
                     [
-                        'path' => '/pre/fix/ctrl/act/',
-                        'handler' => 'pre/fix/ctrl/act',
+                        'path' => '/pre/fix/ctrl-suffix/act',
+                        'handler' => 'pre/fix/ctrl-suffix/act',
                         'params' => []
                     ],
                     [
-                        'path' => '/pre2/3fix/ctrl/act/',
-                        'handler' => 'pre2/3fix/ctrl/act',
+                        'path' => '/pre-2/fix-n/ctrl-f/act-a',
+                        'handler' => 'pre-2/fix-n/ctrl-f/act-a',
                         'params' => []
-                    ],
-                    [
-                        'path' => '/3pre2/3fix/of/ctrl/act/',
-                        'handler' => '3pre2/3fix/of/ctrl/act',
-                        'params' => []
-                    ],
+                    ]
                 ]
             ],
             [
@@ -136,7 +141,7 @@ class TestRoute extends TestCase
         $route->defaultRoute = false;
         foreach ($cases as $row) {
             try {
-                [$handler, $params] = $route
+                [, $handler, $params] = $route
                     ->clone([
                         'rule' => $rule,
                     ])
