@@ -172,7 +172,7 @@ class ControllerRunner implements ConfigurableInterface
         } else {
             $ns = $this->suffix;
         }
-        $class = sprintf('%s\\%s\\%s', $this->config->appNamespace, $ns, Str::toPascalCase($controller, '-') . $this->suffix);
+        $class = sprintf('%s\\%s\\%s', $this->config->appNamespace, $ns, Str::toPascalCase($controller) . $this->suffix);
         return [$prefix, $class, $action];
     }
 
