@@ -65,6 +65,11 @@ abstract class Controller implements ControllerInterface
         return $this->getService()->json($data);
     }
 
+    protected function status(int $statusCode): ResponseInterface
+    {
+        return $this->getService()->status($statusCode);
+    }
+
     protected function render(string $view, array $params = []): ResponseInterface
     {
         return $this->getService()->string($this->getView()->render($view, $params));
