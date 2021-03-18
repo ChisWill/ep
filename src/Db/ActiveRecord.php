@@ -117,11 +117,12 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     {
         if ($request->getMethod() === Method::POST) {
             if ($scope === '') {
-                $this->setAttributes($request->getParsedBody());
+                $data = $request->getParsedBody();
             } else {
                 $scope ??= static::getAlias();
-                $this->setAttributes($request->getParsedBody()[$scope] ?? []);
+                $data = $request->getParsedBody()[$scope] ?? [];
             }
+            $this->setAttributes(array_diff_key($data, array_flip($this->primaryKey())));
             return true;
         } else {
             return false;
