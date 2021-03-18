@@ -70,7 +70,7 @@ class DemoController extends Controller
     {
         $id = User::find()->orderBy('id DESC')->select('id')->scalar();
 
-        return $this->redirect('form?id=' . $id);
+        return $this->redirect('arform?id=' . $id);
     }
 
     public function loggerAction()
