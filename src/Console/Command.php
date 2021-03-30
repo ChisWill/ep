@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Console;
 
-use Ep;
 use Ep\Contract\ContextTrait;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ControllerInterface;
@@ -41,11 +40,6 @@ abstract class Command implements ControllerInterface
     protected function alias(): array
     {
         return [];
-    }
-
-    public function getViewPath(): string
-    {
-        return Ep::getConfig()->viewPath;
     }
 
     /**

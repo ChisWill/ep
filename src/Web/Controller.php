@@ -47,11 +47,6 @@ abstract class Controller implements ControllerInterface
         return $this->service;
     }
 
-    public function getViewPath(): string
-    {
-        return Ep::getConfig()->viewPath;
-    }
-
     protected function string(string $data = '', int $statusCode = Status::OK): ResponseInterface
     {
         return $this->getService()->string($data, $statusCode);

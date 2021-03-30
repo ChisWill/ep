@@ -14,7 +14,7 @@ class InitCommand extends Command
     {
         return [
             'table' => 1,
-            'field' => 3
+            'field' => 2
         ];
     }
 

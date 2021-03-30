@@ -2,24 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Ep\Tests\App\Handler;
+namespace Ep\Tests\App\Component;
 
-use Ep;
 use Ep\Contract\ContextTrait;
-use Ep\Contract\WebErrorHandlerInterface;
+use Ep\Contract\WebErrorRendererInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
-class ErrorHandler implements WebErrorHandlerInterface
+class ErrorRenderer implements WebErrorRendererInterface
 {
     use ContextTrait;
 
     public string $id = 'error';
-
-    public function getViewPath(): string
-    {
-        return Ep::getConfig()->viewPath;
-    }
 
     public function render(Throwable $t, ServerRequestInterface $request): string
     {

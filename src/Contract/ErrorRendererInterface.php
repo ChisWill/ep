@@ -8,7 +8,7 @@ use Throwable;
 
 interface ErrorRendererInterface
 {
-    public function render(Throwable $t, $request = null): string;
+    public function render(Throwable $t, $request): string;
 
-    public function log(Throwable $t, $request = null): void;
+    public function log(Throwable $t, $request): void;
 }

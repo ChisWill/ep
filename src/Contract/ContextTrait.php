@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Contract;
 
+use Ep;
 use Ep\Base\View;
 
 trait ContextTrait
@@ -18,5 +19,8 @@ trait ContextTrait
         return $this->view;
     }
 
-    abstract public function getViewPath(): string;
+    public function getViewPath(): string
+    {
+        return Ep::getConfig()->viewPath;
+    }
 }

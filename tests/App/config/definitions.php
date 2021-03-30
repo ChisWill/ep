@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use Ep\Contract\InterceptorInterface;
-use Ep\Contract\WebErrorHandlerInterface;
+use Ep\Contract\WebErrorRendererInterface;
+use Ep\Tests\App\Component\ErrorRenderer;
 use Ep\Tests\App\Component\Interceptor;
-use Ep\Tests\App\Handler\ErrorHandler;
 
 return [
-    WebErrorHandlerInterface::class => ErrorHandler::class,
+    WebErrorRendererInterface::class => ErrorRenderer::class,
     InterceptorInterface::class => Interceptor::class
 ];

@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Ep\Console;
 
-use Ep\Base\ErrorHandler;
+use Ep\Base\ErrorRenderer as BaseErrorRenderer;
 use Ep\Contract\ConsoleRequestInterface;
-use Ep\Contract\ErrorRendererInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-final class ErrorRenderer implements ErrorRendererInterface
+final class ErrorRenderer extends BaseErrorRenderer
 {
     private LoggerInterface $logger;
 
@@ -20,17 +19,9 @@ final class ErrorRenderer implements ErrorRendererInterface
     }
 
     /**
-     * @param ConsoleRequestInterface|null $request
+     * @param ConsoleRequestInterface $request
      */
-    public function render(Throwable $t, $request = null): string
-    {
-        return ErrorHandler::convertToString($t);
-    }
-
-    /**
-     * @param ConsoleRequestInterface|null $request
-     */
-    public function log(Throwable $t, $request = null): void
+    public function log(Throwable $t, $request): void
     {
         $context = [
             'category' => self::class
@@ -40,6 +31,6 @@ final class ErrorRenderer implements ErrorRendererInterface
             $context['params'] = $request->getParams();
         }
 
-        $this->logger->error(ErrorHandler::convertToString($t), $context);
+        $this->logger->error($this->render($t, $request), $context);
     }
 }

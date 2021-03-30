@@ -1,14 +1,12 @@
 <?php
 
-use Ep\Base\ErrorHandler;
-
 /**
  * @var Throwable $exception
  * @var Psr\Http\Message\ServerRequestInterface|null $request
  * @var Ep\Web\View $this
- * @var Ep\Web\ErrorRenderer $handler
+ * @var Ep\Web\ErrorRenderer $renderer
  */
-$handler = $this->context;
+$renderer = $this->context;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,16 +24,16 @@ $handler = $this->context;
 
 <body>
     <div class="header">
-        <h1><?= ($exception instanceof ErrorException ? '<span>' . ErrorHandler::getErrorName($exception->getSeverity()) . '</span> &ndash; ' : '') . get_class($exception) ?></h1>
-        <h2><?= nl2br($handler->htmlEncode($exception->getMessage())) ?></h2>
-        <?= $handler->renderPreviousException($exception) ?>
+        <h1><?= ($exception instanceof ErrorException ? '<span>' . $renderer->getErrorName($exception->getSeverity()) . '</span> &ndash; ' : '') . get_class($exception) ?></h1>
+        <h2><?= nl2br($renderer->htmlEncode($exception->getMessage())) ?></h2>
+        <?= $renderer->renderPreviousException($exception) ?>
     </div>
 
     <div class="call-stack">
         <ul>
-            <?= $handler->renderCallStackItem($exception->getFile(), $exception->getLine(), null, null, [], 1) ?>
+            <?= $renderer->renderCallStackItem($exception->getFile(), $exception->getLine(), null, null, [], 1) ?>
             <?php for ($i = 0, $trace = $exception->getTrace(), $length = count($trace); $i < $length; ++$i) : ?>
-                <?= $handler->renderCallStackItem(
+                <?= $renderer->renderCallStackItem(
                     $trace[$i]['file'] ?? null,
                     $trace[$i]['line'] ?? null,
                     $trace[$i]['class'] ?? null,
@@ -47,16 +45,14 @@ $handler = $this->context;
         </ul>
     </div>
 
-    <?php if ($request) : ?>
-        <div class="request">
-            <div class="code">
-                <?= $handler->renderRequest($request) ?>
-            </div>
+    <div class="request">
+        <div class="code">
+            <?= $renderer->renderRequest($request) ?>
         </div>
-    <?php endif ?>
+    </div>
 
     <div class="footer">
-        <?php foreach ($handler->getServerInfo() as $title => $info) : ?>
+        <?php foreach ($renderer->getServerInfo($request) as $title => $info) : ?>
             <?= '<p>' . $title . '：' . $info . '</p>' ?>
         <?php endforeach ?>
     </div>

@@ -14,15 +14,15 @@ interface ConsoleRequestInterface
     /**
      * 标准输入格式为：
      * 
-     * `-d p1=v1 -force p2=v2`
+     * `-d -force p1=v1 p2=v2`
      * 
      * 返回格式为：
      * 
      * ```
      * [
      *     'd' => true,
-     *     'p1' => 'v1',
      *     'force' => true,
+     *     'p1' => 'v1',
      *     'p2' => 'v2',
      * ]
      * ```

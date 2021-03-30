@@ -6,11 +6,10 @@ namespace Ep\Web;
 
 use Ep;
 use Ep\Base\Config;
+use Ep\Base\ErrorRenderer as BaseErrorRenderer;
 use Ep\Contract\ContextTrait;
-use Ep\Base\ErrorHandler;
 use Ep\Contract\ContextInterface;
-use Ep\Contract\WebErrorHandlerInterface;
-use Ep\Contract\ErrorRendererInterface;
+use Ep\Contract\WebErrorRendererInterface;
 use Ep\Helper\Alias;
 use Ep\Helper\Date;
 use Yiisoft\Http\Method;
@@ -20,7 +19,7 @@ use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Throwable;
 
-final class ErrorRenderer implements ErrorRendererInterface, ContextInterface
+final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
 {
     use ContextTrait;
 
@@ -59,7 +58,7 @@ final class ErrorRenderer implements ErrorRendererInterface, ContextInterface
      * 
      * @return string
      */
-    public function render(Throwable $t, $request = null): string
+    public function render(Throwable $t, $request): string
     {
         if ($this->config->debug) {
             return $this
@@ -69,9 +68,9 @@ final class ErrorRenderer implements ErrorRendererInterface, ContextInterface
                     'request' => $request
                 ]);
         } else {
-            if ($this->container->has(WebErrorHandlerInterface::class)) {
+            if ($this->container->has(WebErrorRendererInterface::class)) {
                 return $this->container
-                    ->get(WebErrorHandlerInterface::class)
+                    ->get(WebErrorRendererInterface::class)
                     ->render($t, $request);
             } else {
                 return $this->getView()->renderPartial('production');
@@ -80,9 +79,9 @@ final class ErrorRenderer implements ErrorRendererInterface, ContextInterface
     }
 
     /**
-     * @param ServerRequestInterface|null $request
+     * @param ServerRequestInterface $request
      */
-    public function log(Throwable $t, $request = null): void
+    public function log(Throwable $t, $request): void
     {
         $context = [
             'category' => self::class
@@ -95,7 +94,7 @@ final class ErrorRenderer implements ErrorRendererInterface, ContextInterface
                 $context['post'] = $request->getParsedBody();
             }
         }
-        $this->logger->error(ErrorHandler::convertToString($t), $context);
+        $this->logger->error(parent::render($t, $request), $context);
     }
 
     public function renderPreviousException(Throwable $t): string
@@ -210,11 +209,11 @@ final class ErrorRenderer implements ErrorRendererInterface, ContextInterface
         return implode(', ', $args);
     }
 
-    public function getServerInfo(): array
+    public function getServerInfo(ServerRequestInterface $request): array
     {
         return [
             'Now' => Date::fromUnix(),
-            'Server' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
+            'Server' => $request->getServerParams()['SERVER_SOFTWARE'] ?? 'Unknown',
             'PHP Version' => phpversion(),
             'Time Zone' => @ini_get('date.timezone') ?: 'Unknown',
             'Timeout' => @ini_get('max_execution_time') ?: 'Unknown',
