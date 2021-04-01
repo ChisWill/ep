@@ -6,6 +6,18 @@ declare(strict_types=1);
 use Ep\Console\Application;
 
 (static function () {
+    if (count($_SERVER['argv']) === 1) {
+        echo <<<HELP
+
+The following commands are available:
+
+- generate/model
+- clear
+
+HELP;
+        exit(0);
+    }
+
     $cwd = getcwd();
     if (file_exists($cwd . '/.ep')) {
         $content = str_replace("\r\n", "\n", file_get_contents($cwd . '/.ep'));
@@ -21,27 +33,26 @@ use Ep\Console\Application;
         $params = [];
     }
 
-    $autoloadPath = $params['autoload'] ?? null;
+    $possibleAutoloadPaths = [
+        $params['autoload'] ?? '',
+        $cwd . '/vendor/autoload.php',
+        dirname($cwd) . '/autoload.php'
+    ];
 
+    $autoloadPath = null;
+    foreach ($possibleAutoloadPaths as $path) {
+        if (file_exists($path)) {
+            $autoloadPath = $path;
+            break;
+        }
+    }
     if ($autoloadPath === null) {
-        $possibleAutoloadPaths = [
-            $cwd . '/vendor/autoload.php',
-            dirname($cwd) . '/autoload.php'
-        ];
-        foreach ($possibleAutoloadPaths as $path) {
-            if (file_exists($path)) {
-                $autoloadPath = $path;
-                break;
-            }
-        }
-        if ($autoloadPath === null) {
-            $message = "Unable to find vendor/autoload.php in your current directory.\n";
-            $message .= "You should:\n";
-            $message .= "- run ./bin/ep from project root.\n";
-            $message .= "- run ./ep from vendor/bin.\n";
-            fwrite(STDERR, $message);
-            exit(1);
-        }
+        $message = "Unable to find vendor/autoload.php in your current directory.\n";
+        $message .= "You should:\n";
+        $message .= "- run ./bin/ep from project root.\n";
+        $message .= "- run ./ep from vendor/bin.\n";
+        fwrite(STDERR, $message);
+        exit(1);
     }
     require_once $autoloadPath;
 

@@ -50,6 +50,7 @@ final class ConsoleRequest implements ConsoleRequestInterface
                     } catch (ErrorException $e) {
                         echo <<<HELP
 Error: invalid param "{$this->options[$i]}"
+
 HELP;
                         exit(1);
                     }

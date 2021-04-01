@@ -70,9 +70,10 @@ final class Application extends BaseApplication
                 ->configure(['suffix' => $this->config->commandDirAndSuffix])
                 ->run($handler, $request);
         } catch (NotFoundException $e) {
-            $command = trim($handler, '/');
+            $command = trim($request->getRoute(), '/');
             echo <<<HELP
 Error: unknown command "{$command}"
+
 HELP;
             exit(1);
         }
