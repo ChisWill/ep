@@ -20,7 +20,6 @@ use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface as YiiCacheInterface;
 use Yiisoft\Cache\File\FileCache;
 use Yiisoft\Db\Connection\Connection;
-use Yiisoft\Db\Connection\LazyConnectionDependencies;
 use Yiisoft\Db\Mysql\Connection as MysqlConnection;
 use Yiisoft\Db\Redis\Connection as RedisConnection;
 use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
@@ -94,16 +93,12 @@ return [
     // Default NotFoundHandler
     NotFoundHandlerInterface::class => NotFoundHandler::class,
     // Default DB
-    Connection::class => static function (ContainerInterface $container) use ($config): Connection {
-        $connection = new MysqlConnection(
-            $config->mysqlDsn,
-            new LazyConnectionDependencies($container)
-        );
-        $connection->setUsername($config->mysqlUsername);
-        $connection->setPassword($config->mysqlPassword);
-
-        return $connection;
-    },
+    Connection::class => [
+        '__class' => MysqlConnection::class,
+        '__construct()' => [$config->mysqlDsn],
+        'setUsername()' => [$config->mysqlUsername],
+        'setPassword()' => [$config->mysqlPassword]
+    ],
     // Default Redis
     RedisConnection::class => [
         '__class' => RedisConnection::class,
