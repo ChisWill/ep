@@ -13,6 +13,7 @@
         "httpsoft/http-message": "^1.0.5",
         "nikic/fast-route": "^1.3",
         "yiisoft/active-record": "dev-master",
+        "yiisoft/aliases": "^1.1.0",
         "yiisoft/arrays": "^1.0",
         "yiisoft/assets": "1.0.x-dev",
         "yiisoft/cache-file": "dev-master",
