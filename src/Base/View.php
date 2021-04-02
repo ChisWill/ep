@@ -6,22 +6,24 @@ namespace Ep\Base;
 
 use Ep;
 use Ep\Contract\ContextInterface;
-use Ep\Helper\Alias;
+use Yiisoft\Aliases\Aliases;
 
 class View
 {
     public string $layout = 'main';
 
+    private Aliases $aliases;
     private string $viewPath;
-    private string $layoutDir;
     protected ?ContextInterface $context = null;
     private string $contextId;
+    private string $layoutDir;
 
     /**
      * @param ContextInterface|string $context
      */
     public function __construct(string $viewPath, $context)
     {
+        $this->aliases = Ep::getDi()->get(Aliases::class);
         $this->viewPath = $viewPath;
         $this->layoutDir = Ep::getConfig()->layoutDir;
         if ($context instanceof ContextInterface) {
@@ -70,7 +72,7 @@ class View
 
     private function findViewFile(string $path, bool $isPHPFile = true): string
     {
-        return Alias::get($this->viewPath . $path . ($isPHPFile ? '.php' : ''));
+        return $this->aliases->get($this->viewPath . $path . ($isPHPFile ? '.php' : ''));
     }
 
     /**

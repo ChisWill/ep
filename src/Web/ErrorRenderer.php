@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Ep\Web;
 
-use Ep;
 use Ep\Base\Config;
 use Ep\Base\ErrorRenderer as BaseErrorRenderer;
 use Ep\Contract\ContextTrait;
 use Ep\Contract\ContextInterface;
 use Ep\Contract\WebErrorRendererInterface;
-use Ep\Helper\Alias;
 use Ep\Helper\Date;
+use Yiisoft\Aliases\Aliases;
 use Yiisoft\Http\Method;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -30,14 +29,18 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
     private Config $config;
     private ContainerInterface $container;
     private LoggerInterface $logger;
+    private Aliases $aliases;
 
     public function __construct(
+        Config $config,
         ContainerInterface $container,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Aliases $aliases
     ) {
-        $this->config = Ep::getConfig();
+        $this->config = $config;
         $this->container = $container;
         $this->logger = $logger;
+        $this->aliases = $aliases;
     }
 
     public function __get($name)
@@ -152,7 +155,7 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
 
     public function isVendorFile(?string $file): bool
     {
-        return $file === null || strpos($file, Alias::get('@vendor')) === 0;
+        return $file === null || strpos($file, $this->aliases->get('@vendor')) === 0;
     }
 
     public function htmlEncode(string $text): string

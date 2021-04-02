@@ -4,27 +4,25 @@ declare(strict_types=1);
 
 namespace Ep\Command;
 
-use Ep;
 use Ep\Base\Config;
 use Ep\Console\Command;
-use Ep\Console\ConsoleRequest;
-use Ep\Helper\Alias;
 use Ep\Helper\File;
+use Yiisoft\Aliases\Aliases;
 use RuntimeException;
 
 final class ClearCommand extends Command
 {
     private Config $config;
 
-    public function __construct()
+    public function __construct(Config $config)
     {
-        $this->config = Ep::getConfig();
+        $this->config = $config;
     }
 
-    public function indexAction(ConsoleRequest $request): string
+    public function indexAction(Aliases $aliases): string
     {
         try {
-            $runtimeDir = Alias::get($this->config->runtimeDir);
+            $runtimeDir = $aliases->get($this->config->runtimeDir);
             File::rmdir($runtimeDir);
             File::mkdir($runtimeDir);
             return '';

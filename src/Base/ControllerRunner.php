@@ -24,9 +24,9 @@ class ControllerRunner implements ConfigurableInterface
     protected Injector $injector;
     protected string $suffix;
 
-    public function __construct(ContainerInterface $container, Injector $injector)
+    public function __construct(Config $config, ContainerInterface $container, Injector $injector)
     {
-        $this->config = Ep::getConfig();
+        $this->config = $config;
         $this->container = $container;
         $this->injector = $injector;
         $this->suffix = $this->config->controllerDirAndSuffix;

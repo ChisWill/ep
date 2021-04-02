@@ -8,9 +8,9 @@ use Ep;
 use Ep\Contract\ConfigurableInterface;
 use Ep\Contract\ConfigurableTrait;
 use Ep\Contract\NotFoundException;
-use Ep\Helper\Alias;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
+use Yiisoft\Aliases\Aliases;
 use Closure;
 
 use function FastRoute\cachedDispatcher;
@@ -22,12 +22,14 @@ final class Route implements ConfigurableInterface
     public bool $defaultRoute = true;
 
     private Config $config;
+    private Aliases $aliases;
     private Closure $rule;
     private string $baseUrl;
 
     public function __construct(Closure $rule, string $baseUrl = '')
     {
         $this->config = Ep::getConfig();
+        $this->aliases = Ep::getDi()->get(Aliases::class);
         $this->rule = $rule;
         $this->baseUrl = $baseUrl;
     }
@@ -44,7 +46,7 @@ final class Route implements ConfigurableInterface
                     $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
                 }
             }, [
-                'cacheFile' => Alias::get($this->config->runtimeDir . '/route.cache'),
+                'cacheFile' => $this->aliases->get($this->config->runtimeDir . '/route.cache'),
                 'cacheDisabled' => $this->config->debug
             ])
                 ->dispatch($method, rtrim($path, '/') ?: '/')

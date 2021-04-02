@@ -3,32 +3,24 @@
 declare(strict_types=1);
 
 use Ep\Base\Config;
-use Ep\Helper\Alias;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Redis\Connection as RedisConnection;
-use Yiisoft\Di\CompositeContainer;
 use Yiisoft\Di\Container;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
 final class Ep
 {
     private static Config $config;
 
-    private static CompositeContainer $di;
+    private static ContainerInterface $di;
 
     public static function init(array $config = []): void
     {
         self::$config = new Config($config);
 
-        Alias::set('@root', self::$config->rootPath);
-        Alias::set('@vendor', self::$config->vendorPath);
-        Alias::set('@ep', dirname(__DIR__, 1));
-
-        self::$di = new CompositeContainer();
-        self::$di->attach(new Container(
-            self::$config->getDefinitions() + require(Alias::get('@ep/config/definitions.php'))
-        ));
+        self::$di = new Container(self::$config->getDi() + require(dirname(__DIR__, 1) . '/config/definitions.php'));
     }
 
     public static function getConfig(): Config
@@ -36,7 +28,7 @@ final class Ep
         return self::$config;
     }
 
-    public static function getDi(): CompositeContainer
+    public static function getDi(): ContainerInterface
     {
         return self::$di;
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Web;
 
-use Ep;
 use Ep\Base\Application as BaseApplication;
 use Ep\Base\Config;
 use Ep\Base\ErrorHandler;
@@ -25,13 +24,14 @@ final class Application extends BaseApplication
     private SapiEmitter $sapiEmitter;
 
     public function __construct(
+        Config $config,
         ServerRequestFactory $serverRequestFactory,
         ErrorHandler $errorHandler,
         RequestHandlerFactory $requestHandlerFactory,
         NotFoundHandlerInterface $notFoundHandler,
         SapiEmitter $sapiEmitter
     ) {
-        $this->config = Ep::getConfig();
+        $this->config = $config;
         $this->serverRequestFactory = $serverRequestFactory;
         $this->errorHandler = $errorHandler;
         $this->requestHandlerFactory = $requestHandlerFactory;

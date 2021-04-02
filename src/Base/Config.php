@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
-use Ep\Helper\Alias;
 use Ep\Web\Middleware\InterceptorMiddleware;
 use Ep\Web\Middleware\RouteMiddleware;
 use Yiisoft\Http\Method;
@@ -22,6 +21,10 @@ final class Config
      * 项目根目录地址，必填
      */
     public string $rootPath = '';
+    /**
+     * 路径别名
+     */
+    public array $aliases = [];
     /**
      * 默认路由的根 URL
      */
@@ -131,18 +134,27 @@ final class Config
      */
     public array $params = [];
     /**
-     * di 配置文件地址
-     */
-    private string $definitions = '@root/config/definitions.php';
-    /**
-     * 以匿名函数方式设置路由规则，具体方式参看示例
+     * di 配置
      * 
-     * For example:
+     * ```php
+     * 
+     * use Ep\Base\Config;
+     * 
+     * return static fn (Config $config): array => [
+     *     FooInterface::class => Foo::class
+     * ];
+     * 
+     * ```
+     */
+    private ?Closure $di = null;
+    /**
+     * 路由规则
+     * 
      * ```php
      * 
      * use FastRoute\RouteCollector;
      *
-     * function (RouteCollector $route) {
+     * return function (RouteCollector $route) {
      *     $route->addGroup('/api', function (RouteCollector $route) {
      *         $route->get('/error/index', 'error/index');
      *     });
@@ -172,18 +184,13 @@ final class Config
         throw new InvalidArgumentException("The \"{$name}\" configuration is invalid.");
     }
 
-    public function getDefinitions(): array
+    public function getDi(): array
     {
-        $filename = Alias::get($this->definitions);
-        if (file_exists($filename)) {
-            return require($filename);
-        } else {
-            return [];
-        }
+        return $this->di ? call_user_func($this->di, $this) : [];
     }
 
-    public function getRouteRule(): Closure
+    public function getRoute(): Closure
     {
-        return $this->route ?: fn () => true;
+        return $this->route ?: static fn (): bool => true;
     }
 }

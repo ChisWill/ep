@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Web\Middleware;
 
-use Ep;
+use Ep\Base\Config;
 use Ep\Contract\FilterInterface;
 use Ep\Contract\InterceptorInterface;
 use Ep\Web\RequestHandlerFactory;
@@ -25,6 +25,7 @@ final class InterceptorMiddleware implements MiddlewareInterface
     private array $excludePath = [];
 
     public function __construct(
+        Config $config,
         ContainerInterface $container,
         RequestHandlerFactory $requestHandlerFactory,
         Service $service,
@@ -38,7 +39,7 @@ final class InterceptorMiddleware implements MiddlewareInterface
         $this->service = $service;
         $this->includePath = $interceptor->includePath();
         $this->excludePath = $interceptor->excludePath();
-        $baseUrl = Ep::getConfig()->baseUrl;
+        $baseUrl = $config->baseUrl;
 
         foreach ($this->includePath as [&$path, $class]) {
             $path = $baseUrl . $path;

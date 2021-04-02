@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Console;
 
-use Ep;
 use Ep\Base\Application as BaseApplication;
 use Ep\Base\Config;
 use Ep\Base\ControllerRunner;
@@ -23,13 +22,14 @@ final class Application extends BaseApplication
     private ControllerRunner $controllerRunner;
 
     public function __construct(
+        Config $config,
         ConsoleRequestInterface $consoleRequest,
         ErrorHandler $errorHandler,
         ErrorRenderer $errorRenderer,
         Route $route,
         ControllerRunner $controllerRunner
     ) {
-        $this->config = Ep::getConfig();
+        $this->config = $config;
         $this->consoleRequest = $consoleRequest;
         $this->errorHandler = $errorHandler;
         $this->errorRenderer = $errorRenderer;

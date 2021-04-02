@@ -6,6 +6,7 @@ namespace Ep\Tests\App\Controller;
 
 use DateInterval;
 use Ep;
+use Ep\Base\Config;
 use Ep\Base\View;
 use Ep\Db\Query;
 use Ep\Tests\App\Component\Controller;
@@ -14,6 +15,7 @@ use Ep\Tests\App\Model\User;
 use Ep\Web\ServerRequest;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
 use Yiisoft\Http\Method;
@@ -104,8 +106,9 @@ class DemoController extends Controller
         return compact('r1', 'r2');
     }
 
-    public function queryAction()
+    public function queryAction(Aliases $aliases, Config $config)
     {
+
         $result = [];
         $query = User::find()->where(['like', 'username', 'Peter%', false]);
         $result['RawSql'] = $query->getRawSql();

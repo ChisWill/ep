@@ -12,6 +12,7 @@ return [
     'env' => 'test',
     'debug' => true,
     'secretKey' => '8FFA893E119A32D0C6A686863217A181',
+    'di' => require('di.php'),
     'route' => require('route.php'),
     'events' => require('events.php'),
     'params' => require('params.php')

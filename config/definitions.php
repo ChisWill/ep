@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use Ep\Base\Config;
 use Ep\Base\Route;
 use Ep\Console\ConsoleRequest;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ErrorRendererInterface;
 use Ep\Contract\NotFoundHandlerInterface;
-use Ep\Helper\Alias;
 use Ep\Web\ErrorRenderer;
 use Ep\Web\NotFoundHandler;
 use Ep\Web\ServerRequestFactory;
@@ -16,6 +16,7 @@ use HttpSoft\Message\ServerRequestFactory as HttpSoftServerRequestFactory;
 use HttpSoft\Message\StreamFactory;
 use HttpSoft\Message\UploadedFileFactory;
 use HttpSoft\Message\UriFactory;
+use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface as YiiCacheInterface;
 use Yiisoft\Cache\File\FileCache;
@@ -47,40 +48,30 @@ use Psr\SimpleCache\CacheInterface;
 $config = Ep::getConfig();
 
 return [
+    Config::class => static fn (): Config => $config,
+    Aliases::class => static fn (): Aliases => new Aliases([
+        '@root' => $config->rootPath,
+        '@vendor' => $config->vendorPath,
+        '@ep' => dirname(__DIR__, 1)
+    ] + $config->aliases),
     // Console
     ConsoleRequestInterface::class => ConsoleRequest::class,
     // HttpMiddleware
-    Route::class => static fn () => new Route($config->getRouteRule(), $config->baseUrl),
+    Route::class => static fn (): Route => new Route($config->getRoute(), $config->baseUrl),
     // Session
-    SessionInterface::class => [
-        '__class' => Session::class,
-        '__construct()' => [
-            ['cookie_secure' => 0]
-        ]
-    ],
+    SessionInterface::class => static fn (): SessionInterface => new Session(['cookie_secure' => 0]),
     // ServerRequest
-    ServerRequestFactoryInterface::class => [
-        '__class' => ServerRequestFactory::class,
-        '__construct()' => [
-            new HttpSoftServerRequestFactory()
-        ]
-    ],
+    ServerRequestFactoryInterface::class => static fn (): ServerRequestFactoryInterface => new ServerRequestFactory(new HttpSoftServerRequestFactory()),
     UriFactoryInterface::class => UriFactory::class,
     UploadedFileFactoryInterface::class => UploadedFileFactory::class,
     StreamFactoryInterface::class => StreamFactory::class,
     // Response
     ResponseFactoryInterface::class => ResponseFactory::class,
     // Logger
-    FileTarget::class => [
-        '__class' => FileTarget::class,
-        '__construct()' => [
-            Alias::get($config->runtimeDir . '/logs/app.log'),
-            new FileRotator()
-        ]
-    ],
+    FileTarget::class => static fn (Aliases $aliases): FileTarget => new FileTarget($aliases->get($config->runtimeDir . '/logs/app.log'), new FileRotator()),
     LoggerInterface::class => static fn (FileTarget $fileTarget): LoggerInterface => new Logger([$fileTarget]),
     // Cache
-    CacheInterface::class => static fn (): CacheInterface => new FileCache(Alias::get($config->runtimeDir . '/cache')),
+    CacheInterface::class => static fn (Aliases $aliases): CacheInterface => new FileCache($aliases->get($config->runtimeDir . '/cache')),
     YiiCacheInterface::class => Cache::class,
     // Profiler
     ProfilerInterface::class => Profiler::class,
