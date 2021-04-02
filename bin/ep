@@ -11,7 +11,7 @@ use Ep\Console\Application;
 
 The following commands are available:
 
-- generate/model
+- generate/model table [options]
 - clear
 
 HELP;

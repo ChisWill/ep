@@ -36,7 +36,7 @@ abstract class ErrorRenderer implements ErrorRendererInterface
     {
         return "Exception '" . get_class($t) . "' with message '{$t->getMessage()}' \n\nin "
             . $t->getFile() . ':' . $t->getLine() . "\n\n"
-            . "Stack trace:\n" . $t->getTraceAsString();
+            . "Stack trace:\n" . $t->getTraceAsString() . "\n";
     }
 
     abstract public function log(Throwable $t, $request): void;

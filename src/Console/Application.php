@@ -86,9 +86,13 @@ HELP;
     public function send($request, $response): void
     {
         if (is_scalar($response)) {
-            echo $response;
+            if ($response) {
+                echo $response . PHP_EOL;
+            }
         } elseif (is_array($response)) {
-            echo json_encode($response, JSON_UNESCAPED_UNICODE);
+            foreach ($response as $row) {
+                $this->send($request, $row);
+            }
         }
     }
 }
