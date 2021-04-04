@@ -14,16 +14,9 @@ final class Ep
 {
     public static function init(array $config = []): void
     {
-        self::$config = new Config($config);
+        $config = new Config($config);
 
-        self::$di = new Container(self::$config->getDi() + require(dirname(__DIR__, 1) . '/config/definitions.php'));
-    }
-
-    private static Config $config;
-
-    public static function getConfig(): Config
-    {
-        return self::$config;
+        self::$di = new Container($config->getDi() + require(dirname(__DIR__, 1) . '/config/definitions.php'));
     }
 
     private static ContainerInterface $di;
@@ -31,6 +24,11 @@ final class Ep
     public static function getDi(): ContainerInterface
     {
         return self::$di;
+    }
+
+    public static function getConfig(): Config
+    {
+        return self::$di->get(Config::class);
     }
 
     public static function getDb(?string $id = null): Connection

@@ -44,7 +44,7 @@ use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
-$config = Ep::getConfig();
+/** @var Config $config */
 
 return [
     Config::class => static fn (): Config => $config,
@@ -93,8 +93,8 @@ return [
     RedisConnection::class => [
         '__class' => RedisConnection::class,
         'hostname()' => [$config->redisHost],
-        'port()' => [$config->rediPort],
         'database()' => [$config->redisDatabase],
-        'password()' => [$config->redisPassword]
+        'password()' => [$config->redisPassword],
+        'port()'     => [$config->redisPort]
     ]
 ];

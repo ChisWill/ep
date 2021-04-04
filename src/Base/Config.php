@@ -112,7 +112,7 @@ final class Config
     /**
      * Redis Port
      */
-    public int $rediPort = 6379;
+    public int $redisPort = 6379;
     /**
      * Redis Database
      */
