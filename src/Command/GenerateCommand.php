@@ -34,20 +34,20 @@ final class GenerateCommand extends Command
 
         if ($this->service->hasModel()) {
             return $this->service->updateModel();
+        } else {
+            $data = [
+                'namespace' => $this->service->getNamespace(),
+                'primaryKey' => $this->service->getPrimaryKey(),
+                'tableName' => $this->service->getTableName(),
+                'className' => $this->service->getClassName(),
+                'property' => $this->service->getProperty(),
+                'rules' => $this->service->getRules()
+            ];
+
+            return $this->service->createModel(
+                $this->getView()->renderPartial('model', $data)
+            );
         }
-
-        $data = [
-            'namespace' => $this->service->getNamespace(),
-            'primaryKey' => $this->service->getPrimaryKey(),
-            'tableName' => $this->service->getTableName(),
-            'className' => $this->service->getClassName(),
-            'property' => $this->service->getProperty(),
-            'rules' => $this->service->getRules()
-        ];
-
-        return $this->service->createModel(
-            $this->getView()->renderPartial('model', $data)
-        );
     }
 
     public function getViewPath(): string

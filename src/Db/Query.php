@@ -26,15 +26,16 @@ class Query extends BaseQuery
         if (empty($columns)) {
             return 0;
         }
-        return $this->createCommand()->insert($table, $columns)->execute();
+        return $this->createCommand()
+            ->insert($table, $columns)
+            ->execute();
     }
 
     public function batchInsert(string $table, array $columns, iterable $rows): int
     {
-        if (empty($rows)) {
-            return 0;
-        }
-        return $this->createCommand()->batchInsert($table, $columns, $rows)->execute();
+        return $this->createCommand()
+            ->batchInsert($table, $columns, $rows)
+            ->execute();
     }
 
     /**
@@ -45,7 +46,9 @@ class Query extends BaseQuery
         if (empty($columns)) {
             return 0;
         }
-        return $this->createCommand()->update($table, $columns, $condition, $params)->execute();
+        return $this->createCommand()
+            ->update($table, $columns, $condition, $params)
+            ->execute();
     }
 
     /**
@@ -57,7 +60,9 @@ class Query extends BaseQuery
         if (empty($insertColumns)) {
             return 0;
         }
-        return $this->createCommand()->upsert($table, $insertColumns, $updateColumns, $params)->execute();
+        return $this->createCommand()
+            ->upsert($table, $insertColumns, $updateColumns, $params)
+            ->execute();
     }
 
     /**
@@ -65,7 +70,9 @@ class Query extends BaseQuery
      */
     public function delete(string $table, $condition = '', array $params = []): int
     {
-        return $this->createCommand()->delete($table, $condition, $params)->execute();
+        return $this->createCommand()
+            ->delete($table, $condition, $params)
+            ->execute();
     }
 
     /**

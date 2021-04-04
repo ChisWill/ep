@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Ep\Widget;
 
-use Yiisoft\Db\Query\QueryInterface;
+use Ep\Db\Query;
 
 final class Paginator
 {
-    private QueryInterface $query;
+    private Query $query;
     private int $page;
     private int $pageSize;
     private int $totalPage;
@@ -16,18 +16,18 @@ final class Paginator
     private array $data;
 
     /**
-     * @param \Ep\Db\Query|\Ep\Db\ActiveQuery $query
+     * @param Query $query
      */
-    public function __construct(QueryInterface $query, int $page, int $pageSize)
+    public function __construct(Query $query, int $page, int $pageSize)
     {
         $this->query = $query;
         $this->page = $page < 1 ? 1 : $page;
         $this->pageSize = $pageSize  < 1 ? 1 : $pageSize;
 
-        $this->init();
+        $this->execute();
     }
 
-    private function init(): void
+    private function execute(): void
     {
         $this->totalCount = (int) $this->query->count();
         $this->totalPage = (int) ceil($this->totalCount / $this->pageSize);

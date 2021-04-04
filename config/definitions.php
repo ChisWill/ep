@@ -34,7 +34,6 @@ use Yiisoft\Profiler\ProfilerInterface;
 use Yiisoft\Session\Session;
 use Yiisoft\Session\SessionInterface;
 use Yiisoft\Yii\Event\ListenerCollectionFactory;
-use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Http\Message\UriFactoryInterface;
@@ -76,7 +75,7 @@ return [
     // Profiler
     ProfilerInterface::class => Profiler::class,
     // Event
-    ListenerCollection::class => static fn (ContainerInterface $container): ListenerCollection => $container->get(ListenerCollectionFactory::class)->create($config->events),
+    ListenerCollection::class => static fn (ListenerCollectionFactory $listenerCollectionFactory): ListenerCollection => $listenerCollectionFactory->create($config->events),
     ListenerProviderInterface::class => Provider::class,
     EventDispatcherInterface::class => Dispatcher::class,
     // Default ErrorRenderer

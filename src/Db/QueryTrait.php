@@ -35,6 +35,13 @@ trait QueryTrait
             ->column();
     }
 
+    public function update(array $columns): int
+    {
+        return $this->createCommand()
+            ->update(current($this->getFrom()), $columns, $this->getWhere(), $this->getParams())
+            ->execute();
+    }
+
     public function getRawSql(): string
     {
         return $this->createCommand()->getRawSql();
@@ -42,6 +49,9 @@ trait QueryTrait
 
     public function dump(): void
     {
-        test($this->getRawSql(), $this->createCommand()->getParams());
+        test(
+            $this->getRawSql(),
+            $this->createCommand()->getParams()
+        );
     }
 }

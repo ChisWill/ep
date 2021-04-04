@@ -29,7 +29,7 @@ class ControllerRunner implements ConfigurableInterface
         $this->config = $config;
         $this->container = $container;
         $this->injector = $injector;
-        $this->suffix = $this->config->controllerDirAndSuffix;
+        $this->suffix = $config->controllerDirAndSuffix;
     }
 
     /**

@@ -59,8 +59,7 @@ final class Application extends BaseApplication
      */
     public function handleRequest($request)
     {
-        return $this
-            ->requestHandlerFactory
+        return $this->requestHandlerFactory
             ->wrap($this->config->webMiddlewares, $this->notFoundHandler)
             ->handle($request);
     }

@@ -136,7 +136,7 @@ final class GenerateService
             }
             if ($column->isAllowNull()) {
                 if (isset($fields[$field])) {
-                    $fields[$field] = array_map(fn ($rule) => $rule . ':skipOnEmpty(true)', $fields[$field]);
+                    $fields[$field] = array_map(fn ($rule): string => $rule . ':skipOnEmpty(true)', $fields[$field]);
                 }
             } else {
                 $fields[$field][] = 'Required';
