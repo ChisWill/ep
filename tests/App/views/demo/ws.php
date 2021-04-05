@@ -1,5 +1,3 @@
-<script src="https://lib.baomitu.com/jquery/3.5.1/jquery.min.js"></script>
-
 <h1>Swoole WebSocket Server</h1>
 
 <div>

@@ -12,7 +12,6 @@
 
     <input type="submit" id="btn">
 </form>
-<script src="https://lib.baomitu.com/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $(function() {
         $("#btn").click(function() {

@@ -17,6 +17,10 @@ use HttpSoft\Message\StreamFactory;
 use HttpSoft\Message\UploadedFileFactory;
 use HttpSoft\Message\UriFactory;
 use Yiisoft\Aliases\Aliases;
+use Yiisoft\Assets\AssetLoader;
+use Yiisoft\Assets\AssetLoaderInterface;
+use Yiisoft\Assets\AssetPublisher;
+use Yiisoft\Assets\AssetPublisherInterface;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface as YiiCacheInterface;
 use Yiisoft\Cache\File\FileCache;
@@ -47,6 +51,7 @@ use Psr\SimpleCache\CacheInterface;
 /** @var Config $config */
 
 return [
+    // Base
     Config::class => static fn (): Config => $config,
     Aliases::class => static fn (): Aliases => new Aliases([
         '@root' => $config->rootPath,
@@ -57,6 +62,9 @@ return [
     ConsoleRequestInterface::class => ConsoleRequest::class,
     // HttpMiddleware
     Route::class => static fn (): Route => new Route($config->getRoute(), $config->baseUrl),
+    // View
+    AssetLoaderInterface::class => AssetLoader::class,
+    AssetPublisherInterface::class => AssetPublisher::class,
     // Session
     SessionInterface::class => static fn (): SessionInterface => new Session(['cookie_secure' => 0]),
     // ServerRequest
