@@ -10,9 +10,8 @@ use Ep\Contract\ErrorRendererInterface;
 use Ep\Contract\NotFoundHandlerInterface;
 use Ep\Web\ErrorRenderer;
 use Ep\Web\NotFoundHandler;
-use Ep\Web\ServerRequestFactory;
 use HttpSoft\Message\ResponseFactory;
-use HttpSoft\Message\ServerRequestFactory as HttpSoftServerRequestFactory;
+use HttpSoft\Message\ServerRequestFactory;
 use HttpSoft\Message\StreamFactory;
 use HttpSoft\Message\UploadedFileFactory;
 use HttpSoft\Message\UriFactory;
@@ -68,7 +67,7 @@ return [
     // Session
     SessionInterface::class => static fn (): SessionInterface => new Session(['cookie_secure' => 0]),
     // ServerRequest
-    ServerRequestFactoryInterface::class => static fn (): ServerRequestFactoryInterface => new ServerRequestFactory(new HttpSoftServerRequestFactory()),
+    ServerRequestFactoryInterface::class => ServerRequestFactory::class,
     UriFactoryInterface::class => UriFactory::class,
     UploadedFileFactoryInterface::class => UploadedFileFactory::class,
     StreamFactoryInterface::class => StreamFactory::class,

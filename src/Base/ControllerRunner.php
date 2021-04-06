@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
-use Ep;
 use Ep\Contract\ConfigurableInterface;
 use Ep\Contract\ConfigurableTrait;
 use Ep\Contract\ControllerInterface;

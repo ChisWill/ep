@@ -41,7 +41,7 @@ final class Application extends BaseApplication
 
     public function createRequest(): ServerRequestInterface
     {
-        return $this->serverRequestFactory->createFromGlobals();
+        return new ServerRequest($this->serverRequestFactory->createFromGlobals());
     }
 
     /**
