@@ -8,18 +8,16 @@ use Ep;
 
 class Url
 {
-    public static string $signName = '_s';
-
     /**
      * 根据已有地址，增加额外参数，如果已存在则覆盖
      *
      * @param  string  $url    基础网址
      * @param  array   $params URL参数
-     * @param  bool    $sign   是否添加签名参数
+     * @param  string  $sign   签名参数名，为空表示不设置
      * 
      * @return string
      */
-    public static function addParams(string $url, array $params = [], bool $sign = false): string
+    public static function addParams(string $url, array $params = [], string $sign = ''): string
     {
         $urlInfo = parse_url($url);
         if (isset($urlInfo['query'])) {
@@ -28,8 +26,8 @@ class Url
             $queryParams = [];
         }
         $params += $queryParams;
-        if ($sign === true) {
-            $params[self::$signName] = Str::getSign($params, Ep::getConfig()->secretKey, 'md5');
+        if ($sign !== '') {
+            $params[$sign] = Str::getSign($params, Ep::getConfig()->secretKey, 'md5');
         }
         $baseUrl = $queryParams ? substr($url, 0, strpos($url, '?')) : $url;
         $d = $params ? '?' : '';
@@ -39,13 +37,14 @@ class Url
     /**
      * 检查 URL 地址是否被篡改过
      * 
-     * @param  array   $params 待检查参数
+     * @param  string $sign   签名字段名
+     * @param  array  $params 待检查参数
      * 
      * @return bool
      */
-    public static function checkSign(array $params = [])
+    public static function checkSign($sign, array $params = [])
     {
-        $old = Arr::remove($params, self::$signName, '');
+        $old = Arr::remove($params, $sign, '');
         $new = Str::getSign($params, Ep::getConfig()->secretKey, 'md5');
         return $old === $new;
     }
