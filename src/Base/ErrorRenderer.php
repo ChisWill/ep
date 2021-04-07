@@ -32,6 +32,9 @@ abstract class ErrorRenderer implements ErrorRendererInterface
         return self::ERRORS[$severity] ?? 'Error';
     }
 
+    /**
+     * @param mixed $request
+     */
     public function render(Throwable $t, $request): string
     {
         return "Exception '" . get_class($t) . "' with message '{$t->getMessage()}' \n\nin "
@@ -39,5 +42,8 @@ abstract class ErrorRenderer implements ErrorRendererInterface
             . "Stack trace:\n" . $t->getTraceAsString() . "\n";
     }
 
+    /**
+     * @param mixed $request
+     */
     abstract public function log(Throwable $t, $request): void;
 }

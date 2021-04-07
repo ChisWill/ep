@@ -133,11 +133,11 @@ class ControllerRunner implements ConfigurableInterface
             case 1:
                 array_push($handler, $this->config->defaultAction);
             case 2:
-                array_unshift($handler, str_replace(
-                    $this->config->appNamespace . '\\',
-                    '',
-                    substr($handler[0], 0, strpos($handler[0], $this->suffix) - 1)
-                ));
+                $suffixPos = strpos($handler[0], '\\' . $this->suffix . '\\');
+                if ($suffixPos === false) {
+                    throw new InvalidArgumentException('The route handler is not in the correct directory.');
+                }
+                array_unshift($handler, str_replace($this->config->appNamespace . '\\', '', substr($handler[0], 0, $suffixPos)));
                 break;
             case 3:
                 break;

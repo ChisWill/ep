@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Widget;
 
-use Yiisoft\Validator\Rule;
 use Yiisoft\Validator\Validator;
 
 trait FormTrait
@@ -27,8 +26,5 @@ trait FormTrait
         return $this->_errors;
     }
 
-    /**
-     * @return Rule[][] $rules
-     */
     abstract protected function rules(): array;
 }

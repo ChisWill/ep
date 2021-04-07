@@ -11,9 +11,8 @@ use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\TableSchema;
+use Yiisoft\Factory\Exceptions\NotFoundException;
 use Yiisoft\Strings\StringHelper;
-use Psr\Container\NotFoundExceptionInterface;
-use Closure;
 use InvalidArgumentException;
 
 final class GenerateService
@@ -30,7 +29,7 @@ final class GenerateService
     /**
      * @throws InvalidArgumentException
      */
-    public function validateModel($params)
+    public function validateModel(array $params)
     {
         $this->autoloadPath = $params['autoloadPath'];
         $this->appNamespace = $params['appNamespace'];
@@ -41,10 +40,10 @@ final class GenerateService
         }
         $this->path = $params['path'] ?? $params['generate.model.path'] ?? 'Model';
         $this->prefix = $params['prefix'] ?? $params['generate.model.prefix'] ?? '';
+        $db = $params['db'] ?? $params['generate.model.db'] ?? $params['common.db'] ?? null;
         try {
-            $db = $params['db'] ?? $params['generate.model.db'] ?? $params['common.db'] ?? '';
-            $this->db = $this->getDb($db ?: null);
-        } catch (NotFoundExceptionInterface $e) {
+            $this->db = Ep::getDb($db);
+        } catch (NotFoundException $e) {
             $this->invalid('db', $db);
         }
         $this->schema = $this->db->getTableSchema($this->table);
@@ -258,11 +257,6 @@ final class GenerateService
             default:
                 return $type;
         }
-    }
-
-    private function getDb(?string $id = null): Connection
-    {
-        return Ep::getDb($id);
     }
 
     /**
