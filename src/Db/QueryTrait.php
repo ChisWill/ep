@@ -10,15 +10,12 @@ trait QueryTrait
 {
     public function getPaginator(int $page, int $pageSize = 15): Paginator
     {
-        return new Paginator($this, $page, $pageSize);
+        return (new Paginator($this, $page, $pageSize))->execute();
     }
 
     public function paginate(int $page, int $pageSize = 15): array
     {
-        return $this
-            ->offset(($page - 1) * $pageSize)
-            ->limit($pageSize)
-            ->all();
+        return (new Paginator($this, $page, $pageSize))->paginate();
     }
 
     public function map(string $key, string $value): array
