@@ -15,16 +15,13 @@ use Yiisoft\Http\Method;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use InvalidArgumentException;
 use Throwable;
 
 final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
 {
     use ContextTrait;
 
-    public int $maxSourceLines = 19;
-
-    public int $maxTraceSourceLines = 13;
+    public string $id = 'error';
 
     private Config $config;
     private ContainerInterface $container;
@@ -41,14 +38,6 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
         $this->container = $container;
         $this->logger = $logger;
         $this->aliases = $aliases;
-    }
-
-    public function __get($name)
-    {
-        if ($name === 'id') {
-            return 'error';
-        }
-        throw new InvalidArgumentException("The \"{$name}\" property is not exists.");
     }
 
     public function getViewPath(): string
@@ -119,7 +108,7 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
             if ($line < 0 || $lines === false || ($lineCount = count($lines)) < $line) {
                 return '';
             }
-            $half = (int) (($index === 1 ? $this->maxSourceLines : $this->maxTraceSourceLines) / 2);
+            $half = (int) (($index === 1 ? 19 : 13) / 2);
             $begin = $line - $half > 0 ? $line - $half : 0;
             $end = $line + $half < $lineCount ? $line + $half : $lineCount - 1;
         }

@@ -260,9 +260,6 @@ final class GenerateService
         }
     }
 
-    /**
-     * @throws NotFoundExceptionInterface
-     */
     private function getDb(?string $id = null): Connection
     {
         return Ep::getDb($id);

@@ -10,11 +10,12 @@ use Ep\Contract\NotFoundHandlerInterface;
 use Yiisoft\Http\Status;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use InvalidArgumentException;
 
 final class NotFoundHandler implements NotFoundHandlerInterface, ContextInterface
 {
     use ContextTrait;
+
+    public string $id = 'error';
 
     private Service $service;
 
@@ -23,24 +24,15 @@ final class NotFoundHandler implements NotFoundHandlerInterface, ContextInterfac
         $this->service = $service;
     }
 
-    public function __get($name)
-    {
-        if ($name === 'id') {
-            return 'error';
-        }
-        throw new InvalidArgumentException("The \"{$name}\" property is not exists.");
-    }
-
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $response = $this->service->status(Status::NOT_FOUND);
-        $response->getBody()->write(
+        return $this->service->string(
             $this->getView()->renderPartial('notFound', [
                 'path' => $request->getUri()->getPath(),
                 'exception' => $request->getAttribute('exception')
-            ])
+            ]),
+            Status::NOT_FOUND
         );
-        return $response;
     }
 
     public function getViewPath(): string

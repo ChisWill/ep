@@ -18,28 +18,14 @@ final class Paginator
     /**
      * @param QueryInterface $query
      */
-    public function __construct(QueryInterface $query, int $page, int $pageSize)
+    public function __construct(QueryInterface $query, int $page = 1, int $pageSize = 15)
     {
         $this->query = $query;
         $this->page = $page < 1 ? 1 : $page;
         $this->pageSize = $pageSize  < 1 ? 1 : $pageSize;
-    }
-
-    public function execute(): self
-    {
         $this->totalCount = (int) $this->query->count();
         $this->totalPage = (int) ceil($this->totalCount / $this->pageSize);
         $this->data = $this->paginate();
-
-        return $this;
-    }
-
-    public function paginate(): array
-    {
-        return $this->query
-            ->offset(($this->page - 1) * $this->pageSize)
-            ->limit($this->pageSize)
-            ->all();
     }
 
     public function all(): array
@@ -76,5 +62,13 @@ final class Paginator
     public function getData(): array
     {
         return $this->data;
+    }
+
+    private function paginate(): array
+    {
+        return $this->query
+            ->offset(($this->page - 1) * $this->pageSize)
+            ->limit($this->pageSize)
+            ->all();
     }
 }
