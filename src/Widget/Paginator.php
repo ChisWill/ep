@@ -9,66 +9,43 @@ use Yiisoft\Db\Query\QueryInterface;
 final class Paginator
 {
     private QueryInterface $query;
-    private int $page;
-    private int $pageSize;
-    private int $totalPage;
-    private int $totalCount;
-    private array $data;
 
     /**
      * @param QueryInterface $query
      */
-    public function __construct(QueryInterface $query, int $page = 1, int $pageSize = 15)
+    public function __construct(QueryInterface $query)
     {
         $this->query = $query;
-        $this->page = $page < 1 ? 1 : $page;
-        $this->pageSize = $pageSize  < 1 ? 1 : $pageSize;
-        $this->totalCount = (int) $this->query->count();
-        $this->totalPage = (int) ceil($this->totalCount / $this->pageSize);
-        $this->data = $this->paginate();
     }
 
-    public function all(): array
+    public function all(int $page = 1, int $pageSize = 15): array
     {
+        $this->filter($page, $pageSize);
+
+        $totalCount = (int) $this->query->count();
+
         return [
-            'page' => $this->page,
-            'pageSize' => $this->pageSize,
-            'totalPage' => $this->totalPage,
-            'totalCount' => $this->totalCount,
-            'data' => $this->data
+            'page' => $page,
+            'pageSize' => $pageSize,
+            'totalCount' => $totalCount,
+            'totalPage' => (int) ceil($totalCount / $pageSize),
+            'data' => $this->data($page, $pageSize)
         ];
     }
 
-    public function getPage(): int
+    public function data(int $page = 1, int $pageSize = 15): array
     {
-        return $this->page;
-    }
+        $this->filter($page, $pageSize);
 
-    public function getPageSize(): int
-    {
-        return $this->pageSize;
-    }
-
-    public function getTotalPage(): int
-    {
-        return $this->totalPage;
-    }
-
-    public function getTotalCount(): int
-    {
-        return $this->totalCount;
-    }
-
-    public function getData(): array
-    {
-        return $this->data;
-    }
-
-    private function paginate(): array
-    {
         return $this->query
-            ->offset(($this->page - 1) * $this->pageSize)
-            ->limit($this->pageSize)
+            ->offset(($page - 1) * $pageSize)
+            ->limit($pageSize)
             ->all();
+    }
+
+    private function filter(int &$page, int &$pageSize): void
+    {
+        $page = $page < 1 ? 1 : $page;
+        $pageSize = $pageSize  < 1 ? 1 : $pageSize;
     }
 }

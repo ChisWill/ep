@@ -269,8 +269,7 @@ class DemoController extends Controller
 
         return [
             'count' => $count,
-            'all' => $query->getPaginator((int) $page, 3)->all(),
-            'data' => $query->paginate((int) $page, 3)
+            'all' => $query->getPaginator()->all((int) $page, 3),
         ];
     }
 

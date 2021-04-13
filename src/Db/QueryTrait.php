@@ -8,14 +8,9 @@ use Ep\Widget\Paginator;
 
 trait QueryTrait
 {
-    public function getPaginator(int $page, int $pageSize = 15): Paginator
+    public function getPaginator(): Paginator
     {
-        return new Paginator($this, $page, $pageSize);
-    }
-
-    public function paginate(int $page, int $pageSize = 15): array
-    {
-        return (new Paginator($this, $page, $pageSize))->getData();
+        return new Paginator($this);
     }
 
     public function map(string $key, string $value): array
