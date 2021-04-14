@@ -91,14 +91,14 @@ return [
     NotFoundHandlerInterface::class => NotFoundHandler::class,
     // Default DB
     Connection::class => [
-        '__class' => MysqlConnection::class,
+        'class' => MysqlConnection::class,
         '__construct()' => [$config->mysqlDsn],
         'setUsername()' => [$config->mysqlUsername],
         'setPassword()' => [$config->mysqlPassword]
     ],
     // Default Redis
     RedisConnection::class => [
-        '__class' => RedisConnection::class,
+        'class' => RedisConnection::class,
         'hostname()' => [$config->redisHost],
         'database()' => [$config->redisDatabase],
         'password()' => [$config->redisPassword],

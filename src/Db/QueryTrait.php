@@ -41,9 +41,11 @@ trait QueryTrait
 
     public function dump(): void
     {
-        test(
-            $this->getRawSql(),
-            $this->createCommand()->getParams()
+        $command = $this->createCommand();
+
+        tt(
+            $command->getRawSql(),
+            $command->getParams()
         );
     }
 }
