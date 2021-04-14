@@ -205,6 +205,16 @@ final class GenerateService
         }
     }
 
+    public function isMultiple(array $params): bool
+    {
+        return strpos($params['table'] ?? '', ',') !== false;
+    }
+
+    public function getTables(array $params): array
+    {
+        return explode(',', $params['table']);
+    }
+
     private function getFilePath(): string
     {
         return sprintf('%s/%s/%s', dirname($this->autoloadPath, 2), $this->appPath, $this->path);

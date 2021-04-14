@@ -26,8 +26,22 @@ final class GenerateCommand extends Command
 
     public function modelAction(ConsoleRequest $request): string
     {
+        $params = $request->getParams();
+        if ($this->service->isMultiple($params)) {
+            foreach ($this->service->getTables($params) as $table) {
+                $params['table'] = $table;
+                $result[] = $this->single($params);
+            }
+            return implode(PHP_EOL, $result);
+        } else {
+            return $this->single($request);
+        }
+    }
+
+    private function single(array $params)
+    {
         try {
-            $this->service->validateModel($request->getParams());
+            $this->service->validateModel($params);
         } catch (Throwable $t) {
             return $t->getMessage();
         }
