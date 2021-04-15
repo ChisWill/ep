@@ -34,7 +34,7 @@ final class GenerateCommand extends Command
             }
             return implode(PHP_EOL, $result);
         } else {
-            return $this->single($request);
+            return $this->single($params);
         }
     }
 
