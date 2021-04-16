@@ -6,7 +6,6 @@
 
 use Ep\Tests\App\Asset\MainAsset;
 use Yiisoft\Assets\AssetManager;
-use Yiisoft\Assets\AssetPublisher;
 use Yiisoft\Assets\AssetPublisherInterface;
 
 $manager = Ep::getDi()->get(AssetManager::class);

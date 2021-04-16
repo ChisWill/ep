@@ -10,6 +10,7 @@ final class AdTestController extends Controller
 {
     public function sayAction()
     {
+        return $this->render('index');
         return $this->string('hi');
     }
 }

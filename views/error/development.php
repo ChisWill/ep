@@ -18,7 +18,7 @@ $renderer = $this->context;
     <title><?= get_class($exception) ?></title>
 
     <style type="text/css">
-        <?= $this->loadFile('development.css') ?>
+        <?= $this->renderFile('development.css') ?>
     </style>
 </head>
 
@@ -58,7 +58,7 @@ $renderer = $this->context;
     </div>
 
     <script type="text/javascript">
-        <?= $this->loadFile('hljs.js') ?>
+        <?= $this->renderFile('hljs.js') ?>
     </script>
 
     <script type="text/javascript">

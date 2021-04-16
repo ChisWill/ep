@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
-use Ep;
 use Ep\Contract\ConfigurableInterface;
 use Ep\Contract\ConfigurableTrait;
 use Ep\Contract\NotFoundException;
@@ -23,15 +22,14 @@ final class Route implements ConfigurableInterface
 
     private Config $config;
     private Aliases $aliases;
-    private Closure $rule;
-    private string $baseUrl;
 
-    public function __construct(Closure $rule, string $baseUrl = '')
+    private Closure $rule;
+    private string $baseUrl = '';
+
+    public function __construct(Config $config, Aliases $aliases)
     {
-        $this->config = Ep::getConfig();
-        $this->aliases = Ep::getDi()->get(Aliases::class);
-        $this->rule = $rule;
-        $this->baseUrl = $baseUrl;
+        $this->config = $config;
+        $this->aliases = $aliases;
     }
 
     /**
@@ -41,7 +39,9 @@ final class Route implements ConfigurableInterface
     {
         return $this->solveRouteInfo(
             cachedDispatcher(function (RouteCollector $route) {
-                $route->addGroup($this->baseUrl, $this->rule);
+                if (isset($this->rule)) {
+                    $route->addGroup($this->baseUrl, $this->rule);
+                }
                 if ($this->defaultRoute) {
                     $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
                 }

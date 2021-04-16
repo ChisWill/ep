@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Web\Middleware;
 
+use Ep\Base\Config;
 use Ep\Base\Route;
 use Ep\Contract\NotFoundException;
 use Ep\Web\ControllerRunner;
@@ -16,12 +17,18 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 final class RouteMiddleware implements MiddlewareInterface
 {
+    private Config $config;
     private Route $route;
     private ControllerRunner $controllerRunner;
     private Service $service;
 
-    public function __construct(Route $route, ControllerRunner $controllerRunner, Service $service)
-    {
+    public function __construct(
+        Config $config,
+        Route $route,
+        ControllerRunner $controllerRunner,
+        Service $service
+    ) {
+        $this->config = $config;
         $this->route = $route;
         $this->controllerRunner = $controllerRunner;
         $this->service = $service;
@@ -30,10 +37,15 @@ final class RouteMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
-            [$allowed, $result, $params] = $this->route->match(
-                $request->getUri()->getPath(),
-                $request->getMethod()
-            );
+            [$allowed, $result, $params] = $this->route
+                ->clone([
+                    'rule' => $this->config->getRoute(),
+                    'baseUrl' => $this->config->baseUrl
+                ])
+                ->match(
+                    $request->getUri()->getPath(),
+                    $request->getMethod()
+                );
             if (!$allowed) {
                 return $this->service->status(Status::METHOD_NOT_ALLOWED);
             }

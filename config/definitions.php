@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Ep\Base\Config;
-use Ep\Base\Route;
 use Ep\Console\ConsoleRequest;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ErrorRendererInterface;
@@ -59,8 +58,6 @@ return [
     ] + $config->aliases),
     // Console
     ConsoleRequestInterface::class => ConsoleRequest::class,
-    // HttpMiddleware
-    Route::class => static fn (): Route => new Route($config->getRoute(), $config->baseUrl),
     // View
     AssetLoaderInterface::class => AssetLoader::class,
     AssetPublisherInterface::class => AssetPublisher::class,

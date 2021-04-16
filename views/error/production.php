@@ -6,7 +6,7 @@
     <title>Error</title>
 
     <style type="text/css">
-        <?= $this->loadFile('simple.css') ?>
+        <?= $this->renderFile('production.css') ?>
     </style>
 </head>
 

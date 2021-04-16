@@ -6,20 +6,14 @@ namespace Ep\Contract;
 
 use Ep;
 use InvalidArgumentException;
-use LogicException;
 
 trait ConfigurableTrait
 {
-    private bool $isConfigured = false;
-
     /**
-     * {@inheritDoc}
+     * @return static
      */
     public function configure(array $config)
     {
-        if ($this->isConfigured === true) {
-            throw new LogicException(static::class . ' had been configured.');
-        }
         if (Ep::getConfig()->debug) {
             foreach ($config as $k => $v) {
                 if (property_exists($this, $k)) {
@@ -33,12 +27,12 @@ trait ConfigurableTrait
                 $this->$k = $v;
             }
         }
-        $this->isConfigured = true;
+
         return $this;
     }
 
     /**
-     * {@inheritDoc}
+     * @return static
      */
     public function clone(array $config)
     {

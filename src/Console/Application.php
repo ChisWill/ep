@@ -63,7 +63,10 @@ final class Application extends BaseApplication
     {
         try {
             [, $handler] = $this->route
-                ->configure(['baseUrl' => '/'])
+                ->configure([
+                    'rule' => $this->config->getRoute(),
+                    'baseUrl' => '/'
+                ])
                 ->match($request->getRoute());
 
             return $this->controllerRunner

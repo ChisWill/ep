@@ -7,7 +7,6 @@ namespace Ep\Tests\App\Controller;
 use DateInterval;
 use Ep;
 use Ep\Base\Config;
-use Ep\Base\View;
 use Ep\Db\Query;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Form\TestForm;
@@ -251,14 +250,6 @@ class DemoController extends Controller
         $r = $session->get('title');
 
         return $this->json($r);
-    }
-
-    public function viewAction()
-    {
-        $view = new View('@root/views', 'index');
-        return $view->renderPartial('index', [
-            'message' => 'Only View'
-        ]);
     }
 
     public function paginateAction(ServerRequest $serverRequest)
