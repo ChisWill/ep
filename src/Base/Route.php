@@ -10,6 +10,7 @@ use Ep\Contract\NotFoundException;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use Yiisoft\Aliases\Aliases;
+use Yiisoft\Http\Method;
 use Closure;
 
 use function FastRoute\cachedDispatcher;
@@ -18,13 +19,12 @@ final class Route implements ConfigurableInterface
 {
     use ConfigurableTrait;
 
-    public bool $defaultRoute = true;
+    protected bool $defaultRoute = true;
+    protected string $baseUrl = '';
+    protected Closure $rule;
 
     private Config $config;
     private Aliases $aliases;
-
-    private Closure $rule;
-    private string $baseUrl = '';
 
     public function __construct(Config $config, Aliases $aliases)
     {
@@ -35,7 +35,7 @@ final class Route implements ConfigurableInterface
     /**
      * @throws NotFoundException
      */
-    public function match(string $path, string $method = 'GET'): array
+    public function match(string $path, string $method = Method::GET): array
     {
         return $this->solveRouteInfo(
             cachedDispatcher(function (RouteCollector $route) {

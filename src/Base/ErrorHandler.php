@@ -14,7 +14,7 @@ final class ErrorHandler implements ConfigurableInterface
 {
     use ConfigurableTrait;
 
-    private ErrorRendererInterface $errorRenderer;
+    protected ErrorRendererInterface $errorRenderer;
 
     public function __construct(ErrorRendererInterface $errorRenderer)
     {

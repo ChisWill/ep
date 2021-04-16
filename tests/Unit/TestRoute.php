@@ -137,8 +137,9 @@ class TestRoute extends TestCase
      */
     public function testRules($rule, $cases)
     {
-        $route = Ep::getDi()->get(Route::class);
-        $route->defaultRoute = false;
+        $route = Ep::getDi()->get(Route::class)->configure([
+            'defaultRoute' => false
+        ]);
         foreach ($cases as $row) {
             try {
                 [, $handler, $params] = $route

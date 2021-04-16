@@ -21,7 +21,7 @@ $manager->register([
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:image/ico;base64,aWNv">
-    <title><?= $this->context->title ?: 'Basic - EP' ?></title>
+    <title><?= $this->context->title ?? 'Basic - EP' ?></title>
     <?php foreach ($manager->getJsFiles() as $jsFile) : ?>
         <script src="<?= $jsFile['url'] ?>"></script>
     <?php endforeach ?>

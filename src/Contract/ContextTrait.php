@@ -14,12 +14,17 @@ trait ContextTrait
     public function getView(): View
     {
         if ($this->view === null) {
-            $this->view = Ep::getDi()->get(View::class)->clone([
+            $this->view = Ep::getDi()->get($this->getViewClass())->clone([
                 'viewPath' => $this->getViewPath(),
                 'context' => $this
             ]);
         }
         return $this->view;
+    }
+
+    protected function getViewClass(): string
+    {
+        return View::class;
     }
 
     public function getViewPath(): string

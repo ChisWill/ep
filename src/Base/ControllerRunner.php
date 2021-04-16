@@ -18,10 +18,10 @@ class ControllerRunner implements ConfigurableInterface
 {
     use ConfigurableTrait;
 
-    protected Config $config;
+    private Config $config;
     protected ContainerInterface $container;
-    protected Injector $injector;
-    protected string $suffix;
+    private Injector $injector;
+    private string $suffix;
 
     public function __construct(Config $config, ContainerInterface $container, Injector $injector)
     {

@@ -12,6 +12,9 @@ use Yiisoft\Http\Status;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * @method View getView()
+ */
 abstract class Controller implements ControllerInterface
 {
     use ContextTrait, FilterTrait;
@@ -35,6 +38,11 @@ abstract class Controller implements ControllerInterface
     public function after($request, $response)
     {
         return $response;
+    }
+
+    protected function getViewClass(): string
+    {
+        return View::class;
     }
 
     private ?Service $service = null;

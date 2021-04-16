@@ -15,10 +15,11 @@ class View implements ConfigurableInterface
 
     public string $layout = 'main';
 
+    protected ?string $viewPath = null;
+    protected ?ContextInterface $context = null;
+
     private Aliases $aliases;
     private Config $config;
-
-    protected ?ContextInterface $context = null;
 
     public function __construct(Config $config, Aliases $aliases)
     {
@@ -43,8 +44,6 @@ class View implements ConfigurableInterface
         return file_get_contents($this->findViewFile($this->getFilePath($file), ''));
     }
 
-    private ?string $viewPath = null;
-
     private function getViewPath(): string
     {
         if ($this->viewPath === null) {
@@ -61,6 +60,9 @@ class View implements ConfigurableInterface
             if ($this->context instanceof ContextInterface) {
                 $this->contextId = $this->context->id;
             }
+            if (is_string($this->contextId)) {
+                $this->contextId = trim($this->contextId, '/');
+            }
         }
         return $this->contextId;
     }
@@ -76,10 +78,9 @@ class View implements ConfigurableInterface
 
     private function renderLayout(string $layout, array $params = []): string
     {
-        $contextId = $this->getContextId();
-        if ($contextId !== null && strpos($layout, '/') !== 0) {
-            $pos = strrpos($contextId, '/');
-            if ($pos === false) {
+        if (strpos($layout, '/') !== 0) {
+            $contextId = $this->getContextId();
+            if ($contextId === null || ($pos = strrpos($contextId, '/')) === false) {
                 $layout = '/' . $this->config->layoutDir . '/' . $layout;
             } else {
                 $layout = '/' . substr($contextId, 0, $pos) . '/' . $this->config->layoutDir . '/' . $layout;
