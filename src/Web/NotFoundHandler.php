@@ -15,6 +15,9 @@ final class NotFoundHandler implements NotFoundHandlerInterface, ContextInterfac
 {
     use ContextTrait;
 
+    /**
+     * {@inheritDoc}
+     */
     public string $id = 'error';
 
     private Service $service;

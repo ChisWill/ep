@@ -21,6 +21,9 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
 {
     use ContextTrait;
 
+    /**
+     * {@inheritDoc}
+     */
     public string $id = 'error';
 
     private Config $config;
