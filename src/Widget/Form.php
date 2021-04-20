@@ -4,38 +4,18 @@ declare(strict_types=1);
 
 namespace Ep\Widget;
 
+use Yiisoft\Arrays\ArrayAccessTrait;
 use Yiisoft\Validator\DataSetInterface;
-use Yiisoft\Validator\Rule\Email;
-use Yiisoft\Validator\Rule\HasLength;
-use Yiisoft\Validator\Rule\Number;
-use Yiisoft\Validator\Rule\Required;
-use Yiisoft\Validator\Rule\Url;
+use ArrayAccess;
 
-abstract class Form implements DataSetInterface
+abstract class Form implements ArrayAccess, DataSetInterface
 {
+    use ArrayAccessTrait;
     use FormTrait;
 
-    protected Required $required;
-    protected HasLength $hasLength;
-    protected Number $number;
-    protected Url $url;
-    protected Email $email;
-
-    public function __construct(
-        Required $required,
-        HasLength $hasLength,
-        Number $number,
-        Url $url,
-        Email $email
-    ) {
-        $this->required = $required;
-        $this->hasLength = $hasLength;
-        $this->number = $number;
-        $this->url = $url;
-        $this->email = $email;
-    }
-
     private array $data = [];
+
+    public static $rules = [];
 
     public function __get($name)
     {

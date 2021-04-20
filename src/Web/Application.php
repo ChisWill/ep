@@ -55,7 +55,7 @@ final class Application extends BaseApplication
     /**
      * @param  ServerRequestInterface $request
      * 
-     * @return mixed
+     * @return ResponseInterface
      */
     public function handleRequest($request)
     {
