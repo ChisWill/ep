@@ -7,6 +7,7 @@ namespace Ep\Tests\App\Command;
 use Ep;
 use Ep\Console\Command;
 use Ep\Contract\ConsoleRequestInterface;
+use Psr\Log\LoggerInterface;
 
 class InitCommand extends Command
 {
@@ -25,9 +26,9 @@ class InitCommand extends Command
         return $message;
     }
 
-    public function logAction()
+    public function logAction(LoggerInterface $logger)
     {
-        Ep::getLogger()->info('log info', ['act' => self::class]);
+        $logger->info('log info', ['act' => self::class]);
 
         return 'ok';
     }

@@ -19,18 +19,17 @@ HELP;
     }
 
     $cwd = getcwd();
+
+    $params = [];
     if (file_exists($cwd . '/.ep')) {
         $content = str_replace("\r\n", "\n", file_get_contents($cwd . '/.ep'));
         $result = explode("\n", $content);
-        $params = [];
         foreach ($result as $row) {
             $pieces = explode('=', $row);
             if (count($pieces) == 2) {
                 $params[trim($pieces[0])] = trim($pieces[1]);
             }
         }
-    } else {
-        $params = [];
     }
 
     $possibleAutoloadPaths = [
@@ -47,10 +46,15 @@ HELP;
         }
     }
     if ($autoloadPath === null) {
-        $message = "Unable to find vendor/autoload.php in your current directory.\n";
-        $message .= "You should:\n";
-        $message .= "- run ./bin/ep from project root.\n";
-        $message .= "- run ./ep from vendor/bin.\n";
+        $message = <<<HELP
+
+Unable to find vendor/autoload.php in your current directory.
+
+You should:
+- run ./bin/ep from project root.
+- run ./ep from vendor/bin.
+
+HELP;
         fwrite(STDERR, $message);
         exit(1);
     }
@@ -63,7 +67,7 @@ HELP;
         $configPath = $options['config'] ?? dirname($autoloadPath, 2) . '/config/main.php';
     }
     if (!file_exists($configPath)) {
-        $message = "Unable to find config path in \"{$configPath}\".\n";
+        $message = "Unable to find config path in \"{$configPath}\"." . PHP_EOL;
         fwrite(STDERR, $message);
         exit(1);
     }

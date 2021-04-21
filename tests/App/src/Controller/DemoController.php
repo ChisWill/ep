@@ -14,9 +14,12 @@ use Ep\Tests\App\Model\User;
 use Ep\Web\ServerRequest;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
+use Yiisoft\Cache\Cache;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
+use Yiisoft\Db\Redis\Connection;
 use Yiisoft\Http\Method;
 use Yiisoft\Session\SessionInterface;
 
@@ -74,17 +77,14 @@ class DemoController extends Controller
         return $this->redirect('arform?id=' . $id);
     }
 
-    public function loggerAction()
+    public function loggerAction(LoggerInterface $logger)
     {
-        $logger = Ep::getLogger();
         $logger->info('halo');
         return $this->string('over');
     }
 
-    public function cacheAction()
+    public function cacheAction(Cache $cache)
     {
-        $cache = Ep::getCache();
-
         $r = $cache->getOrSet('name', fn () => mt_rand(0, 100), 5);
 
         return $this->string((string) $r);
@@ -155,10 +155,8 @@ class DemoController extends Controller
         $dipatcher->dispatch($this);
     }
 
-    public function redisAction()
+    public function redisAction(Connection $redis)
     {
-        $redis = Ep::getRedis();
-
         $result = [];
         $r = $redis->set('a', mt_rand(0, 100), 'ex', 5, 'nx');
         $result['set'] = $r;

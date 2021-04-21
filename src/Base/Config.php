@@ -163,7 +163,7 @@ final class Config
      */
     private ?Closure $route = null;
 
-    public function __construct(array $config = [])
+    public function __construct(array $config)
     {
         foreach ($config as $key => $val) {
             $this->$key = $val;

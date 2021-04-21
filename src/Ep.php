@@ -12,14 +12,14 @@ use Psr\Log\LoggerInterface;
 
 final class Ep
 {
-    public static function init(array $config = []): void
+    private static ContainerInterface $di;
+
+    public static function init(array $config): void
     {
         $config = new Config($config);
 
         self::$di = new Container($config->getDi() + require(dirname(__DIR__, 1) . '/config/definitions.php'));
     }
-
-    private static ContainerInterface $di;
 
     public static function getDi(): ContainerInterface
     {
