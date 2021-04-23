@@ -19,6 +19,9 @@ final class ClearCommand extends Command
         $this->config = $config;
     }
 
+    /**
+     * 清除缓存
+     */
     public function indexAction(Aliases $aliases): string
     {
         try {

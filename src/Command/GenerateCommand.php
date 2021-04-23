@@ -24,6 +24,9 @@ final class GenerateCommand extends Command
         ];
     }
 
+    /**
+     * 生成模型
+     */
     public function modelAction(ConsoleRequest $request): string
     {
         $params = $request->getParams();
@@ -38,7 +41,7 @@ final class GenerateCommand extends Command
         }
     }
 
-    private function single(array $params)
+    private function single(array $params): string
     {
         try {
             $this->service->validateModel($params);

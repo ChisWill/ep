@@ -6,18 +6,6 @@ declare(strict_types=1);
 use Ep\Console\Application;
 
 (static function () {
-    if (count($_SERVER['argv']) === 1) {
-        echo <<<HELP
-
-The following commands are available:
-
-- generate/model table [options]
-- clear
-
-HELP;
-        exit(0);
-    }
-
     $cwd = getcwd();
 
     $params = [];
@@ -37,6 +25,7 @@ HELP;
         $cwd . '/vendor/autoload.php',
         dirname($cwd) . '/autoload.php'
     ];
+    unset($params['autoload']);
 
     $autoloadPath = null;
     foreach ($possibleAutoloadPaths as $path) {
@@ -60,26 +49,29 @@ HELP;
     }
     require_once $autoloadPath;
 
-    $configPath = $params['config'] ?? null;
-
-    if ($configPath === null) {
-        $options = getopt('', ['config:']);
-        $configPath = $options['config'] ?? dirname($autoloadPath, 2) . '/config/main.php';
-    }
+    $configPath = $params['config'] ?? dirname($autoloadPath, 2) . '/config/main.php';
+    unset($params['config']);
     if (!file_exists($configPath)) {
         $message = "Unable to find config path in \"{$configPath}\"." . PHP_EOL;
         fwrite(STDERR, $message);
         exit(1);
     }
+
     $config = require($configPath);
 
-    unset($params['autoload'], $params['config']);
+    if (count($_SERVER['argv']) === 1 || strpos($_SERVER['argv'][1], '-') === 0) {
+        $_SERVER['argv'][] = 'help/index';
+    }
     $_SERVER['argv'][] = 'appNamespace=' . ($config['appNamespace'] ?? 'App');
     $_SERVER['argv'][] = 'autoloadPath=' . realpath($autoloadPath);
     foreach ($params as $k => $v) {
         $_SERVER['argv'][] = $k . '=' . $v;
     }
+
     $config['appNamespace'] = 'Ep';
+    $config['commandDirAndSuffix'] = 'Command';
+    $config['actionSuffix'] = 'Action';
+    $config['defaultAction'] = 'index';
 
     Ep::init($config);
 
