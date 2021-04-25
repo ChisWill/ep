@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Ep\Command;
 
 use Ep\Console\Command;
+use Ep\Contract\ConsoleRequestInterface;
+use Throwable;
 
 /**
  * 数据库迁移
@@ -21,9 +23,15 @@ final class MigrateCommand extends Command
     /**
      * 初始化所有表结构
      */
-    public function initAction(): string
+    public function initAction(ConsoleRequestInterface $request): string
     {
-        return 'init';
+        $db = $request->getParams()['db'] ?? '';
+
+        try {
+            return $this->service->init($db);
+        } catch (Throwable $t) {
+            return $t->getMessage();
+        }
     }
 
     /**

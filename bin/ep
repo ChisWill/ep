@@ -62,8 +62,8 @@ HELP;
     if (count($_SERVER['argv']) === 1 || strpos($_SERVER['argv'][1], '-') === 0) {
         $_SERVER['argv'][] = 'help/index';
     }
-    $_SERVER['argv'][] = 'appNamespace=' . ($config['appNamespace'] ?? 'App');
-    $_SERVER['argv'][] = 'autoloadPath=' . realpath($autoloadPath);
+    $_SERVER['argv'][] = 'common.appNamespace=' . ($config['appNamespace'] ?? 'App');
+    $_SERVER['argv'][] = 'common.autoloadPath=' . realpath($autoloadPath);
     foreach ($params as $k => $v) {
         $_SERVER['argv'][] = $k . '=' . $v;
     }

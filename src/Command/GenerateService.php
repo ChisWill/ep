@@ -31,8 +31,8 @@ final class GenerateService
      */
     public function validateModel(array $params)
     {
-        $this->autoloadPath = $params['autoloadPath'];
-        $this->appNamespace = $params['appNamespace'];
+        $this->autoloadPath = $params['common.autoloadPath'];
+        $this->appNamespace = $params['common.appNamespace'];
         $this->appPath = $this->getAppPath();
         $this->table = $params['table'] ?? '';
         if (!$this->table) {

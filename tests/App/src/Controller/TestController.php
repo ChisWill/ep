@@ -194,6 +194,13 @@ class TestController extends Controller
         ];
     }
 
+    public function sqliteAction()
+    {
+        $db = Ep::getDb('sqlite');
+
+        return Query::find($db)->from('user')->all();
+    }
+
     public function errorAction(ServerRequestInterface $request)
     {
         $renderer = Ep::getDi()->get(ErrorRendererInterface::class);

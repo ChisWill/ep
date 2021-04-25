@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ep\Command;
 
 use Ep\Console\Command;
-use Ep\Console\ConsoleRequest;
+use Ep\Contract\ConsoleRequestInterface;
 use Throwable;
 
 final class GenerateCommand extends Command
@@ -27,7 +27,7 @@ final class GenerateCommand extends Command
     /**
      * 生成模型
      */
-    public function modelAction(ConsoleRequest $request): string
+    public function modelAction(ConsoleRequestInterface $request): string
     {
         $params = $request->getParams();
         if ($this->service->isMultiple($params)) {
