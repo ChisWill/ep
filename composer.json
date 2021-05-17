@@ -15,7 +15,7 @@
         "yiisoft/active-record": "dev-master",
         "yiisoft/aliases": "^1.1.0",
         "yiisoft/arrays": "^1.0",
-        "yiisoft/assets": "1.0.x-dev",
+        "yiisoft/assets": "^1.0",
         "yiisoft/cache-file": "dev-master",
         "yiisoft/db-mysql": "dev-master",
         "yiisoft/db-redis": "1.0.x-dev",
