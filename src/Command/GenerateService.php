@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Ep\Command;
 
 use Ep;
+use Ep\Base\Config;
 use Ep\Helper\File;
 use Ep\Helper\Str;
+use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Schema\Schema;
@@ -15,11 +17,18 @@ use Yiisoft\Factory\Exceptions\NotFoundException;
 use Yiisoft\Strings\StringHelper;
 use InvalidArgumentException;
 
-final class GenerateService
+final class GenerateService extends Service
 {
-    private string $autoloadPath;
+    private Config $config;
+    private Aliases $aliases;
+
+    public function __construct(Config $config, Aliases $aliases)
+    {
+        $this->config = $config;
+        $this->aliases = $aliases;
+    }
+
     private string $appNamespace;
-    private string $appPath;
     private string $table;
     private string $path;
     private string $prefix;
@@ -31,9 +40,7 @@ final class GenerateService
      */
     public function validateModel(array $params)
     {
-        $this->autoloadPath = $params['common.autoloadPath'];
         $this->appNamespace = $params['common.appNamespace'];
-        $this->appPath = $this->getAppPath();
         $this->table = $params['table'] ?? '';
         if (!$this->table) {
             $this->required('table');
@@ -205,19 +212,19 @@ final class GenerateService
         }
     }
 
-    public function isMultiple(array $params): bool
+    public function isMultiple(string $param): bool
     {
-        return strpos($params['table'] ?? '', ',') !== false;
+        return strpos($param, ',') !== false;
     }
 
-    public function getTables(array $params): array
+    public function getPieces(string $param): array
     {
-        return explode(',', $params['table']);
+        return explode(',', $param);
     }
 
     private function getFilePath(): string
     {
-        return sprintf('%s/%s/%s', dirname($this->autoloadPath, 2), $this->appPath, $this->path);
+        return sprintf('%s/%s', $this->getAppPath(), $this->path);
     }
 
     private function getFileName(): string
@@ -233,28 +240,35 @@ final class GenerateService
         return $this->schema->getColumns();
     }
 
+    private ?string $appPath = null;
+
     /**
      * @throws InvalidArgumentException
      */
     private function getAppPath(): string
     {
-        $composerPath = dirname($this->autoloadPath, 2) . '/composer.json';
-        if (!file_exists($composerPath)) {
-            throw new InvalidArgumentException('Unable to find composer.json in your project root.');
-        }
-        $composerContent = json_decode(file_get_contents($composerPath), true);
-        $autoload = ($composerContent['autoload']['psr-4'] ?? []) + ($composerContent['autoload-dev']['psr-4'] ?? []);
-        $appPath = null;
-        foreach ($autoload as $ns => $path) {
-            if ($ns === $this->appNamespace . '\\') {
-                $appPath = $path;
-                break;
+        if ($this->appPath === null) {
+            $vendorDirname = dirname($this->aliases->get($this->config->vendorPath));
+            $composerPath = $vendorDirname . '/composer.json';
+            if (!file_exists($composerPath)) {
+                throw new InvalidArgumentException('Unable to find composer.json in your project root.');
             }
+            $composerContent = json_decode(file_get_contents($composerPath), true);
+            $autoload = ($composerContent['autoload']['psr-4'] ?? []) + ($composerContent['autoload-dev']['psr-4'] ?? []);
+            $appPath = null;
+            foreach ($autoload as $ns => $path) {
+                if ($ns === $this->appNamespace . '\\') {
+                    $appPath = $path;
+                    break;
+                }
+            }
+            if ($appPath === null) {
+                throw new InvalidArgumentException('You should set the "autoload[psr-4]" configuration in your composer.json first.');
+            }
+            $this->appPath = $vendorDirname . '/' . $appPath;
         }
-        if ($appPath === null) {
-            throw new InvalidArgumentException('You should set the "autoload[psr-4]" configuration in your composer.json first.');
-        }
-        return $appPath;
+
+        return $this->appPath;
     }
 
     private function typecast(string $type): string
@@ -267,21 +281,5 @@ final class GenerateService
             default:
                 return $type;
         }
-    }
-
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function required(string $option)
-    {
-        throw new InvalidArgumentException("The \"{$option}\" option is required.");
-    }
-
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function invalid(string $option, string $value)
-    {
-        throw new InvalidArgumentException("The value \"{$value}\" of the option \"{$option}\" is invalid.");
     }
 }

@@ -30,18 +30,18 @@ final class GenerateCommand extends Command
     public function modelAction(ConsoleRequestInterface $request): string
     {
         $params = $request->getParams();
-        if ($this->service->isMultiple($params)) {
-            foreach ($this->service->getTables($params) as $table) {
+        if ($this->service->isMultiple($params['table'] ?? '')) {
+            foreach ($this->service->getPieces($params['table']) as $table) {
                 $params['table'] = $table;
-                $result[] = $this->single($params);
+                $result[] = $this->singleModel($params);
             }
             return implode(PHP_EOL, $result);
         } else {
-            return $this->single($params);
+            return $this->singleModel($params);
         }
     }
 
-    private function single(array $params): string
+    private function singleModel(array $params): string
     {
         try {
             $this->service->validateModel($params);
@@ -52,17 +52,15 @@ final class GenerateCommand extends Command
         if ($this->service->hasModel()) {
             return $this->service->updateModel();
         } else {
-            $data = [
-                'namespace' => $this->service->getNamespace(),
-                'primaryKey' => $this->service->getPrimaryKey(),
-                'tableName' => $this->service->getTableName(),
-                'className' => $this->service->getClassName(),
-                'property' => $this->service->getProperty(),
-                'rules' => $this->service->getRules()
-            ];
-
             return $this->service->createModel(
-                $this->getView()->renderPartial('model', $data)
+                $this->getView()->renderPartial('model', [
+                    'namespace' => $this->service->getNamespace(),
+                    'primaryKey' => $this->service->getPrimaryKey(),
+                    'tableName' => $this->service->getTableName(),
+                    'className' => $this->service->getClassName(),
+                    'property' => $this->service->getProperty(),
+                    'rules' => $this->service->getRules()
+                ])
             );
         }
     }

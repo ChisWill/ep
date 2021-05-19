@@ -22,24 +22,47 @@ final class HelpCommand extends Command
             'filter' => (new PathMatcher())->only('**Command.php')->except(__FILE__)
         ]));
 
+        $commands = $this->getCommands($files);
+        $commandMaxLength = $this->getCommandMaxLength($commands);
+
+        $help = "\nThe following commands are available:\n\n";
+        foreach ($commands as $row) {
+            $help .= sprintf("- %s%s%s\n", $row['command'], str_repeat(' ', $commandMaxLength - strlen($row['command']) + 1), $row['desc']);
+        }
+        return $help;
+    }
+
+    private function getCommands(array $files): array
+    {
         foreach ($files as $name) {
             $class = 'Ep\\Command\\' . $name;
-            $commands[$name] = array_filter((new ReflectionClass($class))->getMethods(ReflectionMethod::IS_PUBLIC), static fn (ReflectionMethod $ref) => strpos($ref->getName(), 'Action') !== false);
+            $map[$name] = array_filter((new ReflectionClass($class))->getMethods(ReflectionMethod::IS_PUBLIC), static fn (ReflectionMethod $ref) => strpos($ref->getName(), 'Action') !== false);
         }
-
-        $help = "\nThe following commands are available:\n";
-        foreach ($commands as $name => $actions) {
-            $help .= "\n";
-            /** @var ReflectionMethod $ref */
+        foreach ($map as $name => $actions) {
             foreach ($actions as $ref) {
                 $action = '/' . substr($ref->getName(), 0, strrpos($ref->getName(), 'Action'));
                 if ($action === '/index') {
                     $action = '';
                 }
-                $help .= sprintf("- %s%s %s\n", lcfirst(substr($name, 0, strrpos($name, 'Command'))), $action, $this->getComment($ref));
+                $commands[] = [
+                    'command' => lcfirst(substr($name, 0, strrpos($name, 'Command'))) . $action,
+                    'desc' => $this->getComment($ref)
+                ];
             }
         }
-        return $help;
+        return $commands;
+    }
+
+    private function getCommandMaxLength(array $commands): int
+    {
+        $maxLength = 0;
+        foreach ($commands as $row) {
+            $length = strlen($row['command']);
+            if ($length > $maxLength) {
+                $maxLength = $length;
+            }
+        }
+        return $maxLength;
     }
 
     private function getComment(ReflectionMethod $ref): string

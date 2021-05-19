@@ -47,7 +47,7 @@ HELP;
         fwrite(STDERR, $message);
         exit(1);
     }
-    require_once $autoloadPath;
+    require($autoloadPath);
 
     $configPath = $params['config'] ?? dirname($autoloadPath, 2) . '/config/main.php';
     unset($params['config']);
