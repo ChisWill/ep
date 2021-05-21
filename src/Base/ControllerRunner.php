@@ -18,17 +18,17 @@ class ControllerRunner implements ConfigurableInterface
 {
     use ConfigurableTrait;
 
+    protected ?string $suffix = null;
+
     private Config $config;
     protected ContainerInterface $container;
     private Injector $injector;
-    private string $suffix;
 
     public function __construct(Config $config, ContainerInterface $container, Injector $injector)
     {
         $this->config = $config;
         $this->container = $container;
         $this->injector = $injector;
-        $this->suffix = $config->controllerDirAndSuffix;
     }
 
     /**
@@ -133,7 +133,7 @@ class ControllerRunner implements ConfigurableInterface
             case 1:
                 array_push($handler, $this->config->defaultAction);
             case 2:
-                $suffixPos = strpos($handler[0], '\\' . $this->suffix . '\\');
+                $suffixPos = strpos($handler[0], '\\' . $this->getControllerSuffix() . '\\');
                 if ($suffixPos === false) {
                     throw new InvalidArgumentException('The route handler is not in the correct directory.');
                 }
@@ -166,13 +166,22 @@ class ControllerRunner implements ConfigurableInterface
                 $prefix = implode('\\', array_map([Str::class, 'toPascalCase'], $pieces));
                 break;
         }
+        $suffix = $this->getControllerSuffix();
         if ($prefix) {
-            $ns = strpos($prefix, '\\\\') === false ? $prefix . '\\' . $this->suffix : str_replace('\\\\', '\\' . $this->suffix . '\\', $prefix);
+            $ns = strpos($prefix, '\\\\') === false ? $prefix . '\\' . $suffix : str_replace('\\\\', '\\' . $suffix . '\\', $prefix);
         } else {
-            $ns = $this->suffix;
+            $ns = $suffix;
         }
-        $class = sprintf('%s\\%s\\%s', $this->config->appNamespace, $ns, Str::toPascalCase($controller) . $this->suffix);
+        $class = sprintf('%s\\%s\\%s', $this->config->appNamespace, $ns, Str::toPascalCase($controller) . $suffix);
         return [$prefix, $class, $action];
+    }
+
+    private function getControllerSuffix(): string
+    {
+        if ($this->suffix === null) {
+            $this->suffix = $this->config->controllerDirAndSuffix;
+        }
+        return $this->suffix;
     }
 
     private function generateContextId(ControllerInterface $controller): string
@@ -180,7 +189,7 @@ class ControllerRunner implements ConfigurableInterface
         return implode('/', array_filter(
             array_map('lcfirst', explode(
                 '\\',
-                str_replace([$this->config->appNamespace, $this->suffix], '', get_class($controller))
+                str_replace([$this->config->appNamespace, $this->getControllerSuffix()], '', get_class($controller))
             ))
         ));
     }

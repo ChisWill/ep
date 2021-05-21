@@ -21,32 +21,58 @@ final class MigrateCommand extends Command
     }
 
     /**
-     * 初始化所有表结构
+     * 创建一个迁移记录
      */
-    public function initAction(ConsoleRequestInterface $request): string
+    public function newAction(ConsoleRequestInterface $request): string
     {
-        $db = $request->getParams()['db'] ?? '';
-
         try {
-            return $this->service->init($db);
+            $this->service->init($request->getParams());
+
+            return $this->service->new();
         } catch (Throwable $t) {
             return $t->getMessage();
         }
     }
 
     /**
-     * 创建一个迁移记录
+     * 初始化所有表结构
      */
-    public function createAction(): string
+    public function ddlAction(ConsoleRequestInterface $request): string
     {
-        return 'create';
+        try {
+            $this->service->initDDL($request->getParams());
+
+            return $this->service->ddl();
+        } catch (Throwable $t) {
+            return $t->getMessage();
+        }
+    }
+
+    /**
+     * 更新所有迁移
+     */
+    public function allAction(ConsoleRequestInterface $request): string
+    {
+        try {
+            $this->service->init($request->getParams());
+
+            return $this->service->all();
+        } catch (Throwable $t) {
+            return $t->getMessage();
+        }
     }
 
     /**
      * 执行所有还未同步的迁移
      */
-    public function updateAction(): string
+    public function upAction(ConsoleRequestInterface $request): string
     {
-        return 'update';
+        try {
+            $this->service->init($request->getParams());
+
+            return $this->service->up();
+        } catch (Throwable $t) {
+            return $t->getMessage();
+        }
     }
 }

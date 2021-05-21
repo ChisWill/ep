@@ -43,11 +43,6 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
         $this->aliases = $aliases;
     }
 
-    public function getViewPath(): string
-    {
-        return '@ep/views';
-    }
-
     /**
      * @param  ServerRequestInterface $request
      * 
@@ -215,5 +210,10 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
             'Post Max Size' => @ini_get('post_max_size') ?: 'Unknown',
             'Upload Max Filesize' => @ini_get('upload_max_filesize') ?: 'Unknown',
         ];
+    }
+
+    protected function getViewPath(): string
+    {
+        return '@ep/views';
     }
 }

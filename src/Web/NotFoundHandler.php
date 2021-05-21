@@ -38,7 +38,7 @@ final class NotFoundHandler implements NotFoundHandlerInterface, ContextInterfac
         );
     }
 
-    public function getViewPath(): string
+    protected function getViewPath(): string
     {
         return '@ep/views';
     }

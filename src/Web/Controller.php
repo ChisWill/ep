@@ -40,11 +40,6 @@ abstract class Controller implements ControllerInterface
         return $response;
     }
 
-    protected function getViewClass(): string
-    {
-        return View::class;
-    }
-
     private ?Service $service = null;
 
     protected function getService(): Service
@@ -86,5 +81,10 @@ abstract class Controller implements ControllerInterface
     protected function redirect(string $url, int $statusCode = Status::FOUND): ResponseInterface
     {
         return $this->getService()->redirect($url, $statusCode);
+    }
+
+    protected function getViewClass(): string
+    {
+        return View::class;
     }
 }

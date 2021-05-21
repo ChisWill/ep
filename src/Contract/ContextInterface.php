@@ -12,6 +12,4 @@ use Ep\Base\View;
 interface ContextInterface
 {
     public function getView(): View;
-
-    public function getViewPath(): string;
 }

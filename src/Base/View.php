@@ -16,15 +16,16 @@ class View implements ConfigurableInterface
     public string $layout = 'main';
 
     protected ?string $viewPath = null;
+    protected ?string $prefix = null;
     protected ?ContextInterface $context = null;
 
-    private Aliases $aliases;
     private Config $config;
+    private Aliases $aliases;
 
     public function __construct(Config $config, Aliases $aliases)
     {
-        $this->aliases = $aliases;
         $this->config = $config;
+        $this->aliases = $aliases;
     }
 
     public function render(string $path, array $params = []): string
@@ -36,12 +37,20 @@ class View implements ConfigurableInterface
 
     public function renderPartial(string $path, array $params = []): string
     {
-        return $this->renderPhpFile($this->findViewFile($this->getFilePath($path)), $params);
+        return $this->renderPHPFile($this->findFilePath($this->normalizePath($path)), $params);
     }
 
     public function renderFile(string $file): string
     {
-        return file_get_contents($this->findViewFile($this->getFilePath($file), ''));
+        return file_get_contents($this->findFilePath($this->normalizePath($file), ''));
+    }
+
+    private function normalizePath(string $path): string
+    {
+        if ($this->prefix !== null && strpos($path, '/') !== 0) {
+            $path = '/' . $this->prefix . '/' . $path;
+        }
+        return $path;
     }
 
     private function getViewPath(): string
@@ -52,53 +61,28 @@ class View implements ConfigurableInterface
         return $this->viewPath;
     }
 
-    private ?string $contextId = null;
-
-    private function getContextId(): ?string
-    {
-        if ($this->contextId === null) {
-            if ($this->context instanceof ContextInterface) {
-                $this->contextId = $this->context->id;
-            }
-            if (is_string($this->contextId)) {
-                $this->contextId = trim($this->contextId, '/');
-            }
-        }
-        return $this->contextId;
-    }
-
-    private function getFilePath(string $path): string
-    {
-        $contextId = $this->getContextId();
-        if ($contextId !== null && strpos($path, '/') !== 0) {
-            $path = '/' . $contextId . '/' . $path;
-        }
-        return $path;
-    }
-
     private function renderLayout(string $layout, array $params = []): string
     {
         if (strpos($layout, '/') !== 0) {
-            $contextId = $this->getContextId();
-            if ($contextId === null || ($pos = strrpos($contextId, '/')) === false) {
+            if ($this->prefix === null || ($pos = strrpos($this->prefix, '/')) === false) {
                 $layout = '/' . $this->config->layoutDir . '/' . $layout;
             } else {
-                $layout = '/' . substr($contextId, 0, $pos) . '/' . $this->config->layoutDir . '/' . $layout;
+                $layout = '/' . substr($this->prefix, 0, $pos) . '/' . $this->config->layoutDir . '/' . $layout;
             }
         }
-        return $this->renderPhpFile($this->findViewFile($layout), $params);
+        return $this->renderPHPFile($this->findFilePath($layout), $params);
     }
 
-    private function findViewFile(string $path, string $ext = '.php'): string
+    private function findFilePath(string $view, string $ext = '.php'): string
     {
-        return $this->aliases->get($this->getViewPath() . $path . $ext);
+        return $this->aliases->get($this->getViewPath() . $view . $ext);
     }
 
     /**
      * @param string $file
      * @param array  $params
      */
-    private function renderPhpFile(): string
+    private function renderPHPFile(): string
     {
         ob_start();
         PHP_VERSION_ID >= 80000 ? ob_implicit_flush(false) : ob_implicit_flush(0);

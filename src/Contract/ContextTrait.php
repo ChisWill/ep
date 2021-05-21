@@ -7,6 +7,9 @@ namespace Ep\Contract;
 use Ep;
 use Ep\Base\View;
 
+/**
+ * @property string $id
+ */
 trait ContextTrait
 {
     private ?View $view = null;
@@ -16,6 +19,7 @@ trait ContextTrait
         if ($this->view === null) {
             $this->view = Ep::getDi()->get($this->getViewClass())->clone([
                 'viewPath' => $this->getViewPath(),
+                'prefix' => $this->id,
                 'context' => $this
             ]);
         }
@@ -27,7 +31,7 @@ trait ContextTrait
         return View::class;
     }
 
-    public function getViewPath(): string
+    protected function getViewPath(): string
     {
         return Ep::getConfig()->viewPath;
     }

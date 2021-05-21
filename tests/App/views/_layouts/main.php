@@ -9,7 +9,7 @@ use Yiisoft\Assets\AssetManager;
 use Yiisoft\Assets\AssetPublisherInterface;
 
 $manager = Ep::getDi()->get(AssetManager::class);
-$manager->setPublisher(Ep::getDi()->get(AssetPublisherInterface::class));
+$manager = $manager->withPublisher(Ep::getDi()->get(AssetPublisherInterface::class));
 $manager->register([
     MainAsset::class
 ]);
@@ -22,8 +22,10 @@ $manager->register([
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:image/ico;base64,aWNv">
     <title><?= $this->context->title ?? 'Basic - EP' ?></title>
-    <?php foreach ($manager->getJsFiles() as $jsFile) : ?>
-        <script src="<?= $jsFile['url'] ?>"></script>
+    <?php foreach ($manager->getJsFiles() as $jsFiles) : ?>
+        <?php foreach ($jsFiles as $js) : ?>
+            <script src="<?= $js ?>"></script>
+        <?php endforeach ?>
     <?php endforeach ?>
 </head>
 

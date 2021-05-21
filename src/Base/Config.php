@@ -50,6 +50,10 @@ final class Config
      */
     public string $commandDirAndSuffix = 'Command';
     /**
+     * 数据迁移表名
+     */
+    public string $migrationTableName = 'migration';
+    /**
      * Action 后缀
      */
     public string $actionSuffix = 'Action';

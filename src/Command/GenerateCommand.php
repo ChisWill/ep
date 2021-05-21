@@ -30,8 +30,8 @@ final class GenerateCommand extends Command
     public function modelAction(ConsoleRequestInterface $request): string
     {
         $params = $request->getParams();
-        if ($this->service->isMultiple($params['table'] ?? '')) {
-            foreach ($this->service->getPieces($params['table']) as $table) {
+        if ($this->isMultiple($params['table'] ?? '')) {
+            foreach ($this->getPieces($params['table']) as $table) {
                 $params['table'] = $table;
                 $result[] = $this->singleModel($params);
             }
@@ -41,32 +41,28 @@ final class GenerateCommand extends Command
         }
     }
 
+    private function isMultiple(string $param): bool
+    {
+        return strpos($param, ',') !== false;
+    }
+
+    private function getPieces(string $param): array
+    {
+        return explode(',', $param);
+    }
+
     private function singleModel(array $params): string
     {
         try {
-            $this->service->validateModel($params);
+            $this->service->initModel($params);
+
+            if ($this->service->hasModel()) {
+                return $this->service->updateModel();
+            } else {
+                return $this->service->createModel();
+            }
         } catch (Throwable $t) {
             return $t->getMessage();
         }
-
-        if ($this->service->hasModel()) {
-            return $this->service->updateModel();
-        } else {
-            return $this->service->createModel(
-                $this->getView()->renderPartial('model', [
-                    'namespace' => $this->service->getNamespace(),
-                    'primaryKey' => $this->service->getPrimaryKey(),
-                    'tableName' => $this->service->getTableName(),
-                    'className' => $this->service->getClassName(),
-                    'property' => $this->service->getProperty(),
-                    'rules' => $this->service->getRules()
-                ])
-            );
-        }
-    }
-
-    public function getViewPath(): string
-    {
-        return '@ep/views';
     }
 }

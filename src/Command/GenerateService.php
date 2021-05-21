@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace Ep\Command;
 
-use Ep;
 use Ep\Base\Config;
+use Ep\Base\View;
 use Ep\Helper\File;
 use Ep\Helper\Str;
 use Yiisoft\Aliases\Aliases;
-use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\TableSchema;
-use Yiisoft\Factory\Exceptions\NotFoundException;
 use Yiisoft\Strings\StringHelper;
 use InvalidArgumentException;
 
@@ -21,52 +19,134 @@ final class GenerateService extends Service
 {
     private Config $config;
     private Aliases $aliases;
+    private View $view;
 
-    public function __construct(Config $config, Aliases $aliases)
+    public function __construct(Config $config, Aliases $aliases, View $view)
     {
         $this->config = $config;
         $this->aliases = $aliases;
+        $this->view = $view->configure([
+            'viewPath' => '@ep/views',
+            'prefix' => 'generate'
+        ]);
     }
 
-    private string $appNamespace;
+    public function render(string $path, array $params): string
+    {
+        return $this->view->renderPartial($path, $params);
+    }
+
     private string $table;
     private string $path;
     private string $prefix;
-    private Connection $db;
-    private ?TableSchema $schema;
+    private TableSchema $tableSchema;
 
     /**
+     * @param array $params 可用参数为:
+     *
+     * - table: 生成目标的表名
+     * - path: 生成目标的物理地址，从命名空间后开始计算
+     * - prefix: 数据库连接设置外的表前缀
+     * 
      * @throws InvalidArgumentException
      */
-    public function validateModel(array $params)
+    public function initModel(array $params): void
     {
-        $this->appNamespace = $params['common.appNamespace'];
+        $this->init($params);
+
         $this->table = $params['table'] ?? '';
         if (!$this->table) {
             $this->required('table');
         }
         $this->path = $params['path'] ?? $params['generate.model.path'] ?? 'Model';
         $this->prefix = $params['prefix'] ?? $params['generate.model.prefix'] ?? '';
-        $db = $params['db'] ?? $params['generate.model.db'] ?? $params['common.db'] ?? null;
-        try {
-            $this->db = Ep::getDb($db);
-        } catch (NotFoundException $e) {
-            $this->invalid('db', $db);
-        }
-        $this->schema = $this->db->getTableSchema($this->table);
-        if (!$this->schema) {
+
+        $tableSchema = $this->db->getTableSchema($this->table);
+        if (!$tableSchema) {
             $this->invalid('table', $this->table);
+        }
+        $this->tableSchema = $tableSchema;
+    }
+
+    public function createModel(): string
+    {
+        $filePath = $this->getFilePath();
+        if (!file_exists($filePath)) {
+            File::mkdir($filePath);
+        }
+        if (@file_put_contents($this->getModelFileName(), $this->render('model', [
+            'namespace' => $this->getNamespace(),
+            'primaryKey' => $this->getPrimaryKey(),
+            'tableName' => $this->getTableName(),
+            'className' => $this->getModelClassName(),
+            'property' => $this->getModelProperty(),
+            'rules' => $this->getModelRules()
+        ]))) {
+            return sprintf('The file "%s.php" has been created in "%s".', $this->getModelClassName(), $filePath);
+        } else {
+            return 'Generate failed.';
         }
     }
 
-    public function getNamespace(): string
+    public function updateModel(): string
+    {
+        $filename = $this->getModelFileName();
+        $rules = [
+            '~(/\*\*\s).+( \*/\sclass)~s' => '$1' . $this->getModelProperty() . '$2',
+            '~(public const PK = ).+(;)~' => '$1' . $this->getPrimaryKey() . '$2',
+        ];
+        $content = preg_replace(array_keys($rules), array_values($rules), file_get_contents($filename));
+        if (@file_put_contents($filename, $content)) {
+            return sprintf('%s.php has been overrided in %s', $this->getModelClassName(), $this->getFilePath());
+        } else {
+            return 'Overwrite model failed.';
+        }
+    }
+
+    public function hasModel(): bool
+    {
+        return file_exists($this->getModelFileName());
+    }
+
+    private ?string $appPath = null;
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function getAppPath(): string
+    {
+        if ($this->appPath === null) {
+            $vendorDirname = dirname($this->aliases->get($this->config->vendorPath));
+            $composerPath = $vendorDirname . '/composer.json';
+            if (!file_exists($composerPath)) {
+                throw new InvalidArgumentException('Unable to find composer.json in your project root.');
+            }
+            $composerContent = json_decode(file_get_contents($composerPath), true);
+            $autoload = ($composerContent['autoload']['psr-4'] ?? []) + ($composerContent['autoload-dev']['psr-4'] ?? []);
+            $appPath = null;
+            foreach ($autoload as $ns => $path) {
+                if ($ns === $this->appNamespace . '\\') {
+                    $appPath = $path;
+                    break;
+                }
+            }
+            if ($appPath === null) {
+                throw new InvalidArgumentException('You should set the "autoload[psr-4]" configuration in your composer.json first.');
+            }
+            $this->appPath = $vendorDirname . '/' . $appPath;
+        }
+
+        return $this->appPath;
+    }
+
+    private function getNamespace(): string
     {
         return sprintf('%s\\%s', $this->appNamespace, implode('\\', array_map([Str::class, 'toPascalCase'], explode('/', $this->path))));
     }
 
-    public function getPrimaryKey(): string
+    private function getPrimaryKey(): string
     {
-        $primaryKeys = $this->schema->getPrimaryKey();
+        $primaryKeys = $this->tableSchema->getPrimaryKey();
         switch (count($primaryKeys)) {
             case 0:
                 return "''";
@@ -77,17 +157,17 @@ final class GenerateService extends Service
         }
     }
 
-    public function getTableName(): string
+    private function getTableName(): string
     {
         return substr($this->table, strlen($this->db->getTablePrefix()));
     }
 
-    public function getClassName(): string
+    private function getModelClassName(): string
     {
         return Str::toPascalCase(substr($this->getTableName(), strlen($this->prefix)));
     }
 
-    public function getProperty(): string
+    private function getModelProperty(): string
     {
         $property = '';
         foreach ($this->getColumns() as $field => $column) {
@@ -99,7 +179,7 @@ final class GenerateService extends Service
     /**
      * @return string[]
      */
-    public function getRules(): array
+    private function getModelRules(): array
     {
         $fields = [];
         $types = [];
@@ -179,57 +259,14 @@ final class GenerateService extends Service
         return [$use, $rules];
     }
 
-    public function hasModel(): bool
-    {
-        return file_exists($this->getFileName());
-    }
-
-    public function createModel(string $content): string
-    {
-        $filePath = $this->getFilePath();
-        if (!file_exists($filePath)) {
-            File::mkdir($filePath);
-        }
-        if (@file_put_contents($this->getFileName(), $content)) {
-            return sprintf('%s.php has been created in %s', $this->getClassName(), $filePath);
-        } else {
-            return 'Generate model failed.';
-        }
-    }
-
-    public function updateModel(): string
-    {
-        $filename = $this->getFileName();
-        $rules = [
-            '~(/\*\*\s).+( \*/\sclass)~s' => '$1' . $this->getProperty() . '$2',
-            '~(public const PK = ).+(;)~' => '$1' . $this->getPrimaryKey() . '$2',
-        ];
-        $content = preg_replace(array_keys($rules), array_values($rules), file_get_contents($filename));
-        if (@file_put_contents($filename, $content)) {
-            return sprintf('%s.php has been overrided in %s', $this->getClassName(), $this->getFilePath());
-        } else {
-            return 'Overwrite model failed.';
-        }
-    }
-
-    public function isMultiple(string $param): bool
-    {
-        return strpos($param, ',') !== false;
-    }
-
-    public function getPieces(string $param): array
-    {
-        return explode(',', $param);
-    }
-
     private function getFilePath(): string
     {
         return sprintf('%s/%s', $this->getAppPath(), $this->path);
     }
 
-    private function getFileName(): string
+    private function getModelFileName(): string
     {
-        return $this->getFilePath() . '/' . $this->getClassName() . '.php';
+        return $this->getFilePath() . '/' . $this->getModelClassName() . '.php';
     }
 
     /**
@@ -237,38 +274,7 @@ final class GenerateService extends Service
      */
     private function getColumns(): array
     {
-        return $this->schema->getColumns();
-    }
-
-    private ?string $appPath = null;
-
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function getAppPath(): string
-    {
-        if ($this->appPath === null) {
-            $vendorDirname = dirname($this->aliases->get($this->config->vendorPath));
-            $composerPath = $vendorDirname . '/composer.json';
-            if (!file_exists($composerPath)) {
-                throw new InvalidArgumentException('Unable to find composer.json in your project root.');
-            }
-            $composerContent = json_decode(file_get_contents($composerPath), true);
-            $autoload = ($composerContent['autoload']['psr-4'] ?? []) + ($composerContent['autoload-dev']['psr-4'] ?? []);
-            $appPath = null;
-            foreach ($autoload as $ns => $path) {
-                if ($ns === $this->appNamespace . '\\') {
-                    $appPath = $path;
-                    break;
-                }
-            }
-            if ($appPath === null) {
-                throw new InvalidArgumentException('You should set the "autoload[psr-4]" configuration in your composer.json first.');
-            }
-            $this->appPath = $vendorDirname . '/' . $appPath;
-        }
-
-        return $this->appPath;
+        return $this->tableSchema->getColumns();
     }
 
     private function typecast(string $type): string
