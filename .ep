@@ -1,7 +1,7 @@
 autoload=./vendor/autoload.php
 config=./tests/App/config/main.php
 
-common.db=
+common.db=sqlite
 
 generate.model.path=Model
 generate.model.prefix=

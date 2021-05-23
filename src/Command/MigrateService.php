@@ -36,6 +36,7 @@ final class MigrateService extends Service
 
     private string $basePath;
     private string $migratePath;
+    private int $step;
     private MigrateBuilder $builder;
 
     /**
@@ -46,13 +47,12 @@ final class MigrateService extends Service
         parent::init($params);
 
         $this->generateService->init($params);
-
         $this->migratePath = $params['path'] ?? $params['migrate.path'] ?? null;
         if (!$this->migratePath) {
             $this->required('path');
         }
         $this->basePath = $this->generateService->getAppPath() . '/' . $this->migratePath;
-
+        $this->step = $params['step'] ?? 1;
         $this->builder = new MigrateBuilder($this->db);
 
         if (!file_exists($this->basePath)) {
@@ -90,7 +90,9 @@ final class MigrateService extends Service
         $dbService = new DbService($this->db);
         $ddl = '';
         foreach ($dbService->getTables($this->prefix) as $tableName) {
-            $ddl .= $dbService->getDDL($tableName) . ";\n";
+            if ($tableName !== $this->tableName) {
+                $ddl .= $dbService->getDDL($tableName) . ";\n";
+            }
         }
 
         return $this->createFile('migrate/ddl', $className, compact('ddl'));
@@ -114,6 +116,70 @@ final class MigrateService extends Service
             ->column();
 
         return $this->migrate($history);
+    }
+
+    public function down(): string
+    {
+        $history = Query::find($this->db)
+            ->select('version')
+            ->from($this->tableName)
+            ->column();
+
+        return $this->revert($history, $this->step);
+    }
+
+    private function revert(array $history, int $step = 1): string
+    {
+        $files = FileHelper::findFiles($this->basePath, [
+            'filter' => (new PathMatcher())->only('**.php')->except('**/' . $this->ddlClassName . '.php')
+        ]);
+        rsort($files);
+
+        $error = '';
+        $classList = [];
+        $transaction = $this->db->beginTransaction();
+        $count = 0;
+        foreach ($files as $file) {
+            if ($count === $step) {
+                break;
+            }
+            $className = $this->getClassNameByFile($file);
+            if (!class_exists($className)) {
+                $this->throw("The class \"{$className}\" is not exists.");
+            }
+            if (!in_array($className, $history)) {
+                continue;
+            }
+            /** @var MigrateInterface $class */
+            $class = new $className();
+            if (!$class instanceof MigrateInterface) {
+                $this->throw("The class \"{$className}\" is not implements \"" . MigrateInterface::class . "\".");
+            }
+            try {
+                $class->down($this->builder);
+                array_unshift($classList, $class);
+                $count++;
+            } catch (Throwable $t) {
+                $error = "{$className}::down() failed.";
+                $transaction->rollBack();
+                break;
+            }
+        }
+
+        if ($error) {
+            return $error;
+        } else {
+            $count = count($classList);
+            if ($count > 0) {
+                $this->builder->delete($this->tableName, ['version' => array_map('get_class', $classList)]);
+
+                $transaction->commit();
+
+                return sprintf('Migrate revert count: %d.', $count);
+            } else {
+                return 'No commits.';
+            }
+        }
     }
 
     private function migrate(array $history = []): string
@@ -172,7 +238,7 @@ final class MigrateService extends Service
 
                 $transaction->commit();
 
-                return sprintf('Migrate count: %d.', $count);
+                return sprintf('Migrate commit count: %d.', $count);
             } else {
                 return 'Already up to date.';
             }

@@ -23,7 +23,6 @@ trait QueryTrait
         return $this
             ->select([$value, $key])
             ->indexBy($column)
-            ->asArray()
             ->column();
     }
 

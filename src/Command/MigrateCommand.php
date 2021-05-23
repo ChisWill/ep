@@ -75,4 +75,18 @@ final class MigrateCommand extends Command
             return $t->getMessage();
         }
     }
+
+    /**
+     * 回退已执行过的迁移
+     */
+    public function downAction(ConsoleRequestInterface $request): string
+    {
+        try {
+            $this->service->init($request->getParams());
+
+            return $this->service->down();
+        } catch (Throwable $t) {
+            return $t->getMessage();
+        }
+    }
 }

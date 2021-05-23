@@ -18,6 +18,6 @@ return static fn (Config $config): array => [
     // Sqlite
     'sqlite' => [
         'class' => SqliteConnection::class,
-        '__construct()' => ['sqlite:' . dirname(__FILE__) . '/ep.sqlite3'],
+        '__construct()' => ['sqlite:' . dirname(__FILE__) . '/ep.sqlite'],
     ],
 ];
