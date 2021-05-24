@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ep\Command;
+namespace Ep\Command\Service;
 
 use Ep\Base\Config;
 use Ep\Base\View;

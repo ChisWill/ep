@@ -25,11 +25,25 @@ final class HelpCommand extends Command
         $commands = $this->getCommands($files);
         $commandMaxLength = $this->getCommandMaxLength($commands);
 
-        $help = "\nThe following commands are available:\n\n";
+        $help = "\nThe following commands are available:\n";
+        $lastCommand = null;
         foreach ($commands as $row) {
+            if (($name = $this->getCommandName($row['command'])) != $lastCommand) {
+                $lastCommand = $name;
+                $help .= "\n";
+            }
             $help .= sprintf("- %s%s%s\n", $row['command'], str_repeat(' ', $commandMaxLength - strlen($row['command']) + 1), $row['desc']);
         }
         return $help;
+    }
+
+    private function getCommandName(string $command): string
+    {
+        if (strpos($command, '/') !== false) {
+            return explode('/', $command)[0];
+        } else {
+            return $command;
+        }
     }
 
     private function getCommands(array $files): array

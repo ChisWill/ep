@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ep\Command;
+namespace Ep\Command\Service;
 
 use Ep\Base\Config;
+use Ep\Command\Helper\MigrateBuilder;
 use Ep\Console\Service as ConsoleService;
 use Ep\Contract\MigrateInterface;
 use Ep\Db\ActiveRecord;

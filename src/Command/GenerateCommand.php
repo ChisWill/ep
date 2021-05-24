@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Command;
 
+use Ep\Command\Service\GenerateService;
 use Ep\Console\Command;
 use Ep\Contract\ConsoleRequestInterface;
 use Throwable;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Contract;
 
-use Ep\Command\MigrateBuilder;
+use Ep\Command\Helper\MigrateBuilder;
 
 interface MigrateInterface
 {

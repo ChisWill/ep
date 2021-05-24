@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ep\Command;
+namespace Ep\Command\Helper;
 
 use Ep\Db\Query;
 use Ep\Helper\Str;
