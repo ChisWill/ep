@@ -20,6 +20,7 @@
         "yiisoft/db-mysql": "dev-master",
         "yiisoft/db-redis": "1.0.x-dev",
         "yiisoft/di": "^3.0",
+        "yiisoft/files": "^1.0",
         "yiisoft/http": "^1.0",
         "yiisoft/log": "^1.0",
         "yiisoft/log-target-file": "dev-master",

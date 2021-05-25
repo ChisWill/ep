@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App\Migration;
 
-use Ep\Command\MigrateBuilder;
+use Ep\Command\Helper\MigrateBuilder;
 use Ep\Contract\MigrateInterface;
 
 final class DDL implements MigrateInterface
