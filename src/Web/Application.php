@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Web;
 
-use Ep\Base\Application as BaseApplication;
 use Ep\Base\Config;
 use Ep\Base\ErrorHandler;
 use Ep\Contract\NotFoundHandlerInterface;
@@ -14,7 +13,7 @@ use Yiisoft\Yii\Web\ServerRequestFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class Application extends BaseApplication
+final class Application
 {
     private Config $config;
     private ServerRequestFactory $serverRequestFactory;
@@ -39,36 +38,33 @@ final class Application extends BaseApplication
         $this->sapiEmitter = $sapiEmitter;
     }
 
-    public function createRequest(): ServerRequestInterface
+    public function run(): void
+    {
+        $request = $this->createRequest();
+
+        $this->register($request);
+
+        $this->send($request, $this->handleRequest($request));
+    }
+
+    private function createRequest(): ServerRequestInterface
     {
         return new ServerRequest($this->serverRequestFactory->createFromGlobals());
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     */
-    public function register($request): void
+    private function register(ServerRequestInterface $request): void
     {
         $this->errorHandler->register($request);
     }
 
-    /**
-     * @param  ServerRequestInterface $request
-     * 
-     * @return ResponseInterface
-     */
-    public function handleRequest($request)
+    private function handleRequest(ServerRequestInterface $request): ResponseInterface
     {
         return $this->requestHandlerFactory
             ->wrap($this->config->webMiddlewares, $this->notFoundHandler)
             ->handle($request);
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface      $response
-     */
-    public function send($request, $response): void
+    private function send(ServerRequestInterface $request, ResponseInterface $response): void
     {
         $this->sapiEmitter->emit(
             $response,

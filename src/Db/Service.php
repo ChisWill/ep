@@ -22,19 +22,17 @@ final class Service
 
         switch ($this->db->getDriverName()) {
             case 'mysql':
+                $field = 'TABLE_NAME';
                 $query
-                    ->select('TABLE_NAME')
                     ->from('information_schema.TABLES')
                     ->where(['TABLE_SCHEMA' => new Expression('database()')]);
-                $field = 'TABLE_NAME';
                 break;
             case 'sqlite':
+                $field = 'name';
                 $query
-                    ->select('name')
                     ->from('sqlite_master')
                     ->where(['type' => 'table'])
                     ->andWhere(new Expression("`name` NOT LIKE 'sqlite_%'"));
-                $field = 'name';
                 break;
         }
 
@@ -42,7 +40,7 @@ final class Service
             $query->andWhere(new Expression("`{$field}` LIKE '{$prefix}%'"));
         }
 
-        return $query->column();
+        return $query->select($field)->column();
     }
 
     public function getDDL(string $tableName): string

@@ -12,6 +12,8 @@ use Psr\Log\LoggerInterface;
 
 final class Ep
 {
+    public const VERSION = '1.0';
+
     private static ContainerInterface $di;
 
     public static function init(array $config): void

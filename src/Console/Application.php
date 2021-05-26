@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Ep\Console;
 
-use Ep\Base\Application as BaseApplication;
 use Ep\Base\Config;
 use Ep\Base\ControllerRunner;
 use Ep\Base\ErrorHandler;
 use Ep\Base\Route;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\NotFoundException;
+use Symfony\Component\Console\Application as SymfonyApplication;
 
-final class Application extends BaseApplication
+final class Application
 {
     private Config $config;
+    private SymfonyApplication $symfonyApplication;
     private ConsoleRequestInterface $consoleRequest;
     private ErrorHandler $errorHandler;
     private ErrorRenderer $errorRenderer;
@@ -23,6 +24,7 @@ final class Application extends BaseApplication
 
     public function __construct(
         Config $config,
+        SymfonyApplication $symfonyApplication,
         ConsoleRequestInterface $consoleRequest,
         ErrorHandler $errorHandler,
         ErrorRenderer $errorRenderer,
@@ -30,6 +32,7 @@ final class Application extends BaseApplication
         ControllerRunner $controllerRunner
     ) {
         $this->config = $config;
+        $this->symfonyApplication = $symfonyApplication;
         $this->consoleRequest = $consoleRequest;
         $this->errorHandler = $errorHandler;
         $this->errorRenderer = $errorRenderer;
@@ -37,15 +40,21 @@ final class Application extends BaseApplication
         $this->controllerRunner = $controllerRunner;
     }
 
-    public function createRequest(): ConsoleRequestInterface
+    public function run(): void
+    {
+        $request = $this->createRequest();
+
+        $this->register($request);
+
+        $this->send($request, $this->handleRequest($request));
+    }
+
+    private function createRequest(): ConsoleRequestInterface
     {
         return $this->consoleRequest;
     }
 
-    /**
-     * @param ConsoleRequestInterface $request
-     */
-    public function register($request): void
+    private function register(ConsoleRequestInterface $request): void
     {
         $this->errorHandler
             ->configure([
@@ -54,12 +63,10 @@ final class Application extends BaseApplication
             ->register($request);
     }
 
-    /**
-     * @param ConsoleRequestInterface $request
-     * 
+    /** 
      * @return mixed
      */
-    public function handleRequest($request)
+    private function handleRequest(ConsoleRequestInterface $request)
     {
         try {
             [, $handler] = $this->route
@@ -83,10 +90,9 @@ HELP;
     }
 
     /**
-     * @param ConsoleRequestInterface $request
-     * @param mixed                   $response
+     * @param mixed $response
      */
-    public function send($request, $response): void
+    private function send(ConsoleRequestInterface $request, $response): void
     {
         if (is_scalar($response)) {
             if ($response) {
