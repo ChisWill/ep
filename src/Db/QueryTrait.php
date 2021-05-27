@@ -13,6 +13,11 @@ trait QueryTrait
         return new Paginator($this);
     }
 
+    public function paginate(int $page, int $pageSize = 15): array
+    {
+        return (new Paginator($this))->data($page, $pageSize);
+    }
+
     public function map(string $key, string $value): array
     {
         if (strpos($key, '.') === false) {
