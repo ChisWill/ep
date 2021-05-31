@@ -24,9 +24,9 @@ final class GenerateCommand extends Command
     {
         return [
             new InputArgument('table', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'The table name'),
-            new InputOption('db', null, InputArgument::OPTIONAL, 'The db name'),
-            new InputOption('path', null, InputArgument::OPTIONAL, 'The path of model'),
-            new InputOption('prefix', null, InputArgument::OPTIONAL, 'The prefix of table'),
+            new InputOption('db', null, InputOption::VALUE_REQUIRED, 'The db name'),
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The path of model'),
+            new InputOption('prefix', null, InputOption::VALUE_REQUIRED, 'The prefix of table'),
         ];
     }
 
@@ -54,11 +54,10 @@ final class GenerateCommand extends Command
             $this->service->initModel($options);
 
             if ($this->service->hasModel()) {
-                $this->service->updateModel();
+                return $this->string($this->service->updateModel());
             } else {
-                $this->service->createModel();
+                return $this->string($this->service->createModel());
             }
-            return Command::OK;
         } catch (Throwable $t) {
             return $this->string($t->getMessage());
         }

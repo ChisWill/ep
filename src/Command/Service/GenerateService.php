@@ -21,9 +21,8 @@ final class GenerateService extends Service
     private Config $config;
     private Aliases $aliases;
     private View $view;
-    private ConsoleResponse $consoleResponse;
 
-    public function __construct(Config $config, Aliases $aliases, View $view, ConsoleResponse $consoleResponse)
+    public function __construct(Config $config, Aliases $aliases, View $view)
     {
         $this->config = $config;
         $this->aliases = $aliases;
@@ -31,7 +30,6 @@ final class GenerateService extends Service
             'viewPath' => '@ep/views',
             'prefix' => 'generate'
         ]);
-        $this->consoleResponse = $consoleResponse;
     }
 
     public function render(string $path, array $params): string
@@ -62,7 +60,7 @@ final class GenerateService extends Service
         $this->tableSchema = $tableSchema;
     }
 
-    public function createModel(): void
+    public function createModel(): string
     {
         $filePath = $this->getFilePath();
         if (!file_exists($filePath)) {
@@ -76,13 +74,13 @@ final class GenerateService extends Service
             'property' => $this->getModelProperty(),
             'rules' => $this->getModelRules()
         ]))) {
-            $this->consoleResponse->writeln(sprintf('The file "%s.php" has been created in "%s".', $this->getModelClassName(), $filePath));
+            return sprintf('The file "%s.php" has been created in "%s".', $this->getModelClassName(), $filePath);
         } else {
-            $this->consoleResponse->writeln('Generate failed.');
+            return 'Generate failed.';
         }
     }
 
-    public function updateModel(): void
+    public function updateModel(): string
     {
         $filename = $this->getModelFileName();
         $rules = [
@@ -91,9 +89,9 @@ final class GenerateService extends Service
         ];
         $content = preg_replace(array_keys($rules), array_values($rules), file_get_contents($filename));
         if (@file_put_contents($filename, $content)) {
-            $this->consoleResponse->writeln(sprintf('%s.php has been overrided in %s', $this->getModelClassName(), $this->getFilePath()));
+            return sprintf('%s.php has been overrided in %s', $this->getModelClassName(), $this->getFilePath());
         } else {
-            $this->consoleResponse->writeln('Overwrite model failed.');
+            return 'Overwrite model failed.';
         }
     }
 
