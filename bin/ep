@@ -4,28 +4,29 @@
 declare(strict_types=1);
 
 use Ep\Console\Application;
+use Ep\Contract\ConsoleRequestInterface;
 
 (static function () {
     $cwd = getcwd();
 
-    $params = [];
+    $options = [];
     if (file_exists($cwd . '/.ep')) {
         $content = str_replace("\r\n", "\n", file_get_contents($cwd . '/.ep'));
         $result = explode("\n", $content);
         foreach ($result as $row) {
             $pieces = explode('=', $row);
             if (count($pieces) == 2) {
-                $params[trim($pieces[0])] = trim($pieces[1]);
+                $options[trim($pieces[0])] = trim($pieces[1]);
             }
         }
     }
 
     $possibleAutoloadPaths = [
-        $params['autoload'] ?? '',
+        $options['autoload'] ?? '',
         $cwd . '/vendor/autoload.php',
         dirname($cwd) . '/autoload.php'
     ];
-    unset($params['autoload']);
+    unset($options['autoload']);
 
     $autoloadPath = null;
     foreach ($possibleAutoloadPaths as $path) {
@@ -49,31 +50,37 @@ HELP;
     }
     require($autoloadPath);
 
-    $configPath = $params['config'] ?? dirname($autoloadPath, 2) . '/config/main.php';
-    unset($params['config']);
+    $configPath = $options['config'] ?? dirname($autoloadPath, 2) . '/config/main.php';
+    unset($options['config']);
     if (!file_exists($configPath)) {
         $message = "Unable to find config path in \"{$configPath}\"." . PHP_EOL;
         fwrite(STDERR, $message);
         exit(1);
     }
+    $userConfig = require($configPath);
 
-    $config = require($configPath);
-
-    if (count($_SERVER['argv']) === 1 || strpos($_SERVER['argv'][1], '-') === 0) {
-        $_SERVER['argv'][] = 'help/index';
+    $config = [
+        'appNamespace' => 'Ep',
+        'rootPath' => $userConfig['rootPath'] ?? '',
+        'di' => $userConfig['di'] ?? null,
+        'mysqlDsn' => $userConfig['mysqlDsn'] ?? '',
+        'mysqlUsername' => $userConfig['mysqlUsername'] ?? '',
+        'mysqlPassword' => $userConfig['mysqlPassword'] ?? '',
+        'secretKey' => $userConfig['secretKey'] ?? ''
+    ];
+    if (isset($userConfig['vendorPath'])) {
+        $config['vendorPath'] = $userConfig['vendorPath'];
     }
-    $_SERVER['argv'][] = 'common.appNamespace=' . ($config['appNamespace'] ?? 'App');
-    $_SERVER['argv'][] = 'common.autoloadPath=' . realpath($autoloadPath);
-    foreach ($params as $k => $v) {
-        $_SERVER['argv'][] = $k . '=' . $v;
+    if (isset($userConfig['runtimeDir'])) {
+        $config['runtimeDir'] = $userConfig['runtimeDir'];
     }
-
-    $config['appNamespace'] = 'Ep';
-    $config['commandDirAndSuffix'] = 'Command';
-    $config['actionSuffix'] = 'Action';
-    $config['defaultAction'] = 'index';
 
     Ep::init($config);
+
+    $request = Ep::getDi()->get(ConsoleRequestInterface::class);
+    $request->setOption('common.appNamespace',  $userConfig['appNamespace'] ?? 'App');
+    $request->setOption('common.autoloadPath', realpath($autoloadPath));
+    $request->setOptions($options);
 
     Ep::getDi()->get(Application::class)->run();
 

@@ -27,14 +27,14 @@ final class RequestHandlerFactory
     public function wrap(array $middlewares, RequestHandlerInterface $handler): RequestHandlerInterface
     {
         foreach ($this->buildMiddlewares($middlewares) as $middleware) {
-            $handler = $this->wrapRequestHandler($middleware, $handler);
+            $handler = $this->wrapMiddleware($middleware, $handler);
         }
         return $handler;
     }
 
     public function create(callable $callback): RequestHandlerInterface
     {
-        return new class ($callback, $this->injector, $this->service) implements RequestHandlerInterface
+        return new class($callback, $this->injector, $this->service) implements RequestHandlerInterface
         {
             private $callback;
             private Injector $injector;
@@ -60,14 +60,14 @@ final class RequestHandlerFactory
             if (is_string($definition)) {
                 yield $this->container->get($definition);
             } elseif (is_callable($definition)) {
-                yield $this->wrapMiddleware($definition);
+                yield $this->wrapCallback($definition);
             }
         }
     }
 
-    private function wrapMiddleware(callable $callback): MiddlewareInterface
+    private function wrapCallback(callable $callback): MiddlewareInterface
     {
-        return new class ($callback, $this->injector, $this->service) implements MiddlewareInterface
+        return new class($callback, $this->injector, $this->service) implements MiddlewareInterface
         {
             private $callback;
             private Injector $injector;
@@ -87,9 +87,9 @@ final class RequestHandlerFactory
         };
     }
 
-    private function wrapRequestHandler(MiddlewareInterface $middleware, RequestHandlerInterface $handler): RequestHandlerInterface
+    private function wrapMiddleware(MiddlewareInterface $middleware, RequestHandlerInterface $handler): RequestHandlerInterface
     {
-        return new class ($middleware, $handler) implements RequestHandlerInterface
+        return new class($middleware, $handler) implements RequestHandlerInterface
         {
             private MiddlewareInterface $middleware;
             private RequestHandlerInterface $handler;

@@ -28,7 +28,8 @@ final class ErrorRenderer extends BaseErrorRenderer
         ];
         if ($request) {
             $context['route'] = $request->getRoute();
-            $context['params'] = $request->getParams();
+            $context['arguments'] = $request->getArguments();
+            $context['options'] = $request->getOptions();
         }
 
         $this->logger->error($this->render($t, $request), $context);

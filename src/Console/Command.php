@@ -15,6 +15,9 @@ abstract class Command implements ControllerInterface
 {
     use ContextTrait, FilterTrait;
 
+    public const OK = 0;
+    public const FAIL = 1;
+
     /**
      * @param  ConsoleRequestInterface $request
      * 
@@ -22,8 +25,6 @@ abstract class Command implements ControllerInterface
      */
     public function before($request)
     {
-        $request->setAlias($this->alias());
-
         return true;
     }
 
@@ -48,9 +49,11 @@ abstract class Command implements ControllerInterface
         return $this->service;
     }
 
-    protected function alias(): array
+    public function string(string $message): int
     {
-        return [];
+        $this->getService()->writeln($message);
+
+        return Command::OK;
     }
 
     /**

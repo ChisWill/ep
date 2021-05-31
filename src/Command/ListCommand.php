@@ -5,21 +5,30 @@ declare(strict_types=1);
 namespace Ep\Command;
 
 use Ep\Console\Command;
+use Ep\Contract\ConsoleRequestInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Files\FileHelper;
 use Yiisoft\Files\PathMatcher\PathMatcher;
 use ReflectionClass;
 use ReflectionMethod;
+use Symfony\Component\Console\Input\InputArgument;
 
-final class HelpCommand extends Command
+final class ListCommand extends Command
 {
-    public function indexAction(Aliases $aliases): string
+    public function indexDefinition(): array
     {
-        $commandPath = $aliases->get('@ep/src/Command');
+        return [
+            // new InputArgument('a', InputArgument::REQUIRED, 'lulu')
+        ];
+    }
+
+    public function indexAction(Aliases $aliases, ConsoleRequestInterface $request): int
+    {
+        $commandPath = str_replace('\\', '/', $aliases->get('@ep/src/Command'));
         $files = array_map(static function ($path) use ($commandPath): string {
             return trim(str_replace([$commandPath, '.php'], '', $path), '/');
         }, FileHelper::findFiles($commandPath, [
-            'filter' => (new PathMatcher())->only('**Command.php')->except(__FILE__)
+            'filter' => (new PathMatcher())->only('**Command.php')->except(str_replace('\\', '/', __FILE__))
         ]));
 
         $commands = $this->getCommands($files);
@@ -34,7 +43,8 @@ final class HelpCommand extends Command
             }
             $help .= sprintf("- %s%s%s\n", $row['command'], str_repeat(' ', $commandMaxLength - strlen($row['command']) + 1), $row['desc']);
         }
-        return $help;
+
+        return $this->string($help);
     }
 
     private function getCommandName(string $command): string

@@ -6,6 +6,7 @@ namespace Ep\Command\Service;
 
 use Ep\Base\Config;
 use Ep\Base\View;
+use Ep\Console\ConsoleResponse;
 use Ep\Helper\File;
 use Ep\Helper\Str;
 use Yiisoft\Aliases\Aliases;
@@ -20,8 +21,9 @@ final class GenerateService extends Service
     private Config $config;
     private Aliases $aliases;
     private View $view;
+    private ConsoleResponse $consoleResponse;
 
-    public function __construct(Config $config, Aliases $aliases, View $view)
+    public function __construct(Config $config, Aliases $aliases, View $view, ConsoleResponse $consoleResponse)
     {
         $this->config = $config;
         $this->aliases = $aliases;
@@ -29,6 +31,7 @@ final class GenerateService extends Service
             'viewPath' => '@ep/views',
             'prefix' => 'generate'
         ]);
+        $this->consoleResponse = $consoleResponse;
     }
 
     public function render(string $path, array $params): string
@@ -42,22 +45,13 @@ final class GenerateService extends Service
     private TableSchema $tableSchema;
 
     /**
-     * @param array $params 可用参数为:
-     *
-     * - table: 生成目标的表名
-     * - path: 生成目标的物理地址，从命名空间后开始计算
-     * - prefix: 数据库连接设置外的表前缀
-     * 
      * @throws InvalidArgumentException
      */
     public function initModel(array $params): void
     {
         $this->init($params);
 
-        $this->table = $params['table'] ?? '';
-        if (!$this->table) {
-            $this->required('table');
-        }
+        $this->table = $params['table'];
         $this->path = $params['path'] ?? $params['generate.model.path'] ?? 'Model';
         $this->prefix = $params['prefix'] ?? $params['generate.model.prefix'] ?? '';
 
@@ -68,7 +62,7 @@ final class GenerateService extends Service
         $this->tableSchema = $tableSchema;
     }
 
-    public function createModel(): string
+    public function createModel(): void
     {
         $filePath = $this->getFilePath();
         if (!file_exists($filePath)) {
@@ -82,13 +76,13 @@ final class GenerateService extends Service
             'property' => $this->getModelProperty(),
             'rules' => $this->getModelRules()
         ]))) {
-            return sprintf('The file "%s.php" has been created in "%s".', $this->getModelClassName(), $filePath);
+            $this->consoleResponse->writeln(sprintf('The file "%s.php" has been created in "%s".', $this->getModelClassName(), $filePath));
         } else {
-            return 'Generate failed.';
+            $this->consoleResponse->writeln('Generate failed.');
         }
     }
 
-    public function updateModel(): string
+    public function updateModel(): void
     {
         $filename = $this->getModelFileName();
         $rules = [
@@ -97,9 +91,9 @@ final class GenerateService extends Service
         ];
         $content = preg_replace(array_keys($rules), array_values($rules), file_get_contents($filename));
         if (@file_put_contents($filename, $content)) {
-            return sprintf('%s.php has been overrided in %s', $this->getModelClassName(), $this->getFilePath());
+            $this->consoleResponse->writeln(sprintf('%s.php has been overrided in %s', $this->getModelClassName(), $this->getFilePath()));
         } else {
-            return 'Overwrite model failed.';
+            $this->consoleResponse->writeln('Overwrite model failed.');
         }
     }
 
@@ -119,7 +113,7 @@ final class GenerateService extends Service
             $vendorDirname = dirname($this->aliases->get($this->config->vendorPath));
             $composerPath = $vendorDirname . '/composer.json';
             if (!file_exists($composerPath)) {
-                throw new InvalidArgumentException('Unable to find composer.json in your project root.');
+                $this->throw('Unable to find composer.json in your project root.');
             }
             $composerContent = json_decode(file_get_contents($composerPath), true);
             $autoload = ($composerContent['autoload']['psr-4'] ?? []) + ($composerContent['autoload-dev']['psr-4'] ?? []);
@@ -131,7 +125,7 @@ final class GenerateService extends Service
                 }
             }
             if ($appPath === null) {
-                throw new InvalidArgumentException('You should set the "autoload[psr-4]" configuration in your composer.json first.');
+                $this->throw('You should set the "autoload[psr-4]" configuration in your composer.json first.');
             }
             $this->appPath = $vendorDirname . '/' . $appPath;
         }

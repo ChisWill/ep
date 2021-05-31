@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace Ep\Console;
 
 use Ep\Contract\ConsoleRequestInterface;
-use ErrorException;
+use Symfony\Component\Console\Input\InputInterface;
 
 final class ConsoleRequest implements ConsoleRequestInterface
 {
-    private array $options;
+    public string $defaultCommand = 'list';
 
-    public function __construct()
+    private InputInterface $input;
+
+    public function __construct(InputInterface $input)
     {
-        getopt('', [], $optind);
-        $this->options = array_slice($_SERVER['argv'], $optind);
+        $this->input = $input;
     }
 
     /**
@@ -22,49 +23,104 @@ final class ConsoleRequest implements ConsoleRequestInterface
      */
     public function getRoute(): string
     {
-        return '/' . ($this->options[0] ?? '');
+        $argument = $this->input->getFirstArgument();
+
+        return '/' . ($argument ?: $this->defaultCommand);
     }
 
-    private ?array $params = null;
+    private array $arguments = [];
 
     /**
      * {@inheritDoc}
      */
-    public function getParams(): array
+    public function hasArgument(string $name): bool
     {
-        if ($this->params === null) {
-            $this->params = [];
-            $count = count($this->options);
-            if ($count > 1) {
-                for ($i = 1; $i < $count; $i++) {
-                    try {
-                        $result = array_search($i, $this->alias, true);
-                        if ($result !== false) {
-                            $this->params[$result] = $this->options[$i];
-                        } elseif (strpos($this->options[$i], '-') === 0) {
-                            $this->params[substr($this->options[$i], 1)] = true;
-                        } else {
-                            [$k, $v] = explode('=', $this->options[$i]);
-                            $this->params[$k] = $v;
-                        }
-                    } catch (ErrorException $e) {
-                        echo <<<HELP
-Error: invalid param "{$this->options[$i]}"
-
-HELP;
-                        exit(1);
-                    }
-                }
-            }
-        }
-        return $this->params;
+        return array_key_exists($name, $this->arguments) || $this->input->hasArgument($name);
     }
 
-    private array $alias = [];
-
-    public function setAlias(array $alias): void
+    /**
+     * {@inheritDoc}
+     */
+    public function getArgument(string $name)
     {
-        $this->alias = $alias;
-        $this->params = null;
+        return $this->arguments[$name] ?? $this->input->getArgument($name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setArgument(string $name, $value): void
+    {
+        $this->arguments[$name] = $value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getArguments(): array
+    {
+        return $this->arguments + $this->input->getArguments();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setArguments(array $arguments): void
+    {
+        foreach ($arguments as $name => $value) {
+            $this->setArgument($name, $value);
+        }
+    }
+
+    private array $options = [];
+
+    /**
+     * {@inheritDoc}
+     */
+    public function hasOption(string $name): bool
+    {
+        return array_key_exists($name, $this->options) || $this->input->hasOption($name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOption(string $name)
+    {
+        return $this->options[$name] ?? $this->input->getOption($name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setOption(string $name, $value): void
+    {
+        $this->options[$name] = $value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOptions(): array
+    {
+        return $this->options + $this->input->getOptions();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setOptions(array $options): void
+    {
+        foreach ($options as $name => $value) {
+            $this->setOption($name, $value);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function hasParameterOption($values): bool
+    {
+        return $this->input->hasParameterOption($values, true);
     }
 }

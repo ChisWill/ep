@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace Ep\Console;
 
 use Ep\Base\Config;
-use Ep\Base\ControllerRunner;
 use Ep\Base\ErrorHandler;
 use Ep\Base\Route;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\NotFoundException;
-use Symfony\Component\Console\Application as SymfonyApplication;
 
 final class Application
 {
     private Config $config;
-    private SymfonyApplication $symfonyApplication;
     private ConsoleRequestInterface $consoleRequest;
     private ErrorHandler $errorHandler;
     private ErrorRenderer $errorRenderer;
@@ -24,7 +21,6 @@ final class Application
 
     public function __construct(
         Config $config,
-        SymfonyApplication $symfonyApplication,
         ConsoleRequestInterface $consoleRequest,
         ErrorHandler $errorHandler,
         ErrorRenderer $errorRenderer,
@@ -32,7 +28,6 @@ final class Application
         ControllerRunner $controllerRunner
     ) {
         $this->config = $config;
-        $this->symfonyApplication = $symfonyApplication;
         $this->consoleRequest = $consoleRequest;
         $this->errorHandler = $errorHandler;
         $this->errorRenderer = $errorRenderer;

@@ -7,11 +7,21 @@ namespace Ep\Web;
 use Ep\Base\ControllerRunner as BaseControllerRunner;
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\ModuleInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Closure;
 
 final class ControllerRunner extends BaseControllerRunner
 {
+    private RequestHandlerFactory $requestHandlerFactory;
+
+    public function __construct(ContainerInterface $container, RequestHandlerFactory $requestHandlerFactory)
+    {
+        parent::__construct($container);
+
+        $this->requestHandlerFactory = $requestHandlerFactory;
+    }
+
     /**
      * @param  Controller             $controller
      * @param  ServerRequestInterface $request
@@ -22,9 +32,8 @@ final class ControllerRunner extends BaseControllerRunner
     {
         $middlewares = $module->getMiddlewares();
         if ($middlewares) {
-            $requestHandlerFactory = $this->container->get(RequestHandlerFactory::class);
-            return $requestHandlerFactory
-                ->wrap($middlewares, $requestHandlerFactory->create($this->wrapModule($module, $controller, $action)))
+            return $this->requestHandlerFactory
+                ->wrap($middlewares, $this->requestHandlerFactory->create($this->wrapModule($module, $controller, $action)))
                 ->handle($request);
         } else {
             return parent::runModule($module, $controller, $action, $request);
@@ -41,9 +50,8 @@ final class ControllerRunner extends BaseControllerRunner
     {
         $middlewares = $controller->getMiddlewares();
         if ($middlewares) {
-            $requestHandlerFactory = $this->container->get(RequestHandlerFactory::class);
-            return $requestHandlerFactory
-                ->wrap($middlewares, $requestHandlerFactory->create($this->wrapController($controller, $action)))
+            return $this->requestHandlerFactory
+                ->wrap($middlewares, $this->requestHandlerFactory->create($this->wrapController($controller, $action)))
                 ->handle($request);
         } else {
             return parent::runAction($controller, $action, $request);

@@ -20,15 +20,15 @@ class ControllerRunner implements ConfigurableInterface
 
     protected ?string $suffix = null;
 
+    private ContainerInterface $container;
     private Config $config;
-    protected ContainerInterface $container;
     private Injector $injector;
 
-    public function __construct(Config $config, ContainerInterface $container, Injector $injector)
+    public function __construct(ContainerInterface $container)
     {
-        $this->config = $config;
         $this->container = $container;
-        $this->injector = $injector;
+        $this->config = $container->get(Config::class);
+        $this->injector = $container->get(Injector::class);
     }
 
     /**
@@ -44,8 +44,7 @@ class ControllerRunner implements ConfigurableInterface
 
         $module = $this->createModule($prefix);
 
-        $controller = $this->createController($class);
-        $controller->actionId = $action;
+        $controller = $this->createController($class, $action);
         $action .= $this->config->actionSuffix;
 
         if ($module instanceof ModuleInterface) {
@@ -69,13 +68,14 @@ class ControllerRunner implements ConfigurableInterface
         }
     }
 
-    private function createController(string $class): ControllerInterface
+    private function createController(string $class, string $action): ControllerInterface
     {
         if (!class_exists($class)) {
             throw new NotFoundException("{$class} is not found.");
         }
         $controller = $this->container->get($class);
         $controller->id = $this->generateContextId($controller);
+        $controller->actionId = $action;
         return $controller;
     }
 
@@ -106,10 +106,20 @@ class ControllerRunner implements ConfigurableInterface
         }
         $response = $controller->before($request);
         if ($response === true) {
-            return $controller->after($request, $this->injector->invoke([$controller, $action], [$request]));
+            return $controller->after($request, $this->invoke($controller, $action, $request));
         } else {
             return $response;
         }
+    }
+
+    /**
+     * @param  mixed $request
+     * 
+     * @return mixed
+     */
+    protected function invoke(ControllerInterface $controller, string $action, $request)
+    {
+        return $this->injector->invoke([$controller, $action], [$request]);
     }
 
     /**

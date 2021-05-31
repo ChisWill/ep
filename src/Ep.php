@@ -16,7 +16,7 @@ final class Ep
 
     private static ContainerInterface $di;
 
-    public static function init(array $config): void
+    public static function init(array $config = []): void
     {
         $config = new Config($config);
 

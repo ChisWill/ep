@@ -7,6 +7,8 @@ namespace Ep\Command;
 use Ep\Command\Service\GenerateService;
 use Ep\Console\Command;
 use Ep\Contract\ConsoleRequestInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Throwable;
 
 final class GenerateCommand extends Command
@@ -18,52 +20,47 @@ final class GenerateCommand extends Command
         $this->service = $service;
     }
 
-    protected function alias(): array
+    public function modelDefinition(): array
     {
         return [
-            'table' => 1
+            new InputArgument('table', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'The table name'),
+            new InputOption('db', null, InputArgument::OPTIONAL, 'The db name'),
+            new InputOption('path', null, InputArgument::OPTIONAL, 'The path of model'),
+            new InputOption('prefix', null, InputArgument::OPTIONAL, 'The prefix of table'),
         ];
     }
 
     /**
      * 生成模型
      */
-    public function modelAction(ConsoleRequestInterface $request): string
+    public function modelAction(ConsoleRequestInterface $request): int
     {
-        $params = $request->getParams();
-        if ($this->isMultiple($params['table'] ?? '')) {
-            foreach ($this->getPieces($params['table']) as $table) {
-                $params['table'] = $table;
-                $result[] = $this->singleModel($params);
-            }
-            return implode(PHP_EOL, $result);
+        $tables = $request->getArgument('table');
+        if (count($tables) === 1) {
+            $request->setOption('table', $tables[0]);
+            return $this->singleModel($request->getOptions());
         } else {
-            return $this->singleModel($params);
+            foreach ($tables as $table) {
+                $request->setOption('table', $table);
+                $this->singleModel($request->getOptions());
+            }
+            return Command::OK;
         }
     }
 
-    private function isMultiple(string $param): bool
-    {
-        return strpos($param, ',') !== false;
-    }
-
-    private function getPieces(string $param): array
-    {
-        return explode(',', $param);
-    }
-
-    private function singleModel(array $params): string
+    private function singleModel(array $options): int
     {
         try {
-            $this->service->initModel($params);
+            $this->service->initModel($options);
 
             if ($this->service->hasModel()) {
-                return $this->service->updateModel();
+                $this->service->updateModel();
             } else {
-                return $this->service->createModel();
+                $this->service->createModel();
             }
+            return Command::OK;
         } catch (Throwable $t) {
-            return $t->getMessage();
+            return $this->string($t->getMessage());
         }
     }
 }

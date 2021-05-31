@@ -6,25 +6,28 @@ namespace Ep\Contract;
 
 use Ep;
 use InvalidArgumentException;
+use ReflectionClass;
 
 trait ConfigurableTrait
 {
     /**
      * @return static
      */
-    public function configure(array $config)
+    public function configure(array $properties)
     {
         if (Ep::getConfig()->debug) {
-            foreach ($config as $k => $v) {
-                if (property_exists($this, $k)) {
-                    $this->$k = $v;
-                } else {
-                    throw new InvalidArgumentException("The \"{$k}\" configuration is not exists.");
+            foreach ($properties as $name => $value) {
+                if ((new ReflectionClass($this))->getProperty($name)->isPrivate()) {
+                    throw new InvalidArgumentException("The property \"{$name}\" is private.");
                 }
+                if (!property_exists($this, $name)) {
+                    throw new InvalidArgumentException("The property \"{$name}\" is not exists.");
+                }
+                $this->$name = $value;
             }
         } else {
-            foreach ($config as $k => $v) {
-                $this->$k = $v;
+            foreach ($properties as $name => $value) {
+                $this->$name = $value;
             }
         }
 
@@ -34,9 +37,10 @@ trait ConfigurableTrait
     /**
      * @return static
      */
-    public function clone(array $config)
+    public function clone(array $properties)
     {
         $new = clone $this;
-        return $new->configure($config);
+
+        return $new->configure($properties);
     }
 }

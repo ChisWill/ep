@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 use Ep\Base\Config;
 use Ep\Console\ConsoleRequest;
+use Ep\Console\ConsoleResponse;
 use Ep\Contract\ConsoleRequestInterface;
+use Ep\Contract\ConsoleResponseInterface;
 use Ep\Contract\ErrorRendererInterface;
 use Ep\Contract\NotFoundHandlerInterface;
 use Ep\Web\ErrorRenderer;
@@ -14,6 +16,11 @@ use HttpSoft\Message\ServerRequestFactory;
 use HttpSoft\Message\StreamFactory;
 use HttpSoft\Message\UploadedFileFactory;
 use HttpSoft\Message\UriFactory;
+use Symfony\Component\Console\Application as ConsoleApplication;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Assets\AssetLoader;
 use Yiisoft\Assets\AssetLoaderInterface;
@@ -57,7 +64,11 @@ return [
         '@ep' => dirname(__DIR__, 1)
     ] + $config->aliases),
     // Console
+    ConsoleApplication::class =>  static fn (): ConsoleApplication => new ConsoleApplication('Ep', Ep::VERSION),
     ConsoleRequestInterface::class => ConsoleRequest::class,
+    ConsoleResponseInterface::class => ConsoleResponse::class,
+    InputInterface::class => static fn (): InputInterface => new ArgvInput(null, null),
+    OutputInterface::class => ConsoleOutput::class,
     // View
     AssetLoaderInterface::class => AssetLoader::class,
     AssetPublisherInterface::class => AssetPublisher::class,
