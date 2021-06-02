@@ -49,11 +49,22 @@ abstract class Command implements ControllerInterface
         return $this->service;
     }
 
-    public function string(string $message): int
+    public function success(string $message = ''): int
     {
-        $this->getService()->writeln($message);
+        if ($message) {
+            $this->getService()->writeln($message);
+        }
 
         return Command::OK;
+    }
+
+    public function error(string $message = ''): int
+    {
+        if ($message) {
+            $this->getService()->writeln($message);
+        }
+
+        return Command::FAIL;
     }
 
     /**

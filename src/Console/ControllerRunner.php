@@ -37,17 +37,16 @@ final class ControllerRunner extends BaseControllerRunner
     /**
      * {@inheritDoc}
      */
-    protected function invoke(ControllerInterface $command, string $action, $request): int
+    protected function runAction(ControllerInterface $command, string $action, $request): int
     {
-        $symfonyCommand = $this->wrapCommand($command, $action, $request);
-        $this->symfonyApplication->add($symfonyCommand);
+        $this->symfonyApplication->add($this->wrapCommand($command, $action, $request));
 
         return $this->symfonyApplication->run($this->input, $this->output);
     }
 
     private function wrapCommand(Command $command, string $action, ConsoleRequestInterface $request): SymfonyCommand
     {
-        return new class($command, fn () => parent::invoke($command, $action, $request)) extends SymfonyCommand
+        return new class ($command, fn () => parent::runAction($command, $action, $request)) extends SymfonyCommand
         {
             private Command $command;
             private Closure $callback;
@@ -62,9 +61,15 @@ final class ControllerRunner extends BaseControllerRunner
 
             protected function configure(): void
             {
+                $defaultDefinitionMethod = 'definition';
+                if (method_exists($this->command, $defaultDefinitionMethod)) {
+                    $definitions = call_user_func([$this->command, $defaultDefinitionMethod]);
+                } else {
+                    $definitions = [];
+                }
                 $definitionMethod = $this->command->actionId . 'Definition';
                 if (method_exists($this->command, $definitionMethod)) {
-                    $this->setDefinition(call_user_func([$this->command, $definitionMethod]));
+                    $this->setDefinition(array_merge($definitions, call_user_func([$this->command, $definitionMethod])));
                 }
             }
 

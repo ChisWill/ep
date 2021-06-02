@@ -41,7 +41,7 @@ final class Application
 
         $this->register($request);
 
-        $this->send($request, $this->handleRequest($request));
+        $this->handleRequest($request);
     }
 
     private function createRequest(): ConsoleRequestInterface
@@ -61,7 +61,7 @@ final class Application
     /** 
      * @return mixed
      */
-    private function handleRequest(ConsoleRequestInterface $request)
+    private function handleRequest(ConsoleRequestInterface $request): void
     {
         try {
             [, $handler] = $this->route
@@ -71,32 +71,18 @@ final class Application
                 ])
                 ->match($request->getRoute());
 
-            return $this->controllerRunner
+            $code = $this->controllerRunner
                 ->configure(['suffix' => $this->config->commandDirAndSuffix])
                 ->run($handler, $request);
+
+            exit($code);
         } catch (NotFoundException $e) {
             $command = trim($request->getRoute(), '/');
             echo <<<HELP
 Error: unknown command "{$command}"
 
 HELP;
-            exit(1);
-        }
-    }
-
-    /**
-     * @param mixed $response
-     */
-    private function send(ConsoleRequestInterface $request, $response): void
-    {
-        if (is_scalar($response)) {
-            if ($response) {
-                echo $response . PHP_EOL;
-            }
-        } elseif (is_array($response)) {
-            foreach ($response as $row) {
-                $this->send($request, $row);
-            }
+            exit(Command::FAIL);
         }
     }
 }

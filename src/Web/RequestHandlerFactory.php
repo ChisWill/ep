@@ -34,7 +34,7 @@ final class RequestHandlerFactory
 
     public function create(callable $callback): RequestHandlerInterface
     {
-        return new class($callback, $this->injector, $this->service) implements RequestHandlerInterface
+        return new class ($callback, $this->injector, $this->service) implements RequestHandlerInterface
         {
             private $callback;
             private Injector $injector;
@@ -67,7 +67,7 @@ final class RequestHandlerFactory
 
     private function wrapCallback(callable $callback): MiddlewareInterface
     {
-        return new class($callback, $this->injector, $this->service) implements MiddlewareInterface
+        return new class ($callback, $this->injector, $this->service) implements MiddlewareInterface
         {
             private $callback;
             private Injector $injector;
@@ -89,7 +89,7 @@ final class RequestHandlerFactory
 
     private function wrapMiddleware(MiddlewareInterface $middleware, RequestHandlerInterface $handler): RequestHandlerInterface
     {
-        return new class($middleware, $handler) implements RequestHandlerInterface
+        return new class ($middleware, $handler) implements RequestHandlerInterface
         {
             private MiddlewareInterface $middleware;
             private RequestHandlerInterface $handler;

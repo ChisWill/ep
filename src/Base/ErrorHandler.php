@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
+use Ep\Console\Command;
 use Ep\Contract\ConfigurableInterface;
 use Ep\Contract\ConfigurableTrait;
 use Ep\Contract\ErrorRendererInterface;
@@ -41,7 +42,8 @@ final class ErrorHandler implements ConfigurableInterface
         $this->errorRenderer->log($t, $request);
 
         echo $this->errorRenderer->render($t, $request);
-        exit(1);
+
+        exit(Command::FAIL);
     }
 
     public function handleError(int $severity, string $message, string $file, int $line): void

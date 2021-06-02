@@ -83,6 +83,4 @@ HELP;
     $request->setOptions($options);
 
     Ep::getDi()->get(Application::class)->run();
-
-    exit(0);
 })();

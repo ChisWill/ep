@@ -9,7 +9,6 @@ use Ep\Console\Command;
 use Ep\Contract\ConsoleRequestInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Throwable;
 
 final class GenerateCommand extends Command
 {
@@ -35,31 +34,21 @@ final class GenerateCommand extends Command
      */
     public function modelAction(ConsoleRequestInterface $request): int
     {
-        $tables = $request->getArgument('table');
-        if (count($tables) === 1) {
-            $request->setOption('table', $tables[0]);
-            return $this->singleModel($request->getOptions());
-        } else {
-            foreach ($tables as $table) {
-                $request->setOption('table', $table);
-                $this->singleModel($request->getOptions());
-            }
-            return Command::OK;
+        foreach ($request->getArgument('table') as $table) {
+            $request->setOption('table', $table);
+            $this->singleModel($request->getOptions());
         }
+        return $this->success();
     }
 
     private function singleModel(array $options): int
     {
-        try {
-            $this->service->initModel($options);
+        $this->service->initModel($options);
 
-            if ($this->service->hasModel()) {
-                return $this->string($this->service->updateModel());
-            } else {
-                return $this->string($this->service->createModel());
-            }
-        } catch (Throwable $t) {
-            return $this->string($t->getMessage());
+        if ($this->service->hasModel()) {
+            return $this->success($this->service->updateModel());
+        } else {
+            return $this->success($this->service->createModel());
         }
     }
 }

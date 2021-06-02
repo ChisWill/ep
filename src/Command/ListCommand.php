@@ -5,24 +5,15 @@ declare(strict_types=1);
 namespace Ep\Command;
 
 use Ep\Console\Command;
-use Ep\Contract\ConsoleRequestInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Files\FileHelper;
 use Yiisoft\Files\PathMatcher\PathMatcher;
 use ReflectionClass;
 use ReflectionMethod;
-use Symfony\Component\Console\Input\InputArgument;
 
 final class ListCommand extends Command
 {
-    public function indexDefinition(): array
-    {
-        return [
-            // new InputArgument('a', InputArgument::REQUIRED, 'lulu')
-        ];
-    }
-
-    public function indexAction(Aliases $aliases, ConsoleRequestInterface $request): int
+    public function indexAction(Aliases $aliases): int
     {
         $commandPath = str_replace('\\', '/', $aliases->get('@ep/src/Command'));
         $files = array_map(static function ($path) use ($commandPath): string {
@@ -44,7 +35,7 @@ final class ListCommand extends Command
             $help .= sprintf("- %s%s%s\n", $row['command'], str_repeat(' ', $commandMaxLength - strlen($row['command']) + 1), $row['desc']);
         }
 
-        return $this->string($help);
+        return $this->success($help);
     }
 
     private function getCommandName(string $command): string

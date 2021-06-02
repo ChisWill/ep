@@ -48,10 +48,7 @@ final class MigrateService extends Service
         parent::init($params);
 
         $this->generateService->init($params);
-        $this->migratePath = $params['path'] ?? $params['migrate.path'] ?? null;
-        if (!$this->migratePath) {
-            $this->required('path');
-        }
+        $this->migratePath = $params['path'] ?? $params['migrate.path'] ?? 'Migration';
         $this->basePath = $this->generateService->getAppPath() . '/' . $this->migratePath;
         $this->step = $params['step'] ?? 1;
         $this->builder = new MigrateBuilder($this->db);

@@ -7,7 +7,7 @@ namespace Ep\Command;
 use Ep\Command\Service\MigrateService;
 use Ep\Console\Command;
 use Ep\Contract\ConsoleRequestInterface;
-use Throwable;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * 数据库迁移
@@ -21,73 +21,74 @@ final class MigrateCommand extends Command
         $this->service = $service;
     }
 
+    public function definition(): array
+    {
+        return [
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The path of migration'),
+        ];
+    }
+
     /**
      * 创建一个迁移记录
      */
-    public function newAction(ConsoleRequestInterface $request): string
+    public function newAction(ConsoleRequestInterface $request): int
     {
-        try {
-            $this->service->init($request->getParams());
+        $this->service->init($request->getOptions());
 
-            return $this->service->new();
-        } catch (Throwable $t) {
-            return $t->getMessage();
-        }
+        return $this->success($this->service->new());
+    }
+
+    public function ddlDefinition(): array
+    {
+        return [
+            new InputOption('prefix', null, InputOption::VALUE_REQUIRED, 'The table prefix'),
+        ];
     }
 
     /**
      * 初始化所有表结构
      */
-    public function ddlAction(ConsoleRequestInterface $request): string
+    public function ddlAction(ConsoleRequestInterface $request): int
     {
-        try {
-            $this->service->initDDL($request->getParams());
+        $this->service->initDDL($request->getOptions());
 
-            return $this->service->ddl();
-        } catch (Throwable $t) {
-            return $t->getMessage();
-        }
+        return $this->success($this->service->ddl());
     }
 
     /**
      * 更新所有迁移
      */
-    public function allAction(ConsoleRequestInterface $request): string
+    public function allAction(ConsoleRequestInterface $request): int
     {
-        try {
-            $this->service->init($request->getParams());
+        $this->service->init($request->getOptions());
 
-            return $this->service->all();
-        } catch (Throwable $t) {
-            return $t->getMessage();
-        }
+        return $this->success($this->service->all());
     }
 
     /**
      * 执行所有还未同步的迁移
      */
-    public function upAction(ConsoleRequestInterface $request): string
+    public function upAction(ConsoleRequestInterface $request): int
     {
-        try {
-            $this->service->init($request->getParams());
+        $this->service->init($request->getOptions());
 
-            return $this->service->up();
-        } catch (Throwable $t) {
-            return $t->getMessage();
-        }
+        return $this->success($this->service->up());
+    }
+
+    public function downDefinition(): array
+    {
+        return [
+            new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The step of migrations to downgrade'),
+        ];
     }
 
     /**
      * 回退已执行过的迁移
      */
-    public function downAction(ConsoleRequestInterface $request): string
+    public function downAction(ConsoleRequestInterface $request): int
     {
-        try {
-            $this->service->init($request->getParams());
+        $this->service->init($request->getOptions());
 
-            return $this->service->down();
-        } catch (Throwable $t) {
-            return $t->getMessage();
-        }
+        return $this->success($this->service->down());
     }
 }

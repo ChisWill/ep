@@ -106,20 +106,10 @@ class ControllerRunner implements ConfigurableInterface
         }
         $response = $controller->before($request);
         if ($response === true) {
-            return $controller->after($request, $this->invoke($controller, $action, $request));
+            return $controller->after($request, $this->injector->invoke([$controller, $action], [$request]));
         } else {
             return $response;
         }
-    }
-
-    /**
-     * @param  mixed $request
-     * 
-     * @return mixed
-     */
-    protected function invoke(ControllerInterface $controller, string $action, $request)
-    {
-        return $this->injector->invoke([$controller, $action], [$request]);
     }
 
     /**

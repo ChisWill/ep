@@ -19,18 +19,28 @@ final class ClearCommand extends Command
         $this->config = $config;
     }
 
+    public function before($request)
+    {
+        return true;
+    }
+
     /**
      * 清除缓存
      */
-    public function indexAction(Aliases $aliases): string
+    public function indexAction(Aliases $aliases): int
     {
         try {
             $runtimeDir = $aliases->get($this->config->runtimeDir);
             File::rmdir($runtimeDir);
             File::mkdir($runtimeDir);
-            return '';
+            return $this->success();
         } catch (RuntimeException $e) {
-            return $e->getMessage();
+            return $this->error($e->getMessage());
         }
+    }
+
+    public function after($request, $response)
+    {
+        return $response;
     }
 }
