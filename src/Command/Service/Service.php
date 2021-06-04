@@ -26,25 +26,16 @@ class Service
         }
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     protected function required(string $option): void
     {
         $this->throw("The \"{$option}\" option is required.");
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     protected function invalid(string $option, string $value): void
     {
         $this->throw("The value \"{$value}\" of the option \"{$option}\" is invalid.");
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     protected function throw(string $message): void
     {
         throw new InvalidArgumentException($message);

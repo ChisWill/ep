@@ -67,17 +67,11 @@ abstract class Command implements ControllerInterface
         return Command::FAIL;
     }
 
-    /**
-     * @throws LogicException
-     */
     public function setMiddlewares(array $middlewares): void
     {
         throw new LogicException('Console command doesn\'t have middlewares yet.');
     }
 
-    /**
-     * @throws LogicException
-     */
     public function getMiddlewares(): array
     {
         throw new LogicException('Console command doesn\'t have middlewares yet.');

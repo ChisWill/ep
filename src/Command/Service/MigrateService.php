@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Command\Service;
 
+use Closure;
 use Ep\Base\Config;
 use Ep\Command\Helper\MigrateBuilder;
 use Ep\Console\Service as ConsoleService;
@@ -16,7 +17,6 @@ use Ep\Helper\File;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Files\FileHelper;
 use Yiisoft\Files\PathMatcher\PathMatcher;
-use InvalidArgumentException;
 use Throwable;
 
 final class MigrateService extends Service
@@ -35,23 +35,21 @@ final class MigrateService extends Service
         $this->consoleService = $consoleService;
     }
 
-    private string $basePath;
     private string $migratePath;
+    private string $basePath;
     private int $step;
     private MigrateBuilder $builder;
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function init(array $params): void
     {
         parent::init($params);
 
         $this->generateService->init($params);
+
         $this->migratePath = $params['path'] ?? $params['migrate.path'] ?? 'Migration';
         $this->basePath = $this->generateService->getAppPath() . '/' . $this->migratePath;
-        $this->step = $params['step'] ?? 1;
-        $this->builder = new MigrateBuilder($this->db);
+        $this->step = (int) ($params['step'] ?? 0);
+        $this->builder = new MigrateBuilder($this->db, $this->consoleService);
 
         if (!file_exists($this->basePath)) {
             File::mkdir($this->basePath);
@@ -60,18 +58,13 @@ final class MigrateService extends Service
         $this->createTable();
     }
 
-    public function new(): string
+    public function new(): void
     {
-        return $this->createFile('migrate/new', $this->generateClassName());
+        $this->createFile('migrate/new', $this->generateClassName());
     }
 
     private string $prefix;
 
-    /**
-     * @param array $params 可用参数为:
-     *
-     * - prefix: 需要过滤的数据库表前缀
-     */
     public function initDDL(array $params): void
     {
         $this->init($params);
@@ -81,10 +74,8 @@ final class MigrateService extends Service
 
     private string $ddlClassName = 'DDL';
 
-    public function ddl(): string
+    public function ddl(): void
     {
-        $className = $this->ddlClassName;
-
         $dbService = new DbService($this->db);
         $ddl = '';
         foreach ($dbService->getTables($this->prefix) as $tableName) {
@@ -93,139 +84,35 @@ final class MigrateService extends Service
             }
         }
 
-        return $this->createFile('migrate/ddl', $className, compact('ddl'));
+        $this->createFile('migrate/ddl', $this->ddlClassName, compact('ddl'));
     }
 
-    public function all(): string
+    public function all(): void
     {
         $answer = $this->consoleService->prompt('Are you sure migrate all records? [Yes|No]');
         if ($answer === 'Yes') {
-            return $this->migrate();
+            $this->up(true);
         } else {
-            return 'Skipped.';
+            $this->consoleService->writeln('Skipped.');
         }
     }
 
-    public function up(): string
+    public function up(bool $all = false): void
     {
-        $history = Query::find($this->db)
-            ->select('version')
-            ->from($this->tableName)
-            ->column();
-
-        return $this->migrate($history);
-    }
-
-    public function down(): string
-    {
-        $history = Query::find($this->db)
-            ->select('version')
-            ->from($this->tableName)
-            ->column();
-
-        return $this->revert($history, $this->step);
-    }
-
-    private function revert(array $history, int $step = 1): string
-    {
-        $files = FileHelper::findFiles($this->basePath, [
-            'filter' => (new PathMatcher())->only('**.php')->except('**/' . $this->ddlClassName . '.php')
-        ]);
-        rsort($files);
-
-        $error = '';
-        $classList = [];
-        $transaction = $this->db->beginTransaction();
-        $count = 0;
-        foreach ($files as $file) {
-            if ($count === $step) {
-                break;
-            }
-            $className = $this->getClassNameByFile($file);
-            if (!class_exists($className)) {
-                $this->throw("The class \"{$className}\" is not exists.");
-            }
-            if (!in_array($className, $history)) {
-                continue;
-            }
-            /** @var MigrateInterface $class */
-            $class = new $className();
-            if (!$class instanceof MigrateInterface) {
-                $this->throw("The class \"{$className}\" is not implements \"" . MigrateInterface::class . "\".");
-            }
-            try {
-                $class->down($this->builder);
-                array_unshift($classList, $class);
-                $count++;
-            } catch (Throwable $t) {
-                $error = "{$className}::down() failed.";
-                $transaction->rollBack();
-                break;
-            }
+        if ($all) {
+            $history = [];
+        } else {
+            $history = Query::find($this->db)
+                ->select('version')
+                ->from($this->tableName)
+                ->column();
         }
 
-        if ($error) {
-            return $error;
-        } else {
+        $this->migrate('up', $history, function (array $classList): void {
             $count = count($classList);
-            if ($count > 0) {
-                $this->builder->delete($this->tableName, ['version' => array_map('get_class', $classList)]);
-
-                $transaction->commit();
-
-                return sprintf('Migrate revert count: %d.', $count);
+            if ($count === 0) {
+                $this->consoleService->writeln('Already up to date.');
             } else {
-                return 'No commits.';
-            }
-        }
-    }
-
-    private function migrate(array $history = []): string
-    {
-        $files = FileHelper::findFiles($this->basePath, [
-            'filter' => (new PathMatcher())->only('**.php')->except('**/' . $this->ddlClassName . '.php')
-        ]);
-        sort($files);
-
-        $error = '';
-        $classList = [];
-        $transaction = $this->db->beginTransaction();
-        foreach ($files as $file) {
-            $className = $this->getClassNameByFile($file);
-            if (!class_exists($className)) {
-                $this->throw("The class \"{$className}\" is not exists.");
-            }
-            if (in_array($className, $history)) {
-                continue;
-            }
-            /** @var MigrateInterface $class */
-            $class = new $className();
-            if (!$class instanceof MigrateInterface) {
-                $this->throw("The class \"{$className}\" is not implements \"" . MigrateInterface::class . "\".");
-            }
-            try {
-                $class->up($this->builder);
-                array_unshift($classList, $class);
-            } catch (Throwable $t) {
-                $error = "{$className}::up() failed.";
-                $transaction->rollBack();
-                break;
-            }
-        }
-
-        if ($error) {
-            foreach ($classList as $class) {
-                /** @var MigrateInterface $class */
-                try {
-                    $class->down($this->builder);
-                } catch (Throwable $t) {
-                    $error .= "\n{$className}::down() failed.";
-                }
-            }
-            return $error;
-        } else {
-            $count = count($classList);
-            if ($count > 0) {
                 $rows = [];
                 $now = Date::fromUnix();
                 foreach ($classList as $class) {
@@ -234,16 +121,102 @@ final class MigrateService extends Service
 
                 $this->builder->batchInsert($this->tableName, ['version', ActiveRecord::CREATED_AT], $rows);
 
-                $transaction->commit();
-
-                return sprintf('Migrate commit count: %d.', $count);
-            } else {
-                return 'Already up to date.';
+                $this->consoleService->writeln(sprintf('Commit count: %d.', $count));
             }
+        });
+    }
+
+    public function initDown(array $params): void
+    {
+        $this->init($params);
+
+        $this->step = (int) ($params['step'] ?? 1);
+    }
+
+    public function down(): void
+    {
+        $history = Query::find($this->db)
+            ->select('version')
+            ->from($this->tableName)
+            ->column();
+
+        $this->migrate('down', $history, function (array $classList): void {
+            $count = count($classList);
+            if ($count === 0) {
+                $this->consoleService->writeln('No commits.');
+            } else {
+                $this->builder->delete($this->tableName, ['version' => array_map('get_class', $classList)]);
+
+                $this->consoleService->writeln(sprintf('Revert count: %d.', $count));
+            }
+        });
+    }
+
+    private function migrate(string $method, array $history, Closure $success): void
+    {
+        $files = $this->findClassFiles();
+        switch ($method) {
+            case 'up':
+                sort($files);
+                $reverse = false;
+                break;
+            case 'down':
+                rsort($files);
+                $reverse = true;
+                break;
+            default:
+                $this->throw('Unsupport migrate method.');
+        }
+
+        $classList = [];
+        $transaction = $this->db->beginTransaction();
+        $count = 0;
+        foreach ($files as $file) {
+            if ($this->step > 0 && $count === $this->step) {
+                break;
+            }
+            $className = $this->getClassNameByFile($file);
+            if (!class_exists($className)) {
+                $this->throw("The class \"{$className}\" is not exists.");
+            }
+            $skip = in_array($className, $history);
+            if ($reverse) {
+                $skip = !$skip;
+            }
+            if ($skip) {
+                continue;
+            }
+            $class = new $className();
+            if (!$class instanceof MigrateInterface) {
+                $this->throw("The class \"{$className}\" is not implements \"" . MigrateInterface::class . "\".");
+            }
+            try {
+                call_user_func([$class, $method], $this->builder);
+                array_unshift($classList, $class);
+                $count++;
+            } catch (Throwable $t) {
+                $transaction->rollBack();
+                $this->throw(sprintf("%s::%s() failed.", $className, $method));
+            }
+        }
+
+        try {
+            call_user_func($success, $classList);
+            $transaction->commit();
+        } catch (Throwable $t) {
+            $transaction->rollBack();
+            $this->throw($t->getMessage());
         }
     }
 
-    private function createFile(string $view, string $className, array $params = []): string
+    private function findClassFiles(): array
+    {
+        return FileHelper::findFiles($this->basePath, [
+            'filter' => (new PathMatcher())->only('**.php')->except('**/' . $this->ddlClassName . '.php')
+        ]);
+    }
+
+    private function createFile(string $view, string $className, array $params = []): void
     {
         $namespace = $this->appNamespace . '\\' . $this->migratePath;
 
@@ -251,9 +224,9 @@ final class MigrateService extends Service
         $params['namespace'] = $namespace;
 
         if (@file_put_contents($this->basePath . '/' . $className . '.php', $this->generateService->render($view, $params))) {
-            return sprintf('The file "%s.php" has been created in "%s".', $className, $this->basePath);
+            $this->consoleService->writeln(sprintf('The file "%s.php" has been created in "%s".', $className, $this->basePath));
         } else {
-            return 'Generate failed.';
+            $this->consoleService->writeln('Generate failed.');
         }
     }
 
@@ -282,13 +255,13 @@ final class MigrateService extends Service
     private function createTable(): void
     {
         try {
+            $this->builder->find()->from($this->tableName)->one();
+        } catch (Exception $t) {
             $this->builder->createTable($this->tableName, [
                 'id' => $this->builder->primaryKey(),
                 'version' => $this->builder->string(100)->notNull(),
                 ActiveRecord::CREATED_AT => $this->builder->dateTime()->notNull()
             ]);
-        } catch (Exception $t) {
-            // do nothing.
         }
     }
 }

@@ -25,6 +25,7 @@ final class MigrateCommand extends Command
     {
         return [
             new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The path of migration'),
+            new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The number of migtions to apply'),
         ];
     }
 
@@ -35,7 +36,9 @@ final class MigrateCommand extends Command
     {
         $this->service->init($request->getOptions());
 
-        return $this->success($this->service->new());
+        $this->service->new();
+
+        return $this->success();
     }
 
     public function ddlDefinition(): array
@@ -52,7 +55,9 @@ final class MigrateCommand extends Command
     {
         $this->service->initDDL($request->getOptions());
 
-        return $this->success($this->service->ddl());
+        $this->service->ddl();
+
+        return $this->success();
     }
 
     /**
@@ -62,7 +67,9 @@ final class MigrateCommand extends Command
     {
         $this->service->init($request->getOptions());
 
-        return $this->success($this->service->all());
+        $this->service->all();
+
+        return $this->success();
     }
 
     /**
@@ -72,14 +79,9 @@ final class MigrateCommand extends Command
     {
         $this->service->init($request->getOptions());
 
-        return $this->success($this->service->up());
-    }
+        $this->service->up();
 
-    public function downDefinition(): array
-    {
-        return [
-            new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The step of migrations to downgrade'),
-        ];
+        return $this->success();
     }
 
     /**
@@ -87,8 +89,10 @@ final class MigrateCommand extends Command
      */
     public function downAction(ConsoleRequestInterface $request): int
     {
-        $this->service->init($request->getOptions());
+        $this->service->initDown($request->getOptions());
 
-        return $this->success($this->service->down());
+        $this->service->down();
+
+        return $this->success();
     }
 }

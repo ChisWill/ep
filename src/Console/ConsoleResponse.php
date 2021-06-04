@@ -19,17 +19,17 @@ final class ConsoleResponse implements ConsoleResponseInterface
     /**
      * {@inheritDoc}
      */
-    public function write($messages, int $options = 0, bool $newline = false): void
+    public function write($messages, int $level = 0): void
     {
-        $this->output->write($messages, $newline, $options);
+        $this->output->write($messages, false, $level);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function writeln($messages, int $options = 0): void
+    public function writeln($messages, int $level = 0): void
     {
-        $this->output->writeln($messages, $options);
+        $this->output->write($messages, true, $level);
     }
 
     /**

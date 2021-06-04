@@ -19,11 +19,6 @@ final class ClearCommand extends Command
         $this->config = $config;
     }
 
-    public function before($request)
-    {
-        return true;
-    }
-
     /**
      * 清除缓存
      */
@@ -37,10 +32,5 @@ final class ClearCommand extends Command
         } catch (RuntimeException $e) {
             return $this->error($e->getMessage());
         }
-    }
-
-    public function after($request, $response)
-    {
-        return $response;
     }
 }

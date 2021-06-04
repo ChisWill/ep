@@ -33,7 +33,7 @@ final class Migration_20210523_1 implements MigrateInterface
             ['II-1'],
             ['II-2'],
         ]);
-        $classes = $builder->query()->from('class')->where(['name' => ['I-7', 'II-1', 'II-2']])->map('name', 'id');
+        $classes = $builder->find()->from('class')->where(['name' => ['I-7', 'II-1', 'II-2']])->map('name', 'id');
 
         $builder->batchInsert('student', ['class_id', 'name', 'age', 'birthday', 'sex'], [
             [$classes['I-7'], 'Rean Schwarzer', '17', '2003-1-1', 1],

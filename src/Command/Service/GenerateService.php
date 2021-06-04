@@ -42,9 +42,6 @@ final class GenerateService extends Service
     private string $prefix;
     private TableSchema $tableSchema;
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function initModel(array $params): void
     {
         $this->init($params);
