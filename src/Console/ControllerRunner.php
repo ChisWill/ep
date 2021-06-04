@@ -46,17 +46,17 @@ final class ControllerRunner extends BaseControllerRunner
 
     private function wrapCommand(Command $command, string $action, ConsoleRequestInterface $request): SymfonyCommand
     {
-        return new class ($command, fn () => parent::runAction($command, $action, $request)) extends SymfonyCommand
+        return new class ($command, $request, fn () => parent::runAction($command, $action, $request)) extends SymfonyCommand
         {
             private Command $command;
             private Closure $callback;
 
-            public function __construct(Command $command, Closure $callback)
+            public function __construct(Command $command, ConsoleRequestInterface $request, Closure $callback)
             {
                 $this->command = $command;
                 $this->callback = $callback;
 
-                parent::__construct($command->actionId === Ep::getConfig()->defaultAction ? $command->id : ($command->id . '/' . $command->actionId));
+                parent::__construct(trim($request->getRoute(), '/'));
             }
 
             protected function configure(): void
