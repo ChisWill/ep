@@ -49,7 +49,17 @@ abstract class Command implements ControllerInterface
         return $this->service;
     }
 
-    public function success(string $message = ''): int
+    protected function write(string $message, int $options = 0): void
+    {
+        $this->getService()->write($message, $options);
+    }
+
+    protected function writeln(string $message, int $options = 0): void
+    {
+        $this->getService()->writeln($message, $options);
+    }
+
+    protected function success(string $message = ''): int
     {
         if ($message) {
             $this->getService()->writeln($message);
@@ -58,7 +68,7 @@ abstract class Command implements ControllerInterface
         return Command::OK;
     }
 
-    public function error(string $message = ''): int
+    protected function error(string $message = ''): int
     {
         if ($message) {
             $this->getService()->writeln($message);
