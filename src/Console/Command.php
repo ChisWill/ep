@@ -49,12 +49,12 @@ abstract class Command implements ControllerInterface
         return $this->service;
     }
 
-    protected function write(string $message, int $options = 0): void
+    protected function write(string $message = '', int $options = 0): void
     {
         $this->getService()->write($message, $options);
     }
 
-    protected function writeln(string $message, int $options = 0): void
+    protected function writeln(string $message = '', int $options = 0): void
     {
         $this->getService()->writeln($message, $options);
     }

@@ -15,12 +15,12 @@ final class Service
         $this->consoleResponse = $consoleResponse;
     }
 
-    public function write(string $message, int $options = 0): void
+    public function write(string $message = '', int $options = 0): void
     {
         $this->consoleResponse->write($message, $options);
     }
 
-    public function writeln(string $message, int $options = 0): void
+    public function writeln(string $message = '', int $options = 0): void
     {
         $this->consoleResponse->writeln($message, $options);
     }
