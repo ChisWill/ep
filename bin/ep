@@ -63,6 +63,7 @@ HELP;
         'appNamespace' => 'Ep',
         'rootPath' => $userConfig['rootPath'] ?? '',
         'di' => $userConfig['di'] ?? null,
+        'params' => $userConfig['params'] ?? [],
         'mysqlDsn' => $userConfig['mysqlDsn'] ?? '',
         'mysqlUsername' => $userConfig['mysqlUsername'] ?? '',
         'mysqlPassword' => $userConfig['mysqlPassword'] ?? '',
