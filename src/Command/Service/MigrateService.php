@@ -14,6 +14,7 @@ use Ep\Db\Query;
 use Ep\Db\Service as DbService;
 use Ep\Helper\Date;
 use Ep\Helper\File;
+use Psr\Container\ContainerInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Files\FileHelper;
 use Yiisoft\Files\PathMatcher\PathMatcher;
@@ -21,18 +22,22 @@ use Throwable;
 
 final class MigrateService extends Service
 {
-    private string $tableName;
     private GenerateService $generateService;
     private ConsoleService $consoleService;
+    private string $tableName;
 
     public function __construct(
-        Config $config,
+        ContainerInterface $container,
         GenerateService $generateService,
         ConsoleService $consoleService
     ) {
-        $this->tableName = $config->migrationTableName;
+        parent::__construct($container);
+
         $this->generateService = $generateService;
         $this->consoleService = $consoleService;
+        $this->tableName = $this->config->migrationTableName;
+
+        $this->init();
     }
 
     private string $migratePath;
@@ -40,15 +45,13 @@ final class MigrateService extends Service
     private int $step;
     private MigrateBuilder $builder;
 
-    public function init(array $params): void
+    private function init(): void
     {
-        parent::init($params);
+        $options = $this->request->getOptions();
 
-        $this->generateService->init($params);
-
-        $this->migratePath = $params['path'] ?? $params['migrate.path'] ?? 'Migration';
-        $this->basePath = $this->generateService->getAppPath() . '/' . $this->migratePath;
-        $this->step = (int) ($params['step'] ?? 0);
+        $this->migratePath = $options['path'] ?? $options['migrate.path'] ?? 'Migration';
+        $this->basePath = $this->getAppPath() . '/' . $this->migratePath;
+        $this->step = (int) ($options['step'] ?? 0);
         $this->builder = new MigrateBuilder($this->db, $this->consoleService);
 
         if (!file_exists($this->basePath)) {
@@ -63,22 +66,13 @@ final class MigrateService extends Service
         $this->createFile('migrate/new', $this->generateClassName());
     }
 
-    private string $prefix;
-
-    public function initDDL(array $params): void
-    {
-        $this->init($params);
-
-        $this->prefix = $params['prefix'] ?? '';
-    }
-
     private string $ddlClassName = 'DDL';
 
     public function ddl(): void
     {
         $dbService = new DbService($this->db);
         $ddl = '';
-        foreach ($dbService->getTables($this->prefix) as $tableName) {
+        foreach ($dbService->getTables($this->request->getOption('prefix') ?: '') as $tableName) {
             if ($tableName !== $this->tableName) {
                 $ddl .= $dbService->getDDL($tableName) . ";\n";
             }
@@ -126,15 +120,10 @@ final class MigrateService extends Service
         });
     }
 
-    public function initDown(array $params): void
+    public function down(): bool
     {
-        $this->init($params);
+        $this->step = (int) ($this->request->getOption('step') ?: 1);
 
-        $this->step = (int) ($params['step'] ?? 1);
-    }
-
-    public function down(): void
-    {
         $history = Query::find($this->db)
             ->select('version')
             ->from($this->tableName)
@@ -216,17 +205,19 @@ final class MigrateService extends Service
         ]);
     }
 
-    private function createFile(string $view, string $className, array $params = []): void
+    private function createFile(string $view, string $className, array $params = []): bool
     {
-        $namespace = $this->appNamespace . '\\' . $this->migratePath;
+        $namespace = $this->userAppNamespace . '\\' . $this->migratePath;
 
         $params['className'] = $className;
         $params['namespace'] = $namespace;
 
         if (@file_put_contents($this->basePath . '/' . $className . '.php', $this->generateService->render($view, $params))) {
             $this->consoleService->writeln(sprintf('The file "%s.php" has been created in "%s".', $className, $this->basePath));
+            return true;
         } else {
             $this->consoleService->writeln('Generate failed.');
+            return false;
         }
     }
 
@@ -249,7 +240,7 @@ final class MigrateService extends Service
 
     private function getClassNameByFile(string $file): string
     {
-        return sprintf('%s\\%s\\%s', $this->appNamespace, $this->migratePath, basename($file, '.php'));
+        return sprintf('%s\\%s\\%s', $this->userAppNamespace, $this->migratePath, basename($file, '.php'));
     }
 
     private function createTable(): void

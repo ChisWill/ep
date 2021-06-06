@@ -23,9 +23,7 @@ final class ConsoleRequest implements ConsoleRequestInterface
      */
     public function getRoute(): string
     {
-        $argument = $this->input->getFirstArgument();
-
-        return '/' . ($argument ?: $this->defaultCommand);
+        return $this->input->getFirstArgument() ?: $this->defaultCommand;
     }
 
     private array $arguments = [];

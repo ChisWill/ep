@@ -17,16 +17,14 @@ final class GenerateCommand extends Command
     public function __construct(GenerateService $service)
     {
         $this->service = $service;
-    }
 
-    public function modelDefinition(): array
-    {
-        return [
+        $this->setDefinition('model', [
             new InputArgument('table', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'The table name'),
             new InputOption('db', null, InputOption::VALUE_REQUIRED, 'The db name'),
             new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The path of model'),
-            new InputOption('prefix', null, InputOption::VALUE_REQUIRED, 'The prefix of table'),
-        ];
+            new InputOption('prefix', null, InputOption::VALUE_REQUIRED, 'The prefix of table')
+        ])
+            ->setDescription('Generate model');
     }
 
     /**

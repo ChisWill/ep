@@ -82,10 +82,6 @@ final class Config
      */
     public string $layoutDir = '_layouts';
     /**
-     * 默认路由规则
-     */
-    public array $defaultRoute = [Method::ALL, '{prefix:[\w/-]*?}{controller:/?[a-zA-Z][\w-]*|}{action:/?[a-zA-Z][\w-]*|}', '<prefix>/<controller>/<action>'];
-    /**
      * Web 中间件
      */
     public array $webMiddlewares = [
@@ -163,12 +159,16 @@ final class Config
      *         $route->get('/error/index', 'error/index');
      *     });
      * };
+     * 
      * ```
      */
     private ?Closure $route = null;
 
     public function __construct(array $config)
     {
+        if (array_key_exists('defaultRoute', $config)) {
+            throw new InvalidArgumentException('The "defaultRoute" configuration can not be modified.');
+        }
         foreach ($config as $key => $val) {
             $this->$key = $val;
         }
@@ -188,12 +188,22 @@ final class Config
         throw new InvalidArgumentException("The \"{$name}\" configuration is invalid.");
     }
 
+    /**
+     * 默认路由规则
+     */
+    private array $defaultRoute = [Method::ALL, '{prefix:[\w/-]*?}{controller:/?[a-zA-Z][\w-]*|}{action:/?[a-zA-Z][\w-]*|}', '<prefix>/<controller>/<action>'];
+
+    public function getDefaultRoute(): array
+    {
+        return $this->defaultRoute;
+    }
+
     public function getDi(): array
     {
         return $this->di ? call_user_func($this->di, $this) : [];
     }
 
-    public function getRoute(): Closure
+    public function getRouteRule(): Closure
     {
         return $this->route ?: static fn (): bool => true;
     }

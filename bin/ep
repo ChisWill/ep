@@ -59,7 +59,7 @@ HELP;
     }
     $userConfig = require($configPath);
 
-    $config = [
+    $params = [
         'appNamespace' => 'Ep',
         'rootPath' => $userConfig['rootPath'] ?? '',
         'di' => $userConfig['di'] ?? null,
@@ -70,17 +70,20 @@ HELP;
         'secretKey' => $userConfig['secretKey'] ?? ''
     ];
     if (isset($userConfig['vendorPath'])) {
-        $config['vendorPath'] = $userConfig['vendorPath'];
+        $params['vendorPath'] = $userConfig['vendorPath'];
     }
     if (isset($userConfig['runtimeDir'])) {
-        $config['runtimeDir'] = $userConfig['runtimeDir'];
+        $params['runtimeDir'] = $userConfig['runtimeDir'];
     }
 
-    Ep::init($config);
+    Ep::init($params);
 
+    $config = Ep::getConfig();
     $request = Ep::getDi()->get(ConsoleRequestInterface::class);
-    $request->setOption('common.appNamespace',  $userConfig['appNamespace'] ?? 'App');
-    $request->setOption('common.autoloadPath', realpath($autoloadPath));
+    $request->setOption('user.appNamespace',  $userConfig['appNamespace'] ?? 'App');
+    $request->setOption('user.commandDirAndSuffix', $userConfig['commandDirAndSuffix'] ?? $config->commandDirAndSuffix);
+    $request->setOption('user.actionSuffix', $userConfig['actionSuffix'] ?? $config->actionSuffix);
+    $request->setOption('user.defaultAction', $userConfig['defaultAction'] ?? $config->defaultAction);
     $request->setOptions($options);
 
     Ep::getDi()->get(Application::class)->run();

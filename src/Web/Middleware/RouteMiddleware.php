@@ -39,13 +39,14 @@ final class RouteMiddleware implements MiddlewareInterface
         try {
             [$allowed, $result, $params] = $this->route
                 ->clone([
-                    'rule' => $this->config->getRoute(),
+                    'rule' => $this->config->getRouteRule(),
                     'baseUrl' => $this->config->baseUrl
                 ])
                 ->match(
                     $request->getUri()->getPath(),
                     $request->getMethod()
                 );
+
             if (!$allowed) {
                 return $this->service->status(Status::METHOD_NOT_ALLOWED);
             }

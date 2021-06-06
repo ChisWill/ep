@@ -6,12 +6,8 @@ namespace Ep\Command;
 
 use Ep\Command\Service\MigrateService;
 use Ep\Console\Command;
-use Ep\Contract\ConsoleRequestInterface;
 use Symfony\Component\Console\Input\InputOption;
 
-/**
- * 数据库迁移
- */
 final class MigrateCommand extends Command
 {
     private MigrateService $service;
@@ -19,42 +15,51 @@ final class MigrateCommand extends Command
     public function __construct(MigrateService $service)
     {
         $this->service = $service;
-    }
 
-    public function definition(): array
-    {
-        return [
-            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The path of migration'),
-            new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The number of migtions to apply'),
-        ];
+        $this->setDefinition('new', [
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations')
+        ])
+            ->setDescription('Create migration template');
+
+        $this->setDefinition('ddl', [
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
+            new InputOption('prefix', null, InputOption::VALUE_REQUIRED, 'The table prefix')
+        ])
+            ->setDescription('Initialize DDL');
+
+        $this->setDefinition('all', [
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
+        ])
+            ->setDescription('Upgrades all migrations');
+
+        $this->setDefinition('up', [
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
+            new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The number of migrations to apply')
+        ])
+            ->setDescription('Upgrades new migrations');
+
+        $this->setDefinition('down', [
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
+            new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The number of migtions to downgrade')
+        ])
+            ->setDescription('Downgrades old migrations');
     }
 
     /**
      * 创建一个迁移记录
      */
-    public function newAction(ConsoleRequestInterface $request): int
+    public function newAction(): int
     {
-        $this->service->init($request->getOptions());
-
         $this->service->new();
 
         return $this->success();
     }
 
-    public function ddlDefinition(): array
-    {
-        return [
-            new InputOption('prefix', null, InputOption::VALUE_REQUIRED, 'The table prefix'),
-        ];
-    }
-
     /**
      * 初始化所有表结构
      */
-    public function ddlAction(ConsoleRequestInterface $request): int
+    public function ddlAction(): int
     {
-        $this->service->initDDL($request->getOptions());
-
         $this->service->ddl();
 
         return $this->success();
@@ -63,10 +68,8 @@ final class MigrateCommand extends Command
     /**
      * 更新所有迁移
      */
-    public function allAction(ConsoleRequestInterface $request): int
+    public function allAction(): int
     {
-        $this->service->init($request->getOptions());
-
         $this->service->all();
 
         return $this->success();
@@ -75,10 +78,8 @@ final class MigrateCommand extends Command
     /**
      * 执行所有还未同步的迁移
      */
-    public function upAction(ConsoleRequestInterface $request): int
+    public function upAction(): int
     {
-        $this->service->init($request->getOptions());
-
         $this->service->up();
 
         return $this->success();
@@ -87,10 +88,8 @@ final class MigrateCommand extends Command
     /**
      * 回退已执行过的迁移
      */
-    public function downAction(ConsoleRequestInterface $request): int
+    public function downAction(): int
     {
-        $this->service->initDown($request->getOptions());
-
         $this->service->down();
 
         return $this->success();

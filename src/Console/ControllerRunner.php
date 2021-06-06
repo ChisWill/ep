@@ -44,32 +44,32 @@ final class ControllerRunner extends BaseControllerRunner
         return $this->symfonyApplication->run($this->input, $this->output);
     }
 
-    private function wrapCommand(Command $command, string $action, ConsoleRequestInterface $request): SymfonyCommand
+    private function wrapCommand(ControllerInterface $command, string $action, ConsoleRequestInterface $request): SymfonyCommand
     {
-        return new class ($command, $request, fn () => parent::runAction($command, $action, $request)) extends SymfonyCommand
+        return new class($command, $request, fn () => parent::runAction($command, $action, $request)) extends SymfonyCommand
         {
-            private Command $command;
+            private ControllerInterface $command;
             private Closure $callback;
 
-            public function __construct(Command $command, ConsoleRequestInterface $request, Closure $callback)
+            public function __construct(ControllerInterface $command, ConsoleRequestInterface $request, Closure $callback)
             {
                 $this->command = $command;
                 $this->callback = $callback;
 
-                parent::__construct(trim($request->getRoute(), '/'));
+                parent::__construct($request->getRoute());
             }
 
             protected function configure(): void
             {
-                $defaultDefinitionMethod = 'definition';
-                if (method_exists($this->command, $defaultDefinitionMethod)) {
-                    $definitions = call_user_func([$this->command, $defaultDefinitionMethod]);
-                } else {
-                    $definitions = [];
-                }
-                $definitionMethod = $this->command->actionId . 'Definition';
-                if (method_exists($this->command, $definitionMethod)) {
-                    $this->setDefinition(array_merge($definitions, call_user_func([$this->command, $definitionMethod])));
+                if (method_exists($this->command, 'getDefinitions')) {
+                    /** @var CommandDefinition[] $definitions */
+                    $definitions = $this->command->getDefinitions();
+                    if (array_key_exists($this->command->actionId, $definitions)) {
+                        $this
+                            ->setDefinition($definitions[$this->command->actionId]->getDefinition())
+                            ->setDescription($definitions[$this->command->actionId]->getDescription())
+                            ->setHelp($definitions[$this->command->actionId]->getHelp());
+                    }
                 }
             }
 

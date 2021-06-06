@@ -4,90 +4,67 @@ declare(strict_types=1);
 
 namespace Ep\Command;
 
+use Ep\Command\Service\HelpService;
+use Ep\Command\Service\Service;
 use Ep\Console\Command;
-use Yiisoft\Aliases\Aliases;
-use Yiisoft\Files\FileHelper;
-use Yiisoft\Files\PathMatcher\PathMatcher;
-use ReflectionClass;
-use ReflectionMethod;
+use Ep\Contract\ConsoleRequestInterface;
+use Symfony\Component\Console\Application as SymfonyApplication;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 final class ListCommand extends Command
 {
-    public function indexAction(Aliases $aliases): int
+    private SymfonyApplication $symfonyApplication;
+    private SymfonyCommand $listCommand;
+    private HelpService $service;
+
+    public function __construct(SymfonyApplication $symfonyApplication, HelpService $service)
     {
-        $commandPath = str_replace('\\', '/', $aliases->get('@ep/src/Command'));
-        $files = array_map(static function ($path) use ($commandPath): string {
-            return trim(str_replace([$commandPath, '.php'], '', $path), '/');
-        }, FileHelper::findFiles($commandPath, [
-            'filter' => (new PathMatcher())->only('**Command.php')->except(str_replace('\\', '/', __FILE__))
-        ]));
+        $this->symfonyApplication = $symfonyApplication;
+        $this->listCommand = $symfonyApplication->find('list');
+        $this->service = $service;
 
-        $commands = $this->getCommands($files);
-        $commandMaxLength = $this->getCommandMaxLength($commands);
+        $this
+            ->setDefinition('index', [
+                new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
+                new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
+                new InputOption('short', null, InputOption::VALUE_NONE, 'To skip describing commands\' arguments'),
+            ])
+            ->setDescription('List commands')
+            ->setHelp(<<<'EOF'
+The <info>%command.name%</info> command lists all commands:
 
-        $help = "\nThe following commands are available:\n";
-        $lastCommand = null;
-        foreach ($commands as $row) {
-            if (($name = $this->getCommandName($row['command'])) != $lastCommand) {
-                $lastCommand = $name;
-                $help .= "\n";
-            }
-            $help .= sprintf("- %s%s%s\n", $row['command'], str_repeat(' ', $commandMaxLength - strlen($row['command']) + 1), $row['desc']);
-        }
+    <info>%command.full_name%</info>
 
-        return $this->success($help);
+You can also display the commands for a specific namespace:
+
+    <info>%command.full_name% test</info>
+
+You can also output the information in other formats by using the <comment>--format</comment> option:
+
+    <info>%command.full_name% --format=xml</info>
+
+It's also possible to get raw list of commands (useful for embedding command runner):
+
+    <info>%command.full_name% --raw</info>
+EOF);
     }
 
-    private function getCommandName(string $command): string
+    public function indexAction(ConsoleRequestInterface $request, OutputInterface $output): int
     {
-        if (strpos($command, '/') !== false) {
-            return explode('/', $command)[0];
-        } else {
-            return $command;
-        }
-    }
+        $commands = $this->service->getAllCommands();
+        array_walk($commands, [$this->symfonyApplication, 'add']);
 
-    private function getCommands(array $files): array
-    {
-        foreach ($files as $name) {
-            $class = 'Ep\\Command\\' . $name;
-            $map[$name] = array_filter((new ReflectionClass($class))->getMethods(ReflectionMethod::IS_PUBLIC), static fn (ReflectionMethod $ref) => strpos($ref->getName(), 'Action') !== false);
-        }
-        foreach ($map as $name => $actions) {
-            foreach ($actions as $ref) {
-                $action = '/' . substr($ref->getName(), 0, strrpos($ref->getName(), 'Action'));
-                if ($action === '/index') {
-                    $action = '';
-                }
-                $commands[] = [
-                    'command' => lcfirst(substr($name, 0, strrpos($name, 'Command'))) . $action,
-                    'desc' => $this->getComment($ref)
-                ];
-            }
-        }
-        return $commands;
-    }
-
-    private function getCommandMaxLength(array $commands): int
-    {
-        $maxLength = 0;
-        foreach ($commands as $row) {
-            $length = strlen($row['command']);
-            if ($length > $maxLength) {
-                $maxLength = $length;
-            }
-        }
-        return $maxLength;
-    }
-
-    private function getComment(ReflectionMethod $ref): string
-    {
-        $docComment = $ref->getDocComment();
-        if ($docComment === false) {
-            return '';
-        } else {
-            preg_match('~/\*\*\s*\* (.*)[\s\S]+\*/~', $docComment, $matches);
-            return $matches[1] ?? '';
-        }
+        $arguments = array(
+            'namespace' => $request->getArgument('namespace'),
+            '--raw' => $request->getOption('raw'),
+            '--format' => $request->getOption('format'),
+            '--short' => $request->getOption('short')
+        );
+        return $this->listCommand->run(new ArrayInput($arguments), $output);
     }
 }

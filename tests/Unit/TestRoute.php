@@ -17,7 +17,7 @@ class TestRoute extends TestCase
         return [
             [
                 'rule' => function (RouteCollector $route) {
-                    $rule = Ep::getConfig()->defaultRoute;
+                    $rule = Ep::getConfig()->getDefaultRoute();
                     $route->addGroup(Ep::getConfig()->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$rule));
                 },
                 'cases' => [

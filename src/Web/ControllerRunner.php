@@ -23,7 +23,6 @@ final class ControllerRunner extends BaseControllerRunner
     }
 
     /**
-     * @param  Controller             $controller
      * @param  ServerRequestInterface $request
      * 
      * @return mixed
@@ -41,7 +40,6 @@ final class ControllerRunner extends BaseControllerRunner
     }
 
     /**
-     * @param  Controller             $controller
      * @param  ServerRequestInterface $request
      * 
      * @return mixed
@@ -58,12 +56,12 @@ final class ControllerRunner extends BaseControllerRunner
         }
     }
 
-    private function wrapModule(ModuleInterface $module, Controller $controller, string $action): Closure
+    private function wrapModule(ModuleInterface $module, ControllerInterface $controller, string $action): Closure
     {
         return fn (ServerRequestInterface $request) => parent::runModule($module, $controller, $action, $request);
     }
 
-    private function wrapController(Controller $controller, string $action): Closure
+    private function wrapController(ControllerInterface $controller, string $action): Closure
     {
         return fn (ServerRequestInterface $request) => parent::runAction($controller, $action, $request);
     }

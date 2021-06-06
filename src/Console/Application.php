@@ -66,10 +66,10 @@ final class Application
         try {
             [, $handler] = $this->route
                 ->configure([
-                    'rule' => $this->config->getRoute(),
+                    'rule' => $this->config->getRouteRule(),
                     'baseUrl' => '/'
                 ])
-                ->match($request->getRoute());
+                ->match('/' . $request->getRoute());
 
             $code = $this->controllerRunner
                 ->configure(['suffix' => $this->config->commandDirAndSuffix])
@@ -77,7 +77,7 @@ final class Application
 
             exit($code);
         } catch (NotFoundException $e) {
-            $command = trim($request->getRoute(), '/');
+            $command = $request->getRoute();
             echo <<<HELP
 Error: unknown command "{$command}"
 

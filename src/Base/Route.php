@@ -43,7 +43,7 @@ final class Route implements ConfigurableInterface
                     $route->addGroup($this->baseUrl, $this->rule);
                 }
                 if ($this->defaultRoute) {
-                    $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->defaultRoute));
+                    $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->getDefaultRoute()));
                 }
             }, [
                 'cacheFile' => $this->aliases->get($this->config->runtimeDir . '/route.cache'),

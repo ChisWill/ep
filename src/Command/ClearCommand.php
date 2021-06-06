@@ -17,6 +17,8 @@ final class ClearCommand extends Command
     public function __construct(Config $config)
     {
         $this->config = $config;
+
+        $this->setDefinition('index')->setDescription('Clear runtime cache');
     }
 
     /**

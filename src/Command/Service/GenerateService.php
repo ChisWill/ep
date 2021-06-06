@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Command\Service;
 
-use Ep\Base\Config;
 use Ep\Base\View;
 use Ep\Console\ConsoleResponse;
 use Ep\Helper\File;
@@ -14,18 +13,17 @@ use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\TableSchema;
 use Yiisoft\Strings\StringHelper;
+use Psr\Container\ContainerInterface;
 use InvalidArgumentException;
 
 final class GenerateService extends Service
 {
-    private Config $config;
-    private Aliases $aliases;
     private View $view;
 
-    public function __construct(Config $config, Aliases $aliases, View $view)
+    public function __construct(ContainerInterface $container, View $view)
     {
-        $this->config = $config;
-        $this->aliases = $aliases;
+        parent::__construct($container);
+
         $this->view = $view->configure([
             'viewPath' => '@ep/views',
             'prefix' => 'generate'
@@ -42,13 +40,11 @@ final class GenerateService extends Service
     private string $prefix;
     private TableSchema $tableSchema;
 
-    public function initModel(array $params): void
+    public function initModel(array $options): void
     {
-        $this->init($params);
-
-        $this->table = $params['table'];
-        $this->path = $params['path'] ?? $params['generate.model.path'] ?? 'Model';
-        $this->prefix = $params['prefix'] ?? $params['generate.model.prefix'] ?? '';
+        $this->table = $options['table'];
+        $this->path = $options['path'] ?? $options['generate.model.path'] ?? 'Model';
+        $this->prefix = $options['prefix'] ?? $options['generate.model.prefix'] ?? '';
 
         $tableSchema = $this->db->getTableSchema($this->table);
         if (!$tableSchema) {
@@ -97,40 +93,9 @@ final class GenerateService extends Service
         return file_exists($this->getModelFileName());
     }
 
-    private ?string $appPath = null;
-
-    /**
-     * @throws InvalidArgumentException
-     */
-    public function getAppPath(): string
-    {
-        if ($this->appPath === null) {
-            $vendorDirname = dirname($this->aliases->get($this->config->vendorPath));
-            $composerPath = $vendorDirname . '/composer.json';
-            if (!file_exists($composerPath)) {
-                $this->throw('Unable to find composer.json in your project root.');
-            }
-            $composerContent = json_decode(file_get_contents($composerPath), true);
-            $autoload = ($composerContent['autoload']['psr-4'] ?? []) + ($composerContent['autoload-dev']['psr-4'] ?? []);
-            $appPath = null;
-            foreach ($autoload as $ns => $path) {
-                if ($ns === $this->appNamespace . '\\') {
-                    $appPath = $path;
-                    break;
-                }
-            }
-            if ($appPath === null) {
-                $this->throw('You should set the "autoload[psr-4]" configuration in your composer.json first.');
-            }
-            $this->appPath = $vendorDirname . '/' . $appPath;
-        }
-
-        return $this->appPath;
-    }
-
     private function getNamespace(): string
     {
-        return sprintf('%s\\%s', $this->appNamespace, implode('\\', array_map([Str::class, 'toPascalCase'], explode('/', $this->path))));
+        return sprintf('%s\\%s', $this->userAppNamespace, implode('\\', array_map([Str::class, 'toPascalCase'], explode('/', $this->path))));
     }
 
     private function getPrimaryKey(): string

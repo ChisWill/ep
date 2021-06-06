@@ -39,6 +39,20 @@ abstract class Command implements ControllerInterface
         return $response;
     }
 
+    private array $definitions = [];
+
+    public function getDefinitions(): array
+    {
+        return $this->definitions;
+    }
+
+    protected function setDefinition(string $action, array $definition = []): CommandDefinition
+    {
+        $this->definitions[$action] ??= new CommandDefinition($action, $definition);
+
+        return $this->definitions[$action];
+    }
+
     private ?Service $service = null;
 
     protected function getService(): Service
@@ -64,7 +78,6 @@ abstract class Command implements ControllerInterface
         if ($message) {
             $this->getService()->writeln($message);
         }
-
         return Command::OK;
     }
 
@@ -73,7 +86,6 @@ abstract class Command implements ControllerInterface
         if ($message) {
             $this->getService()->writeln($message);
         }
-
         return Command::FAIL;
     }
 
