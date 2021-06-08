@@ -8,6 +8,7 @@ use Ep\Console\Command;
 use Ep\Console\Service;
 use Ep\Contract\ConsoleRequestInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class InitCommand extends Command
 {
@@ -39,6 +40,32 @@ class InitCommand extends Command
             'options' => $request->getOptions(),
             'argvs' => $request->getArguments()
         ]);
+
+        return $this->success();
+    }
+
+    public function tableAction()
+    {
+        $this->service->renderTable([
+            'name', 'id', 'age'
+        ], [
+            ['zs', 1, 33],
+            ['fe', 31, 333],
+            ['gvb', 51, 315],
+        ]);
+
+        return $this->success();
+    }
+
+    public function progressAction()
+    {
+        $this->service->progress(function (ProgressBar $bar) {
+            $i = 0;
+            while ($i++ < 50) {
+                $bar->advance(2);
+                usleep(30 * 1000);
+            }
+        });
 
         return $this->success();
     }
