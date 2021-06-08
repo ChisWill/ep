@@ -6,6 +6,7 @@ namespace Ep\Command;
 
 use Ep\Command\Service\MigrateService;
 use Ep\Console\Command;
+use Ep\Contract\ConsoleRequestInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 final class MigrateCommand extends Command
@@ -27,20 +28,17 @@ final class MigrateCommand extends Command
         ])
             ->setDescription('Initialize DDL');
 
-        $this->setDefinition('all', [
-            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
-        ])
-            ->setDescription('Upgrades all migrations');
-
         $this->setDefinition('up', [
             new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
-            new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The number of migrations to apply')
+            new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The number of migrations to apply'),
+            new InputOption('all', null, InputOption::VALUE_NONE, 'Whether apply all migrations')
         ])
             ->setDescription('Upgrades new migrations');
 
         $this->setDefinition('down', [
             new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
-            new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The number of migtions to downgrade')
+            new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The number of migtions to downgrade'),
+            new InputOption('all', null, InputOption::VALUE_NONE, 'Whether downgrade all migration history')
         ])
             ->setDescription('Downgrades old migrations');
     }
@@ -66,20 +64,16 @@ final class MigrateCommand extends Command
     }
 
     /**
-     * 更新所有迁移
-     */
-    public function allAction(): int
-    {
-        $this->service->all();
-
-        return $this->success();
-    }
-
-    /**
      * 执行所有还未同步的迁移
      */
-    public function upAction(): int
+    public function upAction(ConsoleRequestInterface $request): int
     {
+        if ($request->getOption('all')) {
+            if (!$this->confirm('Are you sure apply all migrations?')) {
+                return $this->success('Skipped.');
+            }
+        }
+
         $this->service->up();
 
         return $this->success();
@@ -88,8 +82,14 @@ final class MigrateCommand extends Command
     /**
      * 回退已执行过的迁移
      */
-    public function downAction(): int
+    public function downAction(ConsoleRequestInterface $request): int
     {
+        if ($request->getOption('all')) {
+            if (!$this->confirm('Are you sure downgrade all migrations?')) {
+                return $this->success('Skipped.');
+            }
+        }
+
         $this->service->down();
 
         return $this->success();

@@ -48,7 +48,7 @@ abstract class Command implements ControllerInterface
 
     protected function setDefinition(string $action, array $definition = []): CommandDefinition
     {
-        $this->definitions[$action] ??= new CommandDefinition($action, $definition);
+        $this->definitions[$action] ??= new CommandDefinition($definition);
 
         return $this->definitions[$action];
     }
@@ -71,6 +71,11 @@ abstract class Command implements ControllerInterface
     protected function writeln(string $message = '', int $options = 0): void
     {
         $this->getService()->writeln($message, $options);
+    }
+
+    protected function confirm(string $message, bool $default = false): bool
+    {
+        return $this->getService()->confirm($message, $default);
     }
 
     protected function success(string $message = ''): int

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ep\Command;
 
 use Ep\Command\Service\HelpService;
-use Ep\Command\Service\Service;
 use Ep\Console\Command;
 use Ep\Contract\ConsoleRequestInterface;
 use Symfony\Component\Console\Application as SymfonyApplication;

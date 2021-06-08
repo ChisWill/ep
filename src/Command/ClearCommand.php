@@ -8,7 +8,6 @@ use Ep\Base\Config;
 use Ep\Console\Command;
 use Ep\Helper\File;
 use Yiisoft\Aliases\Aliases;
-use RuntimeException;
 
 final class ClearCommand extends Command
 {
@@ -26,13 +25,10 @@ final class ClearCommand extends Command
      */
     public function indexAction(Aliases $aliases): int
     {
-        try {
-            $runtimeDir = $aliases->get($this->config->runtimeDir);
-            File::rmdir($runtimeDir);
-            File::mkdir($runtimeDir);
-            return $this->success();
-        } catch (RuntimeException $e) {
-            return $this->error($e->getMessage());
-        }
+        $runtimeDir = $aliases->get($this->config->runtimeDir);
+        File::rmdir($runtimeDir);
+        File::mkdir($runtimeDir);
+
+        return $this->success();
     }
 }

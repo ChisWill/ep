@@ -36,8 +36,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
 
     public static function find(?ConnectionInterface $db = null): ActiveQuery
     {
-        return (new ActiveQuery(static::class, $db ?: Ep::getDb()))
-            ->alias(static::getAlias());
+        return (new ActiveQuery(static::class, $db ?: Ep::getDb()))->alias(static::getAlias());
     }
 
     /**
@@ -92,6 +91,9 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
             ->alias(lcfirst(System::getCallerMethod('get')));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function save(?array $attributeNames = null): bool
     {
         if ($this->validate()) {
@@ -101,6 +103,9 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function insert(?array $attributes = null): bool
     {
         foreach (array_intersect($this->attributes(), [static::CREATED_AT, static::UPDATED_AT]) as $field) {
@@ -109,6 +114,9 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
         return parent::insert($attributes);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function update(?array $attributeNames = null)
     {
         if (in_array(static::UPDATED_AT, $this->attributes())) {

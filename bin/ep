@@ -53,7 +53,7 @@ HELP;
     $configPath = $options['config'] ?? dirname($autoloadPath, 2) . '/config/main.php';
     unset($options['config']);
     if (!file_exists($configPath)) {
-        $message = "Unable to find config path in \"{$configPath}\"." . PHP_EOL;
+        $message = "Unable to find config path in \"{$configPath}\".\n";
         fwrite(STDERR, $message);
         exit(1);
     }
@@ -80,6 +80,9 @@ HELP;
 
     $config = Ep::getConfig();
     $request = Ep::getDi()->get(ConsoleRequestInterface::class);
+    if (!$request->getRoute()) {
+        $request->setRoute('list');
+    }
     $request->setOption('user.appNamespace',  $userConfig['appNamespace'] ?? 'App');
     $request->setOption('user.commandDirAndSuffix', $userConfig['commandDirAndSuffix'] ?? $config->commandDirAndSuffix);
     $request->setOption('user.actionSuffix', $userConfig['actionSuffix'] ?? $config->actionSuffix);

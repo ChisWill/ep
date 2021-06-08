@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Command\Service;
 
-use Closure;
-use Ep\Base\Config;
 use Ep\Command\Helper\MigrateBuilder;
-use Ep\Console\Service as ConsoleService;
 use Ep\Contract\MigrateInterface;
 use Ep\Db\ActiveRecord;
 use Ep\Db\Query;
@@ -18,23 +15,21 @@ use Psr\Container\ContainerInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Files\FileHelper;
 use Yiisoft\Files\PathMatcher\PathMatcher;
+use Closure;
 use Throwable;
 
 final class MigrateService extends Service
 {
     private GenerateService $generateService;
-    private ConsoleService $consoleService;
     private string $tableName;
 
     public function __construct(
         ContainerInterface $container,
-        GenerateService $generateService,
-        ConsoleService $consoleService
+        GenerateService $generateService
     ) {
         parent::__construct($container);
 
         $this->generateService = $generateService;
-        $this->consoleService = $consoleService;
         $this->tableName = $this->config->migrationTableName;
 
         $this->init();
@@ -71,38 +66,24 @@ final class MigrateService extends Service
     public function ddl(): void
     {
         $dbService = new DbService($this->db);
-        $ddl = '';
-        foreach ($dbService->getTables($this->request->getOption('prefix') ?: '') as $tableName) {
+        $upSql = '';
+        $downSql = '';
+        $tables = $dbService->getTables($this->request->getOption('prefix') ?: '');
+        foreach ($tables as $tableName) {
             if ($tableName !== $this->tableName) {
-                $ddl .= $dbService->getDDL($tableName) . ";\n";
+                $upSql .= $dbService->getDDL($tableName) . ";\n";
+                $downSql .= sprintf('%s$builder->dropTable(\'%s\');%s', str_repeat(' ', 8), $tableName, "\n");
             }
         }
 
-        $this->createFile('migrate/ddl', $this->ddlClassName, compact('ddl'));
+        $this->createFile('migrate/ddl', $this->ddlClassName, compact('upSql', 'downSql'));
     }
 
-    public function all(): void
+    public function up(): void
     {
-        $answer = $this->consoleService->prompt('Are you sure migrate all records? [Yes|No]');
-        if ($answer === 'Yes') {
-            $this->up(true);
-        } else {
-            $this->consoleService->writeln('Skipped.');
-        }
-    }
+        // $this->consoleService->
 
-    public function up(bool $all = false): void
-    {
-        if ($all) {
-            $history = [];
-        } else {
-            $history = Query::find($this->db)
-                ->select('version')
-                ->from($this->tableName)
-                ->column();
-        }
-
-        $this->migrate('up', $history, function (array $classList): void {
+        $this->migrate('up', $this->request->getOption('all'), function (array $classList): void {
             $count = count($classList);
             if ($count === 0) {
                 $this->consoleService->writeln('Already up to date.');
@@ -120,16 +101,17 @@ final class MigrateService extends Service
         });
     }
 
-    public function down(): bool
+    public function down(): void
     {
-        $this->step = (int) ($this->request->getOption('step') ?: 1);
+        $all = $this->request->getOption('all');
 
-        $history = Query::find($this->db)
-            ->select('version')
-            ->from($this->tableName)
-            ->column();
+        if ($all) {
+            $this->step = 0;
+        } else {
+            $this->step = (int) ($this->request->getOption('step') ?: 1);
+        }
 
-        $this->migrate('down', $history, function (array $classList): void {
+        $this->migrate('down', $all, function (array $classList): void {
             $count = count($classList);
             if ($count === 0) {
                 $this->consoleService->writeln('No commits.');
@@ -141,9 +123,19 @@ final class MigrateService extends Service
         });
     }
 
-    private function migrate(string $method, array $history, Closure $success): void
+    private function migrate(string $method, bool $all, Closure $success): void
     {
-        $files = $this->findClassFiles();
+        $files = $this->findClassFiles($all);
+
+        if ($all && $method === 'up') {
+            $history = [];
+        } else {
+            $history = Query::find($this->db)
+                ->select('version')
+                ->from($this->tableName)
+                ->column();
+        }
+
         switch ($method) {
             case 'up':
                 sort($files);
@@ -198,10 +190,14 @@ final class MigrateService extends Service
         }
     }
 
-    private function findClassFiles(): array
+    private function findClassFiles(bool $all = false): array
     {
+        $filter = (new PathMatcher())->only('**.php');
+        if (!$all) {
+            $filter->except('**/' . $this->ddlClassName . '.php');
+        }
         return FileHelper::findFiles($this->basePath, [
-            'filter' => (new PathMatcher())->only('**.php')->except('**/' . $this->ddlClassName . '.php')
+            'filter' => $filter
         ]);
     }
 

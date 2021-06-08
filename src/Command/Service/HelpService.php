@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Ep\Command\Service;
 
-use Ep;
-use Ep\Base\Config;
 use Ep\Console\Command;
 use Ep\Helper\Str;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Yiisoft\Aliases\Aliases;
 use Yiisoft\Files\FileHelper;
 use Yiisoft\Files\PathMatcher\PathMatcher;
 use Yiisoft\Injector\Injector;
@@ -53,41 +50,43 @@ final class HelpService extends Service
         ]));
     }
 
-    private function wrapCommand(array $info): SymfonyCommand
+    private function wrapCommand(CommandData $commandData): SymfonyCommand
     {
-        return new class($this->container, $info['name'], $info['ns'], $info['class'], $info['action'], $info['actionId']) extends SymfonyCommand
+        return new class ($this->container, $commandData) extends SymfonyCommand
         {
             private ContainerInterface $container;
+            private CommandData $commandData;
             private Command $command;
-            private string $action;
-            private string $actionId;
 
-            public function __construct(ContainerInterface $container, string $name, string $ns, string $class, string $action, string $actionId)
+            public function __construct(ContainerInterface $container, CommandData $commandData)
             {
-                $this->command = $container->get($class);
-                $this->action = $action;
-                $this->actionId = $actionId;
+                $this->container = $container;
+                $this->commandData = $commandData;
+                $this->command = $container->get($commandData->className);
 
-                $ns = $ns === 'Ep' ? '' : ($ns . ':');
-
-                parent::__construct($ns . $name);
+                if (in_array($commandData->commandName, ['help', 'list'])) {
+                    $name = $commandData->commandName;
+                } else {
+                    $name = $commandData->appNamespace . ':' . $commandData->commandName;
+                }
+                parent::__construct($name);
             }
 
             protected function configure(): void
             {
                 /** @var CommandDefinition[] $definitions */
                 $definitions = $this->command->getDefinitions();
-                if (array_key_exists($this->actionId, $definitions)) {
+                if (array_key_exists($this->commandData->actionId, $definitions)) {
                     $this
-                        ->setDefinition($definitions[$this->actionId]->getDefinition())
-                        ->setDescription($definitions[$this->actionId]->getDescription())
-                        ->setHelp($definitions[$this->actionId]->getHelp());
+                        ->setDefinition($definitions[$this->commandData->actionId]->getDefinition())
+                        ->setDescription($definitions[$this->commandData->actionId]->getDescription())
+                        ->setHelp($definitions[$this->commandData->actionId]->getHelp());
                 }
             }
 
             protected function execute(InputInterface $input, OutputInterface $output): int
             {
-                return $this->container->get(Injector::class)->invoke([$this->command, $this->action]);
+                return $this->container->get(Injector::class)->invoke([$this->command, $this->commandData->action]);
             }
         };
     }
@@ -106,13 +105,13 @@ final class HelpService extends Service
                 if ($action === '/' . $config['defaultAction']) {
                     $action = '';
                 }
-                $commands[] = [
-                    'ns' => $config['appNamespace'],
-                    'class' => $ref->getDeclaringClass()->getName(),
-                    'name' => $this->getCommandName($name, $action, $config),
-                    'action' => $ref->getName(),
-                    'actionId' => Str::rtrim($ref->getName(), $config['actionSuffix'])
-                ];
+                $commandData = new CommandData();
+                $commandData->appNamespace = $config['appNamespace'];
+                $commandData->className = $ref->getDeclaringClass()->getName();
+                $commandData->commandName = $this->getCommandName($name, $action, $config);
+                $commandData->action = $ref->getName();
+                $commandData->actionId = Str::rtrim($ref->getName(), $config['actionSuffix']);
+                $commands[] = $commandData;
             }
         }
         return $commands;
@@ -128,4 +127,13 @@ final class HelpService extends Service
             return $basename . $action;
         }
     }
+}
+
+class CommandData
+{
+    public string $appNamespace;
+    public string $className;
+    public string $commandName;
+    public string $action;
+    public string $actionId;
 }

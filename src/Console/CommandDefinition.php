@@ -6,12 +6,10 @@ namespace Ep\Console;
 
 final class CommandDefinition
 {
-    private string $action;
     private array $definition;
 
-    public function __construct(string $action, array $definition = [])
+    public function __construct(array $definition = [])
     {
-        $this->action = $action;
         $this->definition = $definition;
     }
 

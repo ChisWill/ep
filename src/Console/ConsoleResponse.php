@@ -16,6 +16,11 @@ final class ConsoleResponse implements ConsoleResponseInterface
         $this->output = $output;
     }
 
+    public function getOutput(): OutputInterface
+    {
+        return $this->output;
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ep\Db;
 
 use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Expression\Expression;
 
 final class Service
 {
@@ -18,29 +17,11 @@ final class Service
 
     public function getTables(string $prefix = ''): array
     {
-        $query = Query::find($this->db);
-
-        switch ($this->db->getDriverName()) {
-            case 'mysql':
-                $field = 'TABLE_NAME';
-                $query
-                    ->from('information_schema.TABLES')
-                    ->where(['TABLE_SCHEMA' => new Expression('database()')]);
-                break;
-            case 'sqlite':
-                $field = 'name';
-                $query
-                    ->from('sqlite_master')
-                    ->where(['type' => 'table'])
-                    ->andWhere(new Expression("`name` NOT LIKE 'sqlite_%'"));
-                break;
-        }
-
+        $tables = $this->db->getSchema()->getTableNames();
         if ($prefix) {
-            $query->andWhere(new Expression("`{$field}` LIKE '{$prefix}%'"));
+            $tables = array_filter($tables, static fn ($name): bool => strpos($name, $prefix) === 0);
         }
-
-        return $query->select($field)->column();
+        return $tables;
     }
 
     public function getDDL(string $tableName): string

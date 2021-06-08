@@ -166,17 +166,19 @@ final class Config
 
     public function __construct(array $config)
     {
-        if (array_key_exists('defaultRoute', $config)) {
-            throw new InvalidArgumentException('The "defaultRoute" configuration can not be modified.');
-        }
         foreach ($config as $key => $val) {
             $this->$key = $val;
         }
-        if ($this->rootPath === '') {
-            throw new InvalidArgumentException('The "rootPath" configuration is required.');
-        }
-        if ($this->secretKey === '') {
-            throw new InvalidArgumentException('The "secretKey" configuration is required.');
+        if ($this->debug) {
+            if (array_key_exists('defaultRoute', $config)) {
+                throw new InvalidArgumentException('The "defaultRoute" configuration can not be modified.');
+            }
+            if ($this->rootPath === '') {
+                throw new InvalidArgumentException('The "rootPath" configuration is required.');
+            }
+            if ($this->secretKey === '') {
+                throw new InvalidArgumentException('The "secretKey" configuration is required.');
+            }
         }
     }
 

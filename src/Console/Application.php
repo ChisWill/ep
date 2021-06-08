@@ -13,7 +13,7 @@ use Ep\Contract\NotFoundException;
 final class Application
 {
     private Config $config;
-    private ConsoleRequestInterface $consoleRequest;
+    private ConsoleRequestInterface $request;
     private ErrorHandler $errorHandler;
     private ErrorRenderer $errorRenderer;
     private Route $route;
@@ -21,14 +21,14 @@ final class Application
 
     public function __construct(
         Config $config,
-        ConsoleRequestInterface $consoleRequest,
+        ConsoleRequestInterface $request,
         ErrorHandler $errorHandler,
         ErrorRenderer $errorRenderer,
         Route $route,
         ControllerRunner $controllerRunner
     ) {
         $this->config = $config;
-        $this->consoleRequest = $consoleRequest;
+        $this->request = $request;
         $this->errorHandler = $errorHandler;
         $this->errorRenderer = $errorRenderer;
         $this->route = $route;
@@ -46,7 +46,7 @@ final class Application
 
     private function createRequest(): ConsoleRequestInterface
     {
-        return $this->consoleRequest;
+        return $this->request;
     }
 
     private function register(ConsoleRequestInterface $request): void

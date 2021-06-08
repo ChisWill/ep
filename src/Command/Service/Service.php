@@ -6,6 +6,7 @@ namespace Ep\Command\Service;
 
 use Ep;
 use Ep\Base\Config;
+use Ep\Console\Service as ConsoleService;
 use Ep\Contract\ConsoleRequestInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Connection\Connection;
@@ -18,6 +19,7 @@ abstract class Service
     protected ContainerInterface $container;
     protected Config $config;
     protected ConsoleRequestInterface $request;
+    protected ConsoleService $consoleService;
     protected Aliases $aliases;
 
     public function __construct(ContainerInterface $container)
@@ -26,6 +28,7 @@ abstract class Service
         $this->config = $container->get(Config::class);
         $this->aliases = $container->get(Aliases::class);
         $this->request = $container->get(ConsoleRequestInterface::class);
+        $this->consoleService = $container->get(ConsoleService::class);
 
         $this->init();
     }

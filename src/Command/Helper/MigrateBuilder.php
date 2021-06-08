@@ -110,6 +110,9 @@ final class MigrateBuilder
         $this->end($time);
     }
 
+    /**
+     * @param ColumnSchemaBuilder|string $type
+     */
     public function addColumn(string $table, string $column, $type): void
     {
         $comment = null;
@@ -140,6 +143,9 @@ final class MigrateBuilder
         $this->end($time);
     }
 
+    /**
+     * @param ColumnSchemaBuilder|string $type
+     */
     public function alterColumn(string $table, string $column, $type): void
     {
         $comment = null;
@@ -160,6 +166,9 @@ final class MigrateBuilder
         $this->end($time);
     }
 
+    /**
+     * @param array|string $columns
+     */
     public function addPrimaryKey(string $name, string $table, $columns): void
     {
         $time = $this->begin(
@@ -232,6 +241,6 @@ final class MigrateBuilder
 
     private function end(float $time): void
     {
-        $this->service->writeln(' Done in ' . sprintf('%.3f', microtime(true) - $time) . 's.');
+        $this->service->writeln(' Done in ' . sprintf('%.4f', microtime(true) - $time) . 's.');
     }
 }

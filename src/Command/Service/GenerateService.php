@@ -5,16 +5,13 @@ declare(strict_types=1);
 namespace Ep\Command\Service;
 
 use Ep\Base\View;
-use Ep\Console\ConsoleResponse;
 use Ep\Helper\File;
 use Ep\Helper\Str;
-use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\TableSchema;
 use Yiisoft\Strings\StringHelper;
 use Psr\Container\ContainerInterface;
-use InvalidArgumentException;
 
 final class GenerateService extends Service
 {
@@ -53,7 +50,7 @@ final class GenerateService extends Service
         $this->tableSchema = $tableSchema;
     }
 
-    public function createModel(): string
+    public function createModel(): void
     {
         $filePath = $this->getFilePath();
         if (!file_exists($filePath)) {
@@ -67,13 +64,13 @@ final class GenerateService extends Service
             'property' => $this->getModelProperty(),
             'rules' => $this->getModelRules()
         ]))) {
-            return sprintf('The file "%s.php" has been created in "%s".', $this->getModelClassName(), $filePath);
+            $this->consoleService->writeln(sprintf('The file "%s.php" has been created in "%s".', $this->getModelClassName(), $filePath));
         } else {
-            return 'Generate failed.';
+            $this->consoleService->writeln('Generate failed.');
         }
     }
 
-    public function updateModel(): string
+    public function updateModel(): void
     {
         $filename = $this->getModelFileName();
         $rules = [
@@ -82,9 +79,9 @@ final class GenerateService extends Service
         ];
         $content = preg_replace(array_keys($rules), array_values($rules), file_get_contents($filename));
         if (@file_put_contents($filename, $content)) {
-            return sprintf('%s.php has been overrided in %s', $this->getModelClassName(), $this->getFilePath());
+            $this->consoleService->writeln(sprintf('%s.php has been overrided in %s', $this->getModelClassName(), $this->getFilePath()));
         } else {
-            return 'Overwrite model failed.';
+            $this->consoleService->writeln('Overwrite model failed.');
         }
     }
 

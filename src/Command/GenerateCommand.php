@@ -39,14 +39,14 @@ final class GenerateCommand extends Command
         return $this->success();
     }
 
-    private function singleModel(array $options): int
+    private function singleModel(array $options): void
     {
         $this->service->initModel($options);
 
         if ($this->service->hasModel()) {
-            return $this->success($this->service->updateModel());
+            $this->service->updateModel();
         } else {
-            return $this->success($this->service->createModel());
+            $this->service->createModel();
         }
     }
 }

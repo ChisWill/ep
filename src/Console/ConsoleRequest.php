@@ -9,8 +9,6 @@ use Symfony\Component\Console\Input\InputInterface;
 
 final class ConsoleRequest implements ConsoleRequestInterface
 {
-    public string $defaultCommand = 'list';
-
     private InputInterface $input;
 
     public function __construct(InputInterface $input)
@@ -21,9 +19,27 @@ final class ConsoleRequest implements ConsoleRequestInterface
     /**
      * {@inheritDoc}
      */
+    public function getInput(): InputInterface
+    {
+        return $this->input;
+    }
+
+    private ?string $route = null;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setRoute(string $route): void
+    {
+        $this->route = $route;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getRoute(): string
     {
-        return $this->input->getFirstArgument() ?: $this->defaultCommand;
+        return $this->route ?? $this->input->getFirstArgument() ?? '';
     }
 
     private array $arguments = [];

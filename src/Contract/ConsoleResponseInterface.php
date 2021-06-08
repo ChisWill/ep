@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Ep\Contract;
 
+use Symfony\Component\Console\Output\OutputInterface;
+
 interface ConsoleResponseInterface
 {
+    public function getOutput(): OutputInterface;
+
     /**
      * @param string|iterable $messages
      */

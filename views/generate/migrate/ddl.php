@@ -11,12 +11,15 @@ final class <?= $className ?> implements MigrateInterface
 {
     public function up(MigrateBuilder $builder): void
     {
+<?php if ($upSql): ?>
         $builder->execute(<<<'DDL'
-<?= $ddl ?>
+<?= $upSql ?>
 DDL);
+<?php endif ?>
     }
 
     public function down(MigrateBuilder $builder): void
     {
+<?= $downSql ?>
     }
 }

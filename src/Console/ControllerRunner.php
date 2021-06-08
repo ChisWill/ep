@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Console;
 
-use Ep;
 use Ep\Base\ControllerRunner as BaseControllerRunner;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ControllerInterface;
@@ -46,7 +45,7 @@ final class ControllerRunner extends BaseControllerRunner
 
     private function wrapCommand(ControllerInterface $command, string $action, ConsoleRequestInterface $request): SymfonyCommand
     {
-        return new class($command, $request, fn () => parent::runAction($command, $action, $request)) extends SymfonyCommand
+        return new class ($command, $request, fn () => parent::runAction($command, $action, $request)) extends SymfonyCommand
         {
             private ControllerInterface $command;
             private Closure $callback;

@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace Ep\Contract;
 
+use Symfony\Component\Console\Input\InputInterface;
+
 interface ConsoleRequestInterface
 {
+    public function getInput(): InputInterface;
+
+    public function setRoute(string $route): void;
+
     public function getRoute(): string;
 
     public function hasArgument(string $name): bool;
@@ -27,12 +33,12 @@ interface ConsoleRequestInterface
     public function hasOption(string $name): bool;
 
     /**
-     * @return string|string[]|null
+     * @return string|string[]|bool|null
      */
     public function getOption(string $name);
 
     /**
-     * @param string|string[]|null $value
+     * @param string|string[]|bool|null $value
      */
     public function setOption(string $name, $value): void;
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Command;
 
-use Ep;
 use Ep\Command\Service\HelpService;
 use Ep\Console\Command;
 use Ep\Contract\ConsoleRequestInterface;
