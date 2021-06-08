@@ -28,6 +28,16 @@ final class Service
         $this->response = $response;
     }
 
+    public function getRequest(): ConsoleRequestInterface
+    {
+        return $this->request;
+    }
+
+    public function getResponse(): ConsoleResponseInterface
+    {
+        return $this->response;
+    }
+
     public function write(string $message = '', int $options = 0): void
     {
         $this->response->write($message, $options);
@@ -57,7 +67,7 @@ final class Service
         return $helper->ask($this->request->getInput(), $this->response->getOutput(), $question);
     }
 
-    private function getHelper(string $name): HelperInterface
+    public function getHelper(string $name): HelperInterface
     {
         return $this->symfonyApplication->getHelperSet()->get($name);
     }

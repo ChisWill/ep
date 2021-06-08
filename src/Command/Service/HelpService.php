@@ -26,17 +26,17 @@ final class HelpService extends Service
     public function getAllCommands(): array
     {
         return array_merge(
-            array_map([$this, 'wrapCommand'], $this->getCommandsInfoFromFiles($this->getEpCommands(), $this->getEpConfig())),
-            array_map([$this, 'wrapCommand'], $this->getCommandsInfoFromFiles($this->getUserCommands(), $this->getUserConfig()))
+            array_map([$this, 'wrapCommand'], $this->getCommandsData($this->getEpCommandFiles(), $this->getEpConfig())),
+            array_map([$this, 'wrapCommand'], $this->getCommandsData($this->getUserCommandFiles(), $this->getUserConfig()))
         );
     }
 
-    private function getEpCommands(): array
+    private function getEpCommandFiles(): array
     {
         return $this->getFiles(str_replace('\\', '/', $this->aliases->get('@ep/src')), $this->config->commandDirAndSuffix);
     }
 
-    private function getUserCommands(): array
+    private function getUserCommandFiles(): array
     {
         return $this->getFiles($this->getAppPath(), $this->userCommandDirAndSuffix);
     }
@@ -91,7 +91,7 @@ final class HelpService extends Service
         };
     }
 
-    private function getCommandsInfoFromFiles(array $files, array $config): array
+    private function getCommandsData(array $files, array $config): array
     {
         foreach ($files as $name) {
             $map[$name] = array_filter(

@@ -26,9 +26,9 @@ abstract class Service
     {
         $this->container = $container;
         $this->config = $container->get(Config::class);
-        $this->aliases = $container->get(Aliases::class);
         $this->request = $container->get(ConsoleRequestInterface::class);
         $this->consoleService = $container->get(ConsoleService::class);
+        $this->aliases = $container->get(Aliases::class);
 
         $this->init();
     }

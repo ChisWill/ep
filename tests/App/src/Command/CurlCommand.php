@@ -18,7 +18,8 @@ class CurlCommand extends Command
             $r[] = Curl::getMulti($url, '', [], 40);
         }
 
-        return $r;
+        t($r);
+        return $this->success();
     }
 
     public function multiTestAction()
@@ -39,9 +40,11 @@ class CurlCommand extends Command
 
         $end = microtime(true);
 
-        return [
+        t([
             'count' => $count,
             'time' => ($end - $start) * 1000
-        ];
+        ]);
+
+        return $this->success();
     }
 }

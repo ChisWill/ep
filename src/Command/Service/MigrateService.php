@@ -45,7 +45,7 @@ final class MigrateService extends Service
         $options = $this->request->getOptions();
 
         $this->migratePath = $options['path'] ?? $options['migrate.path'] ?? 'Migration';
-        $this->basePath = $this->getAppPath() . '/' . $this->migratePath;
+        $this->basePath = $this->getAppPath() . '/' . trim($this->migratePath, '/');
         $this->step = (int) ($options['step'] ?? 0);
         $this->builder = new MigrateBuilder($this->db, $this->consoleService);
 
@@ -81,8 +81,6 @@ final class MigrateService extends Service
 
     public function up(): void
     {
-        // $this->consoleService->
-
         $this->migrate('up', $this->request->getOption('all'), function (array $classList): void {
             $count = count($classList);
             if ($count === 0) {
