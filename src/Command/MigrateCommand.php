@@ -68,10 +68,8 @@ final class MigrateCommand extends Command
      */
     public function upAction(ConsoleRequestInterface $request): int
     {
-        if ($request->getOption('all')) {
-            if (!$this->confirm('Are you sure apply all migrations?')) {
-                return $this->success('Skipped.');
-            }
+        if ($request->getOption('all') && !$this->confirm('Are you sure apply all migrations?')) {
+            return $this->success('Skipped.');
         }
 
         $this->service->up();
@@ -84,10 +82,8 @@ final class MigrateCommand extends Command
      */
     public function downAction(ConsoleRequestInterface $request): int
     {
-        if ($request->getOption('all')) {
-            if (!$this->confirm('Are you sure downgrade all migrations?')) {
-                return $this->success('Skipped.');
-            }
+        if ($request->getOption('all') && !$this->confirm('Are you sure downgrade all migrations?')) {
+            return $this->success('Skipped.');
         }
 
         $this->service->down();

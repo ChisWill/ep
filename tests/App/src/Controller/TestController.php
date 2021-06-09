@@ -105,12 +105,12 @@ class TestController extends Controller
         $root3 = new Container();
         $first = new Container([
             CarInterface::class => BMW::class,
-            WingInterface::class => static fn () => new AngelWing(80),
+            WingInterface::class => static fn (): AngelWing => new AngelWing(80),
         ], [], [], $root1);
         $second = new Container([
             CarInterface::class => Benz::class,
             WingInterface::class => AngelWing::class,
-            'angelWing' => static fn () => new AngelWing(50),
+            'angelWing' => static fn (): AngelWing => new AngelWing(50),
         ], [], [], $root2);
         $third = new Container([
             WingInterface::class => AngelWing::class,

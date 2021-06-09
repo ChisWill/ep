@@ -25,13 +25,13 @@ class OtherFilter implements FilterInterface
 
     public function before($request)
     {
-        // tes('other start');
+        // t('other start');
         return true;
     }
 
     public function after($request, $response)
     {
-        // tes('other over');
+        // t('other over');
 
         return $response;
     }

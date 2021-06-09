@@ -85,7 +85,7 @@ class DemoController extends Controller
 
     public function cacheAction(Cache $cache)
     {
-        $r = $cache->getOrSet('name', fn () => mt_rand(0, 100), 5);
+        $r = $cache->getOrSet('name', fn (): int => mt_rand(0, 100), 5);
 
         return $this->string((string) $r);
     }

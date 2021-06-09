@@ -13,13 +13,13 @@ class DemoFilter implements FilterInterface
 
     public function before($request)
     {
-        tes('demo start');
+        t('demo start');
         return true;
     }
 
     public function after($request, $response)
     {
-        tes('demo over');
+        t('demo over');
 
         return $response;
     }

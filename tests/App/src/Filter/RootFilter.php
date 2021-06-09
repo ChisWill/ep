@@ -26,14 +26,14 @@ class RootFilter implements FilterInterface
 
     public function before($request)
     {
-        // tes('root start');
+        // t('root start');
         // return Ep::getDi()->get(Service::class)->string('over');
         return true;
     }
 
     public function after($request, $response)
     {
-        // tes('root over');
+        // t('root over');
 
         return $response;
     }

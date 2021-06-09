@@ -60,7 +60,7 @@ final class ControllerRunner extends BaseControllerRunner
 
             protected function configure(): void
             {
-                if (method_exists($this->command, 'getDefinitions')) {
+                if ($this->command instanceof Command) {
                     /** @var CommandDefinition[] $definitions */
                     $definitions = $this->command->getDefinitions();
                     if (array_key_exists($this->command->actionId, $definitions)) {

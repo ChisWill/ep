@@ -39,7 +39,7 @@ class SetWithBench
                     'foo' => 'bar',
                     'bar' => 'foo'
                 ])
-                ->setCallback(fn ($n) => $n * $n);
+                ->setCallback(fn ($n): int => $n * $n);
             $result[] = $r;
         }
     }
@@ -54,7 +54,7 @@ class SetWithBench
                     'foo' => 'bar',
                     'bar' => 'foo'
                 ])
-                ->withCallback(fn ($n) => $n * $n);
+                ->withCallback(fn ($n): int => $n * $n);
             $result[] = $r;
         }
     }
