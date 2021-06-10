@@ -207,6 +207,6 @@ final class Config
 
     public function getRouteRule(): Closure
     {
-        return $this->route ?: static fn (): bool => true;
+        return $this->route ?: static fn (): int => 1;
     }
 }

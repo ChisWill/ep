@@ -21,5 +21,6 @@ DDL);
 
     public function down(MigrateBuilder $builder): void
     {
+        $builder->dropTable('school');
     }
 }

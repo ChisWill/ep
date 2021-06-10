@@ -19,6 +19,7 @@ use Yiisoft\Yii\Web\SapiEmitter;
 class NewCloneBench
 {
     private $class;
+    private const COUNT = 1000;
 
     public function before()
     {
@@ -27,11 +28,15 @@ class NewCloneBench
 
     public function benchNew()
     {
-        new SapiEmitter();
+        for ($i = 0; $i < self::COUNT; $i++) {
+            new SapiEmitter();
+        }
     }
 
     public function benchClone()
     {
-        clone $this->class;
+        for ($i = 0; $i < self::COUNT; $i++) {
+            clone $this->class;
+        }
     }
 }

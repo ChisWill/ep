@@ -6,7 +6,6 @@ namespace Ep\Command\Helper;
 
 use Ep\Console\Service;
 use Ep\Db\Query;
-use Ep\Helper\Str;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Schema\ColumnSchemaBuilder;
 use Yiisoft\Db\Schema\SchemaBuilderTrait;
@@ -31,7 +30,7 @@ final class MigrateBuilder
 
     public function execute(string $sql, array $params = []): void
     {
-        $time = $this->begin('Execute SQL: ' . Str::subtext($sql, 50));
+        $time = $this->begin('Execute SQL: ' . $sql);
         $this->db->createCommand($sql)->bindValues($params)->execute();
         $this->end($time);
     }
@@ -234,13 +233,13 @@ final class MigrateBuilder
 
     private function begin(string $message): float
     {
-        $this->service->write('> ' . $message . ' ...');
+        $this->service->write(' - <info>' . $message . '</> ... ');
 
         return microtime(true);
     }
 
     private function end(float $time): void
     {
-        $this->service->writeln(' Done in ' . sprintf('%.4f', microtime(true) - $time) . 's.');
+        $this->service->writeln('Done in <comment>' . sprintf('%.4f', microtime(true) - $time) . 's</>.');
     }
 }

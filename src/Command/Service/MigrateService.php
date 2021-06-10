@@ -192,7 +192,7 @@ final class MigrateService extends Service
     {
         $filter = (new PathMatcher())->only('**.php');
         if (!$all) {
-            $filter->except('**/' . $this->ddlClassName . '.php');
+            $filter = $filter->except('**/' . $this->ddlClassName . '.php');
         }
         return FileHelper::findFiles($this->basePath, [
             'filter' => $filter

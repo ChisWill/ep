@@ -17,7 +17,7 @@ use PhpBench\Benchmark\Metadata\Annotations\Revs;
  */
 class StringBench
 {
-    private const COUNT = 1000;
+    private const COUNT = 100;
 
     private string $appNamespace;
     private string $controllerNamespace;
