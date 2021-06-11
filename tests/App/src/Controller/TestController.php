@@ -209,10 +209,13 @@ class TestController extends Controller
     {
     }
 
+    /**
+     * @LoggerAspect
+     * @Aspect(class=EchoIntAspect::class)
+     */
     public function stringAction(Injector $injector)
     {
-        return $this->service->getRandom();
-        return 'test string';
+        return $this->string((string) $this->service->getRandom());
     }
 
     public function arrayAction(ServerRequestInterface $request)

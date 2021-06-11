@@ -16,9 +16,9 @@ use Reflector;
 final class Service implements AnnotationInterface
 {
     /**
-     * @param ReflectionProperty $reflector
+     * @param  ReflectionProperty $reflector
      */
-    public function process(object $instance, Reflector $reflector, array $arguments = [])
+    public function process(object $instance, Reflector $reflector, array $arguments = []): void
     {
         $reflector->setAccessible(true);
 

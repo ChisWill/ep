@@ -6,8 +6,8 @@ namespace Ep\Kit;
 
 final class CacheKey
 {
-    public static function getAnnotationKey(string $class): string
+    public function classAnnotation(string $class): string
     {
-        return 'Ep-Annotation-' . rawurlencode($class);
+        return 'Ep-Class-Annotation-' . rawurlencode($class);
     }
 }

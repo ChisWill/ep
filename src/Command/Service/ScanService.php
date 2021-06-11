@@ -16,16 +16,19 @@ final class ScanService extends Service
 {
     private Reader $reader;
     private CacheItemPoolInterface $cache;
+    private CacheKey $cacheKey;
 
     public function __construct(
         ContainerInterface $container,
         Reader $reader,
-        CacheItemPoolInterface $cache
+        CacheItemPoolInterface $cache,
+        CacheKey $cacheKey
     ) {
         parent::__construct($container);
 
         $this->reader = $reader;
         $this->cache = $cache;
+        $this->cacheKey = $cacheKey;
     }
 
     public function annotation(): void
@@ -60,7 +63,7 @@ final class ScanService extends Service
         foreach ($data as $class => $value) {
             $this->cache->save(
                 $this->cache->getItem(
-                    CacheKey::getAnnotationKey($class)
+                    $this->cacheKey->classAnnotation($class)
                 )->set($value)
             );
         }

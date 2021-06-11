@@ -28,7 +28,7 @@ final class TimeMiddleware implements MiddlewareInterface
 
         $response = $handler->handle($request);
 
-        $response->getBody()->write('<br>' . (microtime(true) - $start) * 1000 . 's');
+        $response->getBody()->write('<br>' . (microtime(true) - $start) * 1000 . 'ms');
 
         return $response;
     }

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Ep\Kit;
 
+use Ep\Annotation\Aspect;
 use Ep\Base\Config;
 use Ep\Contract\AnnotationInterface;
 use Doctrine\Common\Annotations\Reader;
-use Ep\Annotation\Aspect;
 use Yiisoft\Injector\Injector;
 use Psr\Cache\CacheItemPoolInterface;
 use ReflectionClass;
@@ -18,13 +18,20 @@ final class Annotate
     private Config $config;
     private Reader $reader;
     private CacheItemPoolInterface $cache;
+    private CacheKey $cacheKey;
     private Injector $injector;
 
-    public function __construct(Config $config, Reader $reader, CacheItemPoolInterface $cache, Injector $injector)
-    {
+    public function __construct(
+        Config $config,
+        Reader $reader,
+        CacheItemPoolInterface $cache,
+        CacheKey $cacheKey,
+        Injector $injector
+    ) {
         $this->config = $config;
         $this->reader = $reader;
         $this->cache = $cache;
+        $this->cacheKey = $cacheKey;
         $this->injector = $injector;
     }
 
@@ -34,7 +41,7 @@ final class Annotate
             $properties = (new ReflectionClass($instance))->getProperties();
         } else {
             $properties = [];
-            $item = $this->cache->getItem(CacheKey::getAnnotationKey(get_class($instance)));
+            $item = $this->cache->getItem($this->cacheKey->classAnnotation(get_class($instance)));
             if ($item->isHit()) {
                 $result = $item->get();
                 if (isset($result[AnnotationInterface::TYPE_PROPERTY])) {
@@ -61,7 +68,7 @@ final class Annotate
         if ($this->config->debug) {
             $reflectionMethod = (new ReflectionClass($instance))->getMethod($method);
         } else {
-            $item = $this->cache->getItem(CacheKey::getAnnotationKey(get_class($instance)));
+            $item = $this->cache->getItem($this->cacheKey->classAnnotation(get_class($instance)));
             if ($item->isHit() && isset($item->get()[AnnotationInterface::TYPE_METHOD][$method])) {
                 $reflectionMethod = (new ReflectionClass($instance))->getMethod($method);
             }

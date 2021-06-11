@@ -26,7 +26,9 @@ final class Aspect implements AnnotationInterface
     }
 
     /**
-     * @param ReflectionFunction $reflector
+     * @param  ReflectionFunction $reflector
+     * 
+     * @return mixed
      */
     public function process(object $instance, Reflector $reflector, array $arguments = [])
     {
@@ -40,7 +42,7 @@ final class Aspect implements AnnotationInterface
 
     private function wrapClosure(Closure $closure): HandlerInterface
     {
-        return new class ($closure) implements HandlerInterface
+        return new class($closure) implements HandlerInterface
         {
             private Closure $closure;
 
@@ -49,6 +51,9 @@ final class Aspect implements AnnotationInterface
                 $this->closure = $closure;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public function handle()
             {
                 return call_user_func($this->closure);
@@ -58,7 +63,7 @@ final class Aspect implements AnnotationInterface
 
     private function wrapAspect(AspectInterface $aspect, HandlerInterface $handler): HandlerInterface
     {
-        return new class ($aspect, $handler) implements HandlerInterface
+        return new class($aspect, $handler) implements HandlerInterface
         {
             private AspectInterface $aspect;
             private HandlerInterface $handler;
@@ -69,6 +74,9 @@ final class Aspect implements AnnotationInterface
                 $this->handler = $handler;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public function handle()
             {
                 return $this->aspect->process($this->handler);
