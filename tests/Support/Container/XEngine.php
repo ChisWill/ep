@@ -12,6 +12,12 @@ class XEngine implements EngineInterface
     public int $price;
     public array $params;
     public Closure $callback;
+    public int $a;
+    public int $b;
+    public int $c;
+    public int $d;
+    public int $e;
+    public int $f;
 
     public function __construct(int $power = 30)
     {

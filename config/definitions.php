@@ -3,19 +3,26 @@
 declare(strict_types=1);
 
 use Ep\Base\Config;
+use Ep\Base\Container;
+use Ep\Base\Injector;
 use Ep\Console\ConsoleRequest;
 use Ep\Console\ConsoleResponse;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
 use Ep\Contract\ErrorRendererInterface;
+use Ep\Contract\InjectorInterface;
 use Ep\Contract\NotFoundHandlerInterface;
 use Ep\Web\ErrorRenderer;
 use Ep\Web\NotFoundHandler;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\PsrCachedReader;
+use Doctrine\Common\Annotations\Reader;
 use HttpSoft\Message\ResponseFactory;
 use HttpSoft\Message\ServerRequestFactory;
 use HttpSoft\Message\StreamFactory;
 use HttpSoft\Message\UploadedFileFactory;
 use HttpSoft\Message\UriFactory;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -43,6 +50,8 @@ use Yiisoft\Profiler\ProfilerInterface;
 use Yiisoft\Session\Session;
 use Yiisoft\Session\SessionInterface;
 use Yiisoft\Yii\Event\ListenerCollectionFactory;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Http\Message\UriFactoryInterface;
@@ -57,12 +66,16 @@ use Psr\SimpleCache\CacheInterface;
 
 return [
     // Base
+    ContainerInterface::class => Container::class,
+    InjectorInterface::class => Injector::class,
     Config::class => static fn (): Config => $config,
     Aliases::class => static fn (): Aliases => new Aliases([
         '@root' => $config->rootPath,
         '@vendor' => $config->vendorPath,
         '@ep' => dirname(__DIR__, 1)
     ] + $config->aliases),
+    // Annotation
+    Reader::class => static fn (CacheItemPoolInterface $cache): Reader => $config->debug ? new AnnotationReader() : new PsrCachedReader(new AnnotationReader(), $cache, false),
     // Console
     ConsoleApplication::class =>  static fn (): ConsoleApplication => new ConsoleApplication('Ep', Ep::VERSION),
     ConsoleRequestInterface::class => ConsoleRequest::class,
@@ -85,6 +98,7 @@ return [
     FileTarget::class => static fn (Aliases $aliases): FileTarget => new FileTarget($aliases->get($config->runtimeDir . '/logs/app.log'), new FileRotator()),
     LoggerInterface::class => static fn (FileTarget $fileTarget): LoggerInterface => new Logger([$fileTarget]),
     // Cache
+    CacheItemPoolInterface::class => static fn (Aliases $aliases): CacheItemPoolInterface => new FilesystemAdapter('cache-pool', 0, $aliases->get($config->runtimeDir)),
     CacheInterface::class => static fn (Aliases $aliases): CacheInterface => new FileCache($aliases->get($config->runtimeDir . '/caches')),
     YiiCacheInterface::class => Cache::class,
     // Profiler

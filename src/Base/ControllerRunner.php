@@ -7,10 +7,10 @@ namespace Ep\Base;
 use Ep\Contract\ConfigurableInterface;
 use Ep\Contract\ConfigurableTrait;
 use Ep\Contract\ControllerInterface;
+use Ep\Contract\InjectorInterface;
 use Ep\Contract\ModuleInterface;
 use Ep\Contract\NotFoundException;
 use Ep\Helper\Str;
-use Yiisoft\Injector\Injector;
 use Psr\Container\ContainerInterface;
 use InvalidArgumentException;
 
@@ -22,13 +22,13 @@ class ControllerRunner implements ConfigurableInterface
 
     private ContainerInterface $container;
     private Config $config;
-    private Injector $injector;
+    private InjectorInterface $injector;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->config = $container->get(Config::class);
-        $this->injector = $container->get(Injector::class);
+        $this->injector = $container->get(InjectorInterface::class);
     }
 
     /**
@@ -106,7 +106,7 @@ class ControllerRunner implements ConfigurableInterface
         }
         $response = $controller->before($request);
         if ($response === true) {
-            return $controller->after($request, $this->injector->invoke([$controller, $action], [$request]));
+            return $controller->after($request, $this->injector->call($controller, $action, [$request]));
         } else {
             return $response;
         }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Web;
 
-use Yiisoft\Injector\Injector;
+use Ep\Contract\InjectorInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,10 +14,10 @@ use Psr\Http\Server\RequestHandlerInterface;
 final class RequestHandlerFactory
 {
     private ContainerInterface $container;
-    private Injector $injector;
+    private InjectorInterface $injector;
     private Service $service;
 
-    public function __construct(ContainerInterface $container, Injector $injector, Service $service)
+    public function __construct(ContainerInterface $container, InjectorInterface $injector, Service $service)
     {
         $this->container = $container;
         $this->injector = $injector;
@@ -37,10 +37,10 @@ final class RequestHandlerFactory
         return new class ($callback, $this->injector, $this->service) implements RequestHandlerInterface
         {
             private $callback;
-            private Injector $injector;
+            private InjectorInterface $injector;
             private Service $service;
 
-            public function __construct(callable $callback, Injector $injector, Service $service)
+            public function __construct(callable $callback, InjectorInterface $injector, Service $service)
             {
                 $this->callback = $callback;
                 $this->injector = $injector;
@@ -70,10 +70,10 @@ final class RequestHandlerFactory
         return new class ($callback, $this->injector, $this->service) implements MiddlewareInterface
         {
             private $callback;
-            private Injector $injector;
+            private InjectorInterface $injector;
             private Service $service;
 
-            public function __construct(callable $callback, Injector $injector, Service $service)
+            public function __construct(callable $callback, InjectorInterface $injector, Service $service)
             {
                 $this->callback = $callback;
                 $this->injector = $injector;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\Tests\App\Controller;
 
 use Ep;
+use Ep\Annotation\Aspect;
 use Ep\Contract\ErrorRendererInterface;
 use Ep\Db\Query;
 use Ep\Helper\Str;
@@ -12,6 +13,7 @@ use Ep\Helper\System;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Model\User;
 use Ep\Tests\App\Model\UserParent;
+use Ep\Tests\App\Service\TestService;
 use Ep\Tests\Support\Container\AngelWing;
 use Ep\Tests\Support\Container\Benz;
 use Ep\Tests\Support\Container\BMW;
@@ -39,16 +41,36 @@ use Yiisoft\Db\Redis\Connection;
 use Yiisoft\Di\CompositeContainer;
 use Yiisoft\Di\Container;
 use Yiisoft\Strings\StringHelper;
+use Ep\Annotation\Service;
+use Ep\Base\Container as BaseContainer;
+use Ep\Contract\InjectorInterface;
+use Ep\Tests\App\Aspect\EchoIntAspect;
+use Ep\Tests\App\Aspect\EchoStringAspect;
+use Ep\Tests\App\Aspect\LoggerAspect;
+use Ep\Tests\App\Middleware\TimeMiddleware;
+use Ep\Tests\Support\Container\Bird;
+use Yiisoft\Injector\Injector;
 
 class TestController extends Controller
 {
+    /**
+     * @Service
+     */
+    private TestService $service;
+
+    /**
+     * @Service
+     */
+    private InjectorInterface $injector;
+
     public string $title = 'Test';
 
     public function __construct()
     {
         $this->setMiddlewares([
             FilterMiddleware::class,
-            MultipleMiddleware::class
+            MultipleMiddleware::class,
+            TimeMiddleware::class
         ]);
     }
 
@@ -66,6 +88,16 @@ class TestController extends Controller
 
     public function tAction(ServerRequest $serverRequest)
     {
+        return $this->injector->call($this, 'aspectAction', [$serverRequest, 'a' => 'second param']);
+    }
+
+    /**
+     * @LoggerAspect
+     * @Aspect(class={EchoIntAspect::class, EchoStringAspect::class})
+     */
+    public function aspectAction(ServerRequest $serverRequest)
+    {
+        return $this->string('i am working<br>');
     }
 
     public function testUrlAction(ServerRequest $serverRequest)
@@ -177,8 +209,9 @@ class TestController extends Controller
     {
     }
 
-    public function stringAction()
+    public function stringAction(Injector $injector)
     {
+        return $this->service->getRandom();
         return 'test string';
     }
 

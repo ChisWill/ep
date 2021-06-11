@@ -3,10 +3,13 @@
 declare(strict_types=1);
 
 use Ep\Base\Config;
+use Ep\Base\Container;
+use Ep\Contract\InjectorInterface;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Redis\Connection as RedisConnection;
-use Yiisoft\Di\Container;
+use Yiisoft\Di\Container as YiiContainer;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -20,12 +23,19 @@ final class Ep
     {
         $config = new Config($config);
 
-        self::$di = new Container($config->getDi() + require(dirname(__DIR__, 1) . '/config/definitions.php'));
+        self::$di = new Container(new YiiContainer($config->getDi() + require(dirname(__DIR__, 1) . '/config/definitions.php')));
+
+        AnnotationRegistry::registerLoader('class_exists');
     }
 
     public static function getDi(): ContainerInterface
     {
         return self::$di;
+    }
+
+    public static function getInjector(): InjectorInterface
+    {
+        return self::$di->get(InjectorInterface::class);
     }
 
     public static function getConfig(): Config

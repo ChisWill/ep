@@ -11,6 +11,8 @@ use Ep\Contract\ConsoleRequestInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Factory\Exception\NotFoundException;
+use Yiisoft\Files\FileHelper;
+use Yiisoft\Files\PathMatcher\PathMatcher;
 use Psr\Container\ContainerInterface;
 use InvalidArgumentException;
 
@@ -104,6 +106,18 @@ abstract class Service
         }
 
         return $this->appPath;
+    }
+
+    protected function getClassNameByFile(string $file): string
+    {
+        return str_replace([$this->getAppPath(), '.php', '/'], [$this->userAppNamespace, '', '\\'], $file);
+    }
+
+    protected function findClassFiles(string $path): array
+    {
+        return FileHelper::findFiles($path, [
+            'filter' => (new PathMatcher())->only('**.php')
+        ]);
     }
 
     protected function required(string $option): void

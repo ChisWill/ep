@@ -37,7 +37,6 @@ final class MigrateService extends Service
 
     private string $migratePath;
     private string $basePath;
-    private int $step;
     private MigrateBuilder $builder;
 
     private function init(): void
@@ -46,7 +45,6 @@ final class MigrateService extends Service
 
         $this->migratePath = $options['path'] ?? $options['migrate.path'] ?? 'Migration';
         $this->basePath = $this->getAppPath() . '/' . trim($this->migratePath, '/');
-        $this->step = (int) ($options['step'] ?? 0);
         $this->builder = new MigrateBuilder($this->db, $this->consoleService);
 
         if (!file_exists($this->basePath)) {
@@ -79,9 +77,15 @@ final class MigrateService extends Service
         $this->createFile('migrate/ddl', $this->ddlClassName, compact('upSql', 'downSql'));
     }
 
+    private int $step;
+    private bool $all;
+
     public function up(): void
     {
-        $this->migrate('up', $this->request->getOption('all'), function (array $classList): void {
+        $this->all = $this->request->getOption('all');
+        $this->step = (int) ($this->request->getOption('step') ?: 0);
+
+        $this->migrate('up', function (array $classList): void {
             $count = count($classList);
             if ($count === 0) {
                 $this->consoleService->writeln('Already up to date.');
@@ -101,15 +105,10 @@ final class MigrateService extends Service
 
     public function down(): void
     {
-        $all = $this->request->getOption('all');
+        $this->all = $this->request->getOption('all');
+        $this->step = $this->all ? 0 : (int) ($this->request->getOption('step') ?: 1);
 
-        if ($all) {
-            $this->step = 0;
-        } else {
-            $this->step = (int) ($this->request->getOption('step') ?: 1);
-        }
-
-        $this->migrate('down', $all, function (array $classList): void {
+        $this->migrate('down', function (array $classList): void {
             $count = count($classList);
             if ($count === 0) {
                 $this->consoleService->writeln('No commits.');
@@ -121,11 +120,11 @@ final class MigrateService extends Service
         });
     }
 
-    private function migrate(string $method, bool $all, Closure $success): void
+    private function migrate(string $method, Closure $success): void
     {
-        $files = $this->findClassFiles($all);
+        $files = $this->findMigrations($this->all);
 
-        if ($all && $method === 'up') {
+        if ($this->all && $method === 'up') {
             $history = [];
         } else {
             $history = Query::find($this->db)
@@ -188,7 +187,7 @@ final class MigrateService extends Service
         }
     }
 
-    private function findClassFiles(bool $all = false): array
+    private function findMigrations(bool $all = false): array
     {
         $filter = (new PathMatcher())->only('**.php');
         if (!$all) {
@@ -230,11 +229,6 @@ final class MigrateService extends Service
         }
 
         return $baseClassName . $suffix;
-    }
-
-    private function getClassNameByFile(string $file): string
-    {
-        return sprintf('%s\\%s\\%s', $this->userAppNamespace, $this->migratePath, basename($file, '.php'));
     }
 
     private function createTable(): void
