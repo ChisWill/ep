@@ -93,7 +93,7 @@ class TestController extends Controller
 
     /**
      * @LoggerAspect
-     * @Aspect(class={EchoIntAspect::class, EchoStringAspect::class})
+     * @Aspect(class={EchoIntAspect::class, EchoStringAspect::class={"name"="pet","age"=10}})
      */
     public function aspectAction(ServerRequest $serverRequest)
     {

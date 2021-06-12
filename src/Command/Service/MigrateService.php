@@ -50,8 +50,6 @@ final class MigrateService extends Service
         if (!file_exists($this->basePath)) {
             File::mkdir($this->basePath);
         }
-
-        $this->createTable();
     }
 
     public function new(): void
@@ -63,6 +61,8 @@ final class MigrateService extends Service
 
     public function ddl(): void
     {
+        $this->createTable();
+
         $dbService = new DbService($this->db);
         $upSql = '';
         $downSql = '';
@@ -122,6 +122,8 @@ final class MigrateService extends Service
 
     private function migrate(string $method, Closure $success): void
     {
+        $this->createTable();
+
         $files = $this->findMigrations($this->all);
 
         if ($this->all && $method === 'up') {

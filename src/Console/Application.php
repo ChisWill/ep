@@ -37,31 +37,21 @@ final class Application
 
     public function run(): void
     {
-        $request = $this->createRequest();
+        $this->register();
 
-        $this->register($request);
-
-        $this->handleRequest($request);
+        $this->handleRequest();
     }
 
-    private function createRequest(): ConsoleRequestInterface
-    {
-        return $this->request;
-    }
-
-    private function register(ConsoleRequestInterface $request): void
+    private function register(): void
     {
         $this->errorHandler
             ->configure([
                 'errorRenderer' => $this->errorRenderer
             ])
-            ->register($request);
+            ->register($this->request);
     }
 
-    /** 
-     * @return mixed
-     */
-    private function handleRequest(ConsoleRequestInterface $request): void
+    private function handleRequest(): void
     {
         try {
             [, $handler] = $this->route
@@ -69,15 +59,15 @@ final class Application
                     'rule' => $this->config->getRouteRule(),
                     'baseUrl' => '/'
                 ])
-                ->match('/' . $request->getRoute());
+                ->match('/' . $this->request->getRoute());
 
             $code = $this->controllerRunner
                 ->configure(['suffix' => $this->config->commandDirAndSuffix])
-                ->run($handler, $request);
+                ->run($handler, $this->request);
 
             exit($code);
         } catch (NotFoundException $e) {
-            $command = $request->getRoute();
+            $command = $this->request->getRoute();
             echo <<<HELP
 Error: unknown command "{$command}"
 

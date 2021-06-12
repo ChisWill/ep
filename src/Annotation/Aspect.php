@@ -22,7 +22,23 @@ final class Aspect implements AnnotationInterface
 
     public function __construct(array $values)
     {
-        $this->class = (array) ($values['class'] ?? null);
+        $this->normalize($values);
+    }
+
+    private function normalize(array $values)
+    {
+        if (isset($values['value'])) {
+            $this->class[$values['value']] = [];
+        } else {
+            $classes = (array) ($values['class'] ?? null);
+            foreach ($classes as $key => $value) {
+                if (is_string($key)) {
+                    $this->class[$key] = (array) $value;
+                } else {
+                    $this->class[$value] = [];
+                }
+            }
+        }
     }
 
     /**
@@ -34,8 +50,8 @@ final class Aspect implements AnnotationInterface
     {
         krsort($this->class);
         $handler = $this->wrapClosure($reflector->getClosure());
-        foreach ($this->class as $class) {
-            $handler = $this->wrapAspect(Ep::getInjector()->make($class, $arguments), $handler);
+        foreach ($this->class as $class => $args) {
+            $handler = $this->wrapAspect(Ep::getInjector()->make($class, array_merge($arguments, $args)), $handler);
         }
         return $handler->handle();
     }

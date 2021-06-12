@@ -17,13 +17,22 @@ class EchoStringAspect implements AspectInterface
      */
     private ServerRequest $request;
 
+    private string $name;
+    private int $age;
+
+    public function __construct(string $name, int $age)
+    {
+        $this->name = $name;
+        $this->age = $age;
+    }
+
     public function process(HandlerInterface $handler)
     {
         $b = $this->request->getQueryParams()['b'] ?? 'none';
 
         /** @var ResponseInterface */
         $response = $handler->handle();
-        $response->getBody()->write('get:' . $b . ', who:string<br>');
+        $response->getBody()->write('get:' . $b . ', who:string,params:' . json_encode([$this->name, $this->age]) . '<br>');
         return $response;
     }
 }

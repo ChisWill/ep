@@ -54,7 +54,7 @@ final class Service
     {
         /** @var QuestionHelper $helper */
         $helper = $this->getHelper('question');
-        $question = new ConfirmationQuestion($message . '[y/n] ', $default);
+        $question = new ConfirmationQuestion($message . ' [<comment>' . ($default ? 'Yes' : 'No') . '</>] ', $default);
         return $helper->ask($this->request->getInput(), $this->response->getOutput(), $question);
     }
 
