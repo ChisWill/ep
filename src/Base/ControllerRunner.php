@@ -54,13 +54,13 @@ class ControllerRunner implements ConfigurableInterface
         }
     }
 
-    private function createModule(string $prefix): ?ModuleInterface
+    protected function createModule(string $prefix): ?ModuleInterface
     {
         $prefix = str_replace('/', '\\', $prefix);
         if (strpos($prefix, '\\\\') !== false) {
             $prefix = explode('\\\\', trim($prefix, '\\'))[0];
         }
-        $moduleClass = $this->config->appNamespace . '\\' . ($prefix ? $prefix . '\\' : '') . $this->config->moduleName;
+        $moduleClass = $this->config->appNamespace . '\\' . ($prefix ? $prefix . '\\' : '') . $this->suffix . '\\' . $this->config->moduleName;
         if (class_exists($moduleClass)) {
             return $this->container->get($moduleClass);
         } else {
@@ -68,7 +68,7 @@ class ControllerRunner implements ConfigurableInterface
         }
     }
 
-    private function createController(string $class, string $action): ControllerInterface
+    protected function createController(string $class, string $action): ControllerInterface
     {
         if (!class_exists($class)) {
             throw new NotFoundException("{$class} is not found.");

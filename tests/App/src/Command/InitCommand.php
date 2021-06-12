@@ -9,6 +9,7 @@ use Ep\Console\Service;
 use Ep\Contract\ConsoleRequestInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Input\InputArgument;
 
 class InitCommand extends Command
 {
@@ -17,11 +18,15 @@ class InitCommand extends Command
     public function __construct(Service $service)
     {
         $this->service = $service;
+
+        $this->setDefinition('index', [
+            new InputArgument('name', null, 'your name')
+        ]);
     }
 
-    public function indexAction()
+    public function indexAction(ConsoleRequestInterface $request)
     {
-        $message = 'Welcome Basic';
+        $message = 'Welcome Basic, ' . $request->getArgument('name');
 
         return $this->success($message);
     }

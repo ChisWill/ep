@@ -28,7 +28,6 @@ class FilterMiddleware implements MiddlewareInterface
         $middlewareDefinitions = [
             [$controller, 'do'],
         ];
-
         $handler = $this->factory->wrap($middlewareDefinitions, $handler);
 
         return $handler->handle($request);

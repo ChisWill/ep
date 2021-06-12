@@ -9,6 +9,8 @@ use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ControllerInterface;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
+use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Psr\Container\ContainerInterface;
@@ -31,6 +33,23 @@ final class ControllerRunner extends BaseControllerRunner
         $this->symfonyApplication = $symfonyApplication;
         $this->input = $input;
         $this->output = $output;
+    }
+
+    protected function createController(string $class, string $action): ControllerInterface
+    {
+        /** @var Command $command */
+        $command = parent::createController($class, $action);
+
+        /** @var CommandDefinition $commandDefinition */
+        if ($commandDefinition = $command->getDefinitions()[$action] ?? null) {
+            try {
+                $this->input->bind(new InputDefinition($commandDefinition->getDefinition()));
+            } catch (ExceptionInterface $e) {
+                // do nothing
+            }
+        }
+
+        return $command;
     }
 
     /**
