@@ -80,9 +80,15 @@ final class Annotate
             /** @var AnnotationInterface $annotation */
             foreach ($annotations as $annotation) {
                 $result = $annotation->process($instance, new ReflectionFunction($fn), $arguments);
-                if ($annotation instanceof Aspect) {
-                    return $result;
+                if ($result === false) {
+                    return false;
                 }
+                if ($annotation instanceof Aspect) {
+                    $returnValue = $result;
+                }
+            }
+            if (isset($returnValue)) {
+                return $returnValue;
             }
         }
         return $fn();

@@ -19,22 +19,14 @@ abstract class Command implements ControllerInterface
     public const FAIL = 1;
 
     /**
-     * @param  ConsoleRequestInterface $request
-     * 
-     * @return mixed
+     * @return true|int
      */
-    public function before($request)
+    public function before(ConsoleRequestInterface $request)
     {
         return true;
     }
 
-    /**
-     * @param  ConsoleRequestInterface $request 
-     * @param  mixed                   $response
-     * 
-     * @return mixed
-     */
-    public function after($request, $response)
+    public function after(ConsoleRequestInterface $request, int $response): int
     {
         return $response;
     }

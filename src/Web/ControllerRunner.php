@@ -14,12 +14,14 @@ use Closure;
 final class ControllerRunner extends BaseControllerRunner
 {
     private RequestHandlerFactory $requestHandlerFactory;
+    private Service $service;
 
-    public function __construct(ContainerInterface $container, RequestHandlerFactory $requestHandlerFactory)
+    public function __construct(ContainerInterface $container, RequestHandlerFactory $requestHandlerFactory, Service $service)
     {
         parent::__construct($container);
 
         $this->requestHandlerFactory = $requestHandlerFactory;
+        $this->service = $service;
     }
 
     /**
@@ -54,6 +56,11 @@ final class ControllerRunner extends BaseControllerRunner
         } else {
             return parent::runAction($controller, $action, $request);
         }
+    }
+
+    protected function call(ControllerInterface $controller, string $action, $request)
+    {
+        return $this->service->toResponse(parent::call($controller, $action, $request));
     }
 
     private function wrapModule(ModuleInterface $module, ControllerInterface $controller, string $action): Closure

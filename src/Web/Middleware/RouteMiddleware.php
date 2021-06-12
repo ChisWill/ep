@@ -55,7 +55,7 @@ final class RouteMiddleware implements MiddlewareInterface
                 $request = $request->withAttribute($name, $value);
             }
 
-            return $this->service->toResponse($this->controllerRunner->run($result, $request));
+            return $this->controllerRunner->run($result, $request);
         } catch (NotFoundException $e) {
             return $handler->handle($request->withAttribute('exception', $e));
         }

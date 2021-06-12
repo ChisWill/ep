@@ -61,6 +61,8 @@ final class Service
             return $result;
         } elseif (is_array($result)) {
             return $this->json($result);
+        } elseif ($result === false) {
+            return $this->status(Status::FORBIDDEN);
         } elseif (is_scalar($result)) {
             return $this->string((string) $result);
         } else {

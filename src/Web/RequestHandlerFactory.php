@@ -15,13 +15,11 @@ final class RequestHandlerFactory
 {
     private ContainerInterface $container;
     private InjectorInterface $injector;
-    private Service $service;
 
-    public function __construct(ContainerInterface $container, InjectorInterface $injector, Service $service)
+    public function __construct(ContainerInterface $container, InjectorInterface $injector)
     {
         $this->container = $container;
         $this->injector = $injector;
-        $this->service = $service;
     }
 
     public function wrap(array $middlewares, RequestHandlerInterface $handler): RequestHandlerInterface
@@ -34,22 +32,20 @@ final class RequestHandlerFactory
 
     public function create(callable $callback): RequestHandlerInterface
     {
-        return new class ($callback, $this->injector, $this->service) implements RequestHandlerInterface
+        return new class ($callback, $this->injector) implements RequestHandlerInterface
         {
             private $callback;
             private InjectorInterface $injector;
-            private Service $service;
 
-            public function __construct(callable $callback, InjectorInterface $injector, Service $service)
+            public function __construct(callable $callback, InjectorInterface $injector)
             {
                 $this->callback = $callback;
                 $this->injector = $injector;
-                $this->service = $service;
             }
 
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                return $this->service->toResponse($this->injector->invoke($this->callback, [$request]));
+                return $this->injector->invoke($this->callback, [$request]);
             }
         };
     }
@@ -67,22 +63,20 @@ final class RequestHandlerFactory
 
     private function wrapCallback(callable $callback): MiddlewareInterface
     {
-        return new class ($callback, $this->injector, $this->service) implements MiddlewareInterface
+        return new class ($callback, $this->injector) implements MiddlewareInterface
         {
             private $callback;
             private InjectorInterface $injector;
-            private Service $service;
 
-            public function __construct(callable $callback, InjectorInterface $injector, Service $service)
+            public function __construct(callable $callback, InjectorInterface $injector)
             {
                 $this->callback = $callback;
                 $this->injector = $injector;
-                $this->service = $service;
             }
 
             public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
             {
-                return $this->service->toResponse($this->injector->invoke($this->callback, [$request, $handler]));
+                return $this->injector->invoke($this->callback, [$request, $handler]);
             }
         };
     }

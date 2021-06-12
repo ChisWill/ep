@@ -106,10 +106,20 @@ class ControllerRunner implements ConfigurableInterface
         }
         $response = $controller->before($request);
         if ($response === true) {
-            return $controller->after($request, $this->injector->call($controller, $action, [$request]));
+            return $controller->after($request, $this->call($controller, $action, $request));
         } else {
             return $response;
         }
+    }
+
+    /**
+     * @param  mixed $request
+     * 
+     * @return mixed
+     */
+    protected function call(ControllerInterface $controller, string $action, $request)
+    {
+        return $this->injector->call($controller, $action, [$request]);
     }
 
     /**

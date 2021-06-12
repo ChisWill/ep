@@ -19,9 +19,6 @@ final class TimeMiddleware implements MiddlewareInterface
      */
     private WebService $service;
 
-    /**
-     * @Aspect
-     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $start = microtime(true);

@@ -49,6 +49,7 @@ use Ep\Tests\App\Aspect\EchoStringAspect;
 use Ep\Tests\App\Aspect\LoggerAspect;
 use Ep\Tests\App\Middleware\TimeMiddleware;
 use Ep\Tests\Support\Container\Bird;
+use Psr\Http\Message\ResponseInterface;
 use Yiisoft\Injector\Injector;
 
 class TestController extends Controller
@@ -74,9 +75,14 @@ class TestController extends Controller
         ]);
     }
 
-    public function before($request)
+    public function before(ServerRequestInterface $request)
     {
         return true;
+    }
+
+    public function after(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
+        return $response;
     }
 
     public function indexAction(ServerRequestInterface $serverRequest)

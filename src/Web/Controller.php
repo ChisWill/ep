@@ -20,22 +20,14 @@ abstract class Controller implements ControllerInterface
     use ContextTrait, FilterTrait;
 
     /**
-     * @param  ServerRequestInterface $request
-     * 
-     * @return mixed
+     * @return true|ResponseInterface
      */
-    public function before($request)
+    public function before(ServerRequestInterface $request)
     {
         return true;
     }
 
-    /**
-     * @param  ServerRequestInterface $request
-     * @param  mixed                  $response
-     * 
-     * @return mixed
-     */
-    public function after($request, $response)
+    public function after(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         return $response;
     }
