@@ -46,10 +46,6 @@ final class MigrateService extends Service
         $this->migratePath = $options['path'] ?? $options['migrate.path'] ?? 'Migration';
         $this->basePath = $this->getAppPath() . '/' . trim($this->migratePath, '/');
         $this->builder = new MigrateBuilder($this->db, $this->consoleService);
-
-        if (!file_exists($this->basePath)) {
-            File::mkdir($this->basePath);
-        }
     }
 
     public function new(): void
@@ -202,6 +198,10 @@ final class MigrateService extends Service
 
     private function createFile(string $view, string $className, array $params = []): bool
     {
+        if (!file_exists($this->basePath)) {
+            File::mkdir($this->basePath);
+        }
+
         $namespace = $this->userAppNamespace . '\\' . $this->migratePath;
 
         $params['className'] = $className;

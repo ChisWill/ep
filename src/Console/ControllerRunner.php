@@ -62,14 +62,14 @@ final class ControllerRunner extends BaseControllerRunner
         return $this->symfonyApplication->run($this->input, $this->output);
     }
 
-    private function wrapCommand(ControllerInterface $command, string $action, ConsoleRequestInterface $request): SymfonyCommand
+    private function wrapCommand(Command $command, string $action, ConsoleRequestInterface $request): SymfonyCommand
     {
         return new class ($command, $request, fn () => parent::runAction($command, $action, $request)) extends SymfonyCommand
         {
-            private ControllerInterface $command;
+            private Command $command;
             private Closure $callback;
 
-            public function __construct(ControllerInterface $command, ConsoleRequestInterface $request, Closure $callback)
+            public function __construct(Command $command, ConsoleRequestInterface $request, Closure $callback)
             {
                 $this->command = $command;
                 $this->callback = $callback;
@@ -79,15 +79,13 @@ final class ControllerRunner extends BaseControllerRunner
 
             protected function configure(): void
             {
-                if ($this->command instanceof Command) {
-                    /** @var CommandDefinition[] $definitions */
-                    $definitions = $this->command->getDefinitions();
-                    if (array_key_exists($this->command->actionId, $definitions)) {
-                        $this
-                            ->setDefinition($definitions[$this->command->actionId]->getDefinition())
-                            ->setDescription($definitions[$this->command->actionId]->getDescription())
-                            ->setHelp($definitions[$this->command->actionId]->getHelp());
-                    }
+                /** @var CommandDefinition[] $definitions */
+                $definitions = $this->command->getDefinitions();
+                if (isset($definitions[$this->command->actionId])) {
+                    $this
+                        ->setDefinition($definitions[$this->command->actionId]->getDefinition())
+                        ->setDescription($definitions[$this->command->actionId]->getDescription())
+                        ->setHelp($definitions[$this->command->actionId]->getHelp());
                 }
             }
 

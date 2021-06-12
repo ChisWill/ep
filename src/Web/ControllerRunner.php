@@ -8,6 +8,7 @@ use Ep\Base\ControllerRunner as BaseControllerRunner;
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\ModuleInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Closure;
 
@@ -58,17 +59,22 @@ final class ControllerRunner extends BaseControllerRunner
         }
     }
 
+    /**
+     * @param  ServerRequestInterface $request
+     * 
+     * @return ResponseInterface
+     */
     protected function call(ControllerInterface $controller, string $action, $request)
     {
         return $this->service->toResponse(parent::call($controller, $action, $request));
     }
 
-    private function wrapModule(ModuleInterface $module, ControllerInterface $controller, string $action): Closure
+    private function wrapModule(ModuleInterface $module, Controller $controller, string $action): Closure
     {
         return fn (ServerRequestInterface $request) => parent::runModule($module, $controller, $action, $request);
     }
 
-    private function wrapController(ControllerInterface $controller, string $action): Closure
+    private function wrapController(Controller $controller, string $action): Closure
     {
         return fn (ServerRequestInterface $request) => parent::runAction($controller, $action, $request);
     }
