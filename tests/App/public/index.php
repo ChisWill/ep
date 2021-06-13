@@ -14,4 +14,4 @@ Ep::getDi()->get(Application::class)->run();
 
 $n = microtime(true);
 
-echo '<br>' . ($n - $s) * 1000;
+Ep::getLogger()->info(($n - $s) * 1000 . 'ms');

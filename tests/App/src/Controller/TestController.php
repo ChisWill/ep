@@ -94,7 +94,6 @@ class TestController extends Controller
 
     public function tAction(ServerRequest $serverRequest)
     {
-        return $this->injector->call($this, 'aspectAction', [$serverRequest, 'a' => 'second param']);
     }
 
     /**
