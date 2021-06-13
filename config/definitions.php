@@ -77,7 +77,11 @@ return [
     // Annotation
     Reader::class => static fn (CacheItemPoolInterface $cache): Reader => $config->debug ? new AnnotationReader() : new PsrCachedReader(new AnnotationReader(), $cache, false),
     // Console
-    ConsoleApplication::class =>  static fn (): ConsoleApplication => new ConsoleApplication('Ep', Ep::VERSION),
+    ConsoleApplication::class =>  static function (): ConsoleApplication {
+        $application = new ConsoleApplication('Ep', Ep::VERSION);
+        $application->setAutoExit(false);
+        return $application;
+    },
     ConsoleRequestInterface::class => ConsoleRequest::class,
     ConsoleResponseInterface::class => ConsoleResponse::class,
     InputInterface::class => static fn (): InputInterface => new ArgvInput(null, null),

@@ -10,6 +10,10 @@ interface ConsoleResponseInterface
 {
     public function getOutput(): OutputInterface;
 
+    public function getCode(): int;
+
+    public function setCode(int $code): self;
+
     /**
      * @param string|iterable $messages
      */

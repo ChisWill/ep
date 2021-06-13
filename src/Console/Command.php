@@ -7,6 +7,7 @@ namespace Ep\Console;
 use Ep;
 use Ep\Contract\ContextTrait;
 use Ep\Contract\ConsoleRequestInterface;
+use Ep\Contract\ConsoleResponseInterface;
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\FilterTrait;
 use LogicException;
@@ -19,14 +20,14 @@ abstract class Command implements ControllerInterface
     public const FAIL = 1;
 
     /**
-     * @return true|int
+     * @return true|ConsoleResponseInterface
      */
     public function before(ConsoleRequestInterface $request)
     {
         return true;
     }
 
-    public function after(ConsoleRequestInterface $request, int $response): int
+    public function after(ConsoleRequestInterface $request, ConsoleResponseInterface $response): ConsoleResponseInterface
     {
         return $response;
     }
@@ -55,6 +56,22 @@ abstract class Command implements ControllerInterface
         return $this->service;
     }
 
+    protected function success(string $message = ''): ConsoleResponseInterface
+    {
+        if ($message) {
+            $this->getService()->writeln($message);
+        }
+        return $this->getService()->status(Command::OK);
+    }
+
+    protected function error(string $message = ''): ConsoleResponseInterface
+    {
+        if ($message) {
+            $this->getService()->writeln($message);
+        }
+        return $this->getService()->status(Command::FAIL);
+    }
+
     protected function write(string $message = '', int $options = 0): void
     {
         $this->getService()->write($message, $options);
@@ -68,22 +85,6 @@ abstract class Command implements ControllerInterface
     protected function confirm(string $message, bool $default = false): bool
     {
         return $this->getService()->confirm($message, $default);
-    }
-
-    protected function success(string $message = ''): int
-    {
-        if ($message) {
-            $this->getService()->writeln($message);
-        }
-        return Command::OK;
-    }
-
-    protected function error(string $message = ''): int
-    {
-        if ($message) {
-            $this->getService()->writeln($message);
-        }
-        return Command::FAIL;
     }
 
     public function setMiddlewares(array $middlewares): void

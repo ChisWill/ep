@@ -6,7 +6,9 @@ namespace Ep\Console;
 
 use Ep\Base\ControllerRunner as BaseControllerRunner;
 use Ep\Contract\ConsoleRequestInterface;
+use Ep\Contract\ConsoleResponseInterface;
 use Ep\Contract\ControllerInterface;
+use Ep\Contract\ModuleInterface;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Exception\ExceptionInterface;
@@ -19,35 +21,27 @@ use Closure;
 final class ControllerRunner extends BaseControllerRunner
 {
     private SymfonyApplication $symfonyApplication;
-    private InputInterface $input;
-    private OutputInterface $output;
+    private ConsoleResponseInterface $response;
 
     public function __construct(
         ContainerInterface $container,
         SymfonyApplication $symfonyApplication,
-        InputInterface $input,
-        OutputInterface $output
+        ConsoleResponseInterface $response
     ) {
         parent::__construct($container);
 
         $this->symfonyApplication = $symfonyApplication;
-        $this->input = $input;
-        $this->output = $output;
+        $this->response = $response;
     }
 
-    protected function createController(string $class, string $action): ControllerInterface
+    /**
+     * {@inheritDoc}
+     */
+    protected function createController(string $class, string $actionId, $request): ControllerInterface
     {
-        /** @var Command $command */
-        $command = parent::createController($class, $action);
+        $command = parent::createController($class, $actionId, $request);
 
-        /** @var CommandDefinition $commandDefinition */
-        if ($commandDefinition = $command->getDefinitions()[$action] ?? null) {
-            try {
-                $this->input->bind(new InputDefinition($commandDefinition->getDefinition()));
-            } catch (ExceptionInterface $e) {
-                // do nothing
-            }
-        }
+        $this->symfonyApplication->add($this->wrapCommand($command, $this->createAction($actionId), $request));
 
         return $command;
     }
@@ -55,11 +49,11 @@ final class ControllerRunner extends BaseControllerRunner
     /**
      * {@inheritDoc}
      */
-    protected function runAction(ControllerInterface $command, string $action, $request): int
+    protected function runAction(ControllerInterface $command, string $action, $request): ConsoleResponseInterface
     {
-        $this->symfonyApplication->add($this->wrapCommand($command, $action, $request));
+        $this->symfonyApplication->run($request->getInput(), $this->response->getOutput());
 
-        return $this->symfonyApplication->run($this->input, $this->output);
+        return $this->response;
     }
 
     private function wrapCommand(Command $command, string $action, ConsoleRequestInterface $request): SymfonyCommand
@@ -91,7 +85,7 @@ final class ControllerRunner extends BaseControllerRunner
 
             protected function execute(InputInterface $input, OutputInterface $output): int
             {
-                return call_user_func($this->callback);
+                return call_user_func($this->callback)->getCode();
             }
         };
     }

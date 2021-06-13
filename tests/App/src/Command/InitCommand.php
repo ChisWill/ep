@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App\Command;
 
+use Ep\Annotation\Aspect;
 use Ep\Console\Command;
 use Ep\Console\Service;
 use Ep\Contract\ConsoleRequestInterface;
+use Ep\Contract\ConsoleResponseInterface;
+use Ep\Tests\App\Aspect\ConsoleAspect;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class InitCommand extends Command
 {
@@ -20,10 +24,26 @@ class InitCommand extends Command
         $this->service = $service;
 
         $this->setDefinition('index', [
-            new InputArgument('name', null, 'your name')
+            new InputArgument('name', null, 'your name'),
+            new InputOption('type', 't', InputOption::VALUE_NONE)
         ]);
     }
 
+    public function before(ConsoleRequestInterface $request)
+    {
+        $this->getService()->writeln('command before');
+        return true;
+    }
+
+    public function after(ConsoleRequestInterface $request, ConsoleResponseInterface $response): ConsoleResponseInterface
+    {
+        $this->getService()->writeln('command after');
+        return $response;
+    }
+
+    /**
+     * @Aspect(ConsoleAspect::class)
+     */
     public function indexAction(ConsoleRequestInterface $request)
     {
         $message = 'Welcome Basic, ' . $request->getArgument('name');

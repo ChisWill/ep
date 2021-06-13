@@ -6,6 +6,7 @@ namespace Ep\Command;
 
 use Ep\Command\Service\ScanService;
 use Ep\Console\Command;
+use Ep\Contract\ConsoleResponseInterface;
 
 final class ScanCommand extends Command
 {
@@ -18,7 +19,7 @@ final class ScanCommand extends Command
         $this->setDefinition('annotation')->setDescription('Scan root path to generate annotation cache');
     }
 
-    public function annotationAction()
+    public function annotationAction(): ConsoleResponseInterface
     {
         $this->service->annotation();
 

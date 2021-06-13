@@ -61,16 +61,15 @@ final class Application
                 ])
                 ->match('/' . $this->request->getRoute());
 
-            $code = $this->controllerRunner
+            $response = $this->controllerRunner
                 ->configure(['suffix' => $this->config->commandDirAndSuffix])
                 ->run($handler, $this->request);
 
-            exit($code);
+            exit($response->getCode());
         } catch (NotFoundException $e) {
             $command = $this->request->getRoute();
             echo <<<HELP
-Error: unknown command "{$command}"
-
+Error: unknown command "{$command}"\n
 HELP;
             exit(Command::FAIL);
         }

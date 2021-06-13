@@ -40,6 +40,11 @@ final class Service
         return $this->response;
     }
 
+    public function status(int $code): ConsoleResponseInterface
+    {
+        return $this->response->setCode($code);
+    }
+
     public function write(string $message = '', int $options = 0): void
     {
         $this->response->write($message, $options);

@@ -7,6 +7,7 @@ namespace Ep\Command;
 use Ep\Command\Service\MigrateService;
 use Ep\Console\Command;
 use Ep\Contract\ConsoleRequestInterface;
+use Ep\Contract\ConsoleResponseInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 final class MigrateCommand extends Command
@@ -46,7 +47,7 @@ final class MigrateCommand extends Command
     /**
      * 创建一个迁移记录
      */
-    public function newAction(): int
+    public function newAction(): ConsoleResponseInterface
     {
         $this->service->new();
 
@@ -56,7 +57,7 @@ final class MigrateCommand extends Command
     /**
      * 初始化所有表结构
      */
-    public function ddlAction(): int
+    public function ddlAction(): ConsoleResponseInterface
     {
         $this->service->ddl();
 
@@ -66,7 +67,7 @@ final class MigrateCommand extends Command
     /**
      * 执行所有还未同步的迁移
      */
-    public function upAction(ConsoleRequestInterface $request): int
+    public function upAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
         if ($request->getOption('all') && !$this->confirm('Are you sure apply all migrations?')) {
             return $this->success('Skipped.');
@@ -80,7 +81,7 @@ final class MigrateCommand extends Command
     /**
      * 回退已执行过的迁移
      */
-    public function downAction(ConsoleRequestInterface $request): int
+    public function downAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
         if ($request->getOption('all') && !$this->confirm('Are you sure downgrade all migrations?')) {
             return $this->success('Skipped.');

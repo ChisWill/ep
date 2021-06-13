@@ -40,12 +40,13 @@ class ControllerRunner implements ConfigurableInterface
      */
     public function run($handler, $request)
     {
-        [$prefix, $class, $action] = $this->parseHandler($handler);
+        [$prefix, $class, $actionId] = $this->parseHandler($handler);
 
         $module = $this->createModule($prefix);
 
-        $controller = $this->createController($class, $action);
-        $action .= $this->config->actionSuffix;
+        $controller = $this->createController($class, $actionId, $request);
+
+        $action = $this->createAction($actionId);
 
         if ($module instanceof ModuleInterface) {
             return $this->runModule($module, $controller, $action, $request);
@@ -60,23 +61,28 @@ class ControllerRunner implements ConfigurableInterface
         if (strpos($prefix, '\\\\') !== false) {
             $prefix = explode('\\\\', trim($prefix, '\\'))[0];
         }
-        $moduleClass = $this->config->appNamespace . '\\' . ($prefix ? $prefix . '\\' : '') . $this->suffix . '\\' . $this->config->moduleName;
-        if (class_exists($moduleClass)) {
-            return $this->container->get($moduleClass);
+        $class = $this->config->appNamespace . '\\' . ($prefix ? $prefix . '\\' : '') . $this->suffix . '\\' . $this->config->moduleName;
+        if (class_exists($class)) {
+            return $this->container->get($class);
         } else {
             return null;
         }
     }
 
-    protected function createController(string $class, string $action): ControllerInterface
+    protected function createController(string $class, string $actionId, $request): ControllerInterface
     {
         if (!class_exists($class)) {
             throw new NotFoundException("{$class} is not found.");
         }
         $controller = $this->container->get($class);
         $controller->id = $this->generateContextId($controller);
-        $controller->actionId = $action;
+        $controller->actionId = $actionId;
         return $controller;
+    }
+
+    protected function createAction(string $actionId): string
+    {
+        return $actionId . $this->config->actionSuffix;
     }
 
     /**

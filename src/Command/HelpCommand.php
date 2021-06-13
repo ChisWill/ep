@@ -7,6 +7,7 @@ namespace Ep\Command;
 use Ep\Command\Service\HelpService;
 use Ep\Console\Command;
 use Ep\Contract\ConsoleRequestInterface;
+use Ep\Contract\ConsoleResponseInterface;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -45,7 +46,7 @@ To display the list of available commands, please use the <info>list</info> comm
 EOF);
     }
 
-    public function indexAction(ConsoleRequestInterface $request, OutputInterface $output): int
+    public function indexAction(ConsoleRequestInterface $request, OutputInterface $output): ConsoleResponseInterface
     {
         $commands = $this->service->getAllCommands();
         array_walk($commands, [$this->symfonyApplication, 'add']);
@@ -55,6 +56,8 @@ EOF);
             '--format' => $request->getOption('format'),
             '--raw' => $request->getOption('raw')
         );
-        return $this->helpCommand->run(new ArrayInput($arguments), $output);
+        return $this->getService()->status(
+            $this->helpCommand->run(new ArrayInput($arguments), $output)
+        );
     }
 }

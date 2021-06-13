@@ -21,6 +21,19 @@ final class ConsoleResponse implements ConsoleResponseInterface
         return $this->output;
     }
 
+    private int $code = Command::OK;
+
+    public function getCode(): int
+    {
+        return $this->code;
+    }
+
+    public function setCode(int $code): ConsoleResponseInterface
+    {
+        $this->code = $code;
+        return $this;
+    }
+
     /**
      * {@inheritDoc}
      */

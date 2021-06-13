@@ -6,6 +6,7 @@ namespace Ep\Tests\App\Advance\TestDir\BackAdmin\Command;
 
 use Ep\Console\Module as ConsoleModule;
 use Ep\Contract\ConsoleRequestInterface;
+use Ep\Contract\ConsoleResponseInterface;
 
 final class Module extends ConsoleModule
 {
@@ -14,7 +15,7 @@ final class Module extends ConsoleModule
         return true;
     }
 
-    public function after(ConsoleRequestInterface $request, int $response): int
+    public function after(ConsoleRequestInterface $request, ConsoleResponseInterface $response): ConsoleResponseInterface
     {
         return $response;
     }

@@ -7,6 +7,7 @@ namespace Ep\Command;
 use Ep\Command\Service\GenerateService;
 use Ep\Console\Command;
 use Ep\Contract\ConsoleRequestInterface;
+use Ep\Contract\ConsoleResponseInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -30,7 +31,7 @@ final class GenerateCommand extends Command
     /**
      * 生成模型
      */
-    public function modelAction(ConsoleRequestInterface $request): int
+    public function modelAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
         foreach ($request->getArgument('table') as $table) {
             $request->setOption('table', $table);
