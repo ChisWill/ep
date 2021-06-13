@@ -26,6 +26,8 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Aliases\Aliases;
@@ -80,6 +82,9 @@ return [
     ConsoleApplication::class =>  static function (): ConsoleApplication {
         $application = new ConsoleApplication('Ep', Ep::VERSION);
         $application->setAutoExit(false);
+        $application->setHelperSet(new HelperSet([
+            new QuestionHelper()
+        ]));
         return $application;
     },
     ConsoleRequestInterface::class => ConsoleRequest::class,

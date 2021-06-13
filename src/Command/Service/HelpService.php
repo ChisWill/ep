@@ -69,11 +69,11 @@ final class HelpService extends Service
             {
                 /** @var CommandDefinition[] $definitions */
                 $definitions = $this->data->command->getDefinitions();
-                if (array_key_exists($this->data->action, $definitions)) {
+                if (array_key_exists($this->data->actionId, $definitions)) {
                     $this
-                        ->setDefinition($definitions[$this->data->action]->getDefinition())
-                        ->setDescription($definitions[$this->data->action]->getDescription())
-                        ->setHelp($definitions[$this->data->action]->getHelp());
+                        ->setDefinition($definitions[$this->data->actionId]->getDefinition())
+                        ->setDescription($definitions[$this->data->actionId]->getDescription())
+                        ->setHelp($definitions[$this->data->actionId]->getHelp());
                 }
             }
         };
@@ -97,7 +97,7 @@ final class HelpService extends Service
                 $dataSet->command = $this->container->get($ref->getDeclaringClass()->getName());
                 $dataSet->appNamespace = $config['appNamespace'];
                 $dataSet->commandName = $this->getCommandName($name, $action, $config);
-                $dataSet->action = Str::rtrim($ref->getName(), $config['actionSuffix']);
+                $dataSet->actionId = Str::rtrim($ref->getName(), $config['actionSuffix']);
                 $commands[] = $dataSet;
             }
         }
@@ -121,5 +121,5 @@ class CommandDataSet
     public Command $command;
     public string $appNamespace;
     public string $commandName;
-    public string $action;
+    public string $actionId;
 }
