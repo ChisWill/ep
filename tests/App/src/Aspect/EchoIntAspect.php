@@ -12,18 +12,11 @@ use Psr\Http\Message\ResponseInterface;
 
 class EchoIntAspect implements AspectInterface
 {
-    /**
-     * @Service
-     */
-    private ServerRequest $request;
-
     public function process(HandlerInterface $handler)
     {
-        $a = $this->request->getQueryParams()['a'] ?? 'none';
-
         /** @var ResponseInterface */
         $response = $handler->handle();
-        $response->getBody()->write('get:' . $a . ', who:int<br>');
+        $response->getBody()->write('who:int<br>');
         return $response;
     }
 }

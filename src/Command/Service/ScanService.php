@@ -5,30 +5,27 @@ declare(strict_types=1);
 namespace Ep\Command\Service;
 
 use Ep\Contract\AnnotationInterface;
-use Ep\Kit\CacheKey;
+use Ep\Kit\Annotate;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
+use Psr\SimpleCache\CacheInterface;
 use ReflectionClass;
 
 final class ScanService extends Service
 {
     private Reader $reader;
-    private CacheItemPoolInterface $cache;
-    private CacheKey $cacheKey;
+    private CacheInterface $cache;
 
     public function __construct(
         ContainerInterface $container,
         Reader $reader,
-        CacheItemPoolInterface $cache,
-        CacheKey $cacheKey
+        CacheInterface $cache
     ) {
         parent::__construct($container);
 
         $this->reader = $reader;
         $this->cache = $cache;
-        $this->cacheKey = $cacheKey;
     }
 
     public function annotation(): void
@@ -47,6 +44,9 @@ final class ScanService extends Service
             $reflectionClass = new ReflectionClass($class);
             $properties = $reflectionClass->getProperties();
             $methods = $reflectionClass->getMethods();
+            if ($this->reader->getClassAnnotations($reflectionClass)) {
+                $data[$class][AnnotationInterface::TYPE_CLASS] = 1;
+            }
             foreach ($properties as $property) {
                 if ($this->reader->getPropertyAnnotations($property)) {
                     $data[$class][AnnotationInterface::TYPE_PROPERTY][$property->getName()] = 1;
@@ -61,11 +61,7 @@ final class ScanService extends Service
         }
 
         foreach ($data as $class => $value) {
-            $this->cache->save(
-                $this->cache->getItem(
-                    $this->cacheKey->classAnnotation($class)
-                )->set($value)
-            );
+            $this->cache->set(Annotate::getAnnotationCacheKey($class), $value);
         }
     }
 }

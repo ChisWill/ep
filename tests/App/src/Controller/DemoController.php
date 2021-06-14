@@ -262,7 +262,7 @@ class DemoController extends Controller
         ];
     }
 
-    public function testAction(ServerRequest $serverRequest)
+    public function testAction()
     {
     }
 }

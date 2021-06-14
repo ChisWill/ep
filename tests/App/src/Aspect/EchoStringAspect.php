@@ -12,11 +12,6 @@ use Psr\Http\Message\ResponseInterface;
 
 class EchoStringAspect implements AspectInterface
 {
-    /**
-     * @Service
-     */
-    private ServerRequest $request;
-
     private string $name;
     private int $age;
 
@@ -28,11 +23,9 @@ class EchoStringAspect implements AspectInterface
 
     public function process(HandlerInterface $handler)
     {
-        $b = $this->request->getQueryParams()['b'] ?? 'none';
-
         /** @var ResponseInterface */
         $response = $handler->handle();
-        $response->getBody()->write('get:' . $b . ', who:string,params:' . json_encode([$this->name, $this->age]) . '<br>');
+        $response->getBody()->write('get:who:string,params:' . json_encode([$this->name, $this->age]) . '<br>');
         return $response;
     }
 }

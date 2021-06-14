@@ -44,6 +44,7 @@ use Yiisoft\Strings\StringHelper;
 use Ep\Annotation\Service;
 use Ep\Base\Container as BaseContainer;
 use Ep\Contract\InjectorInterface;
+use Ep\Tests\App\Aspect\ClassAnnotation;
 use Ep\Tests\App\Aspect\EchoIntAspect;
 use Ep\Tests\App\Aspect\EchoStringAspect;
 use Ep\Tests\App\Aspect\LoggerAspect;
@@ -52,6 +53,9 @@ use Ep\Tests\Support\Container\Bird;
 use Psr\Http\Message\ResponseInterface;
 use Yiisoft\Injector\Injector;
 
+/**
+ * @ClassAnnotation
+ */
 class TestController extends Controller
 {
     /**
@@ -100,7 +104,7 @@ class TestController extends Controller
      * @LoggerAspect
      * @Aspect(class={EchoIntAspect::class, EchoStringAspect::class={"name"="pet","age"=10}})
      */
-    public function aspectAction(ServerRequest $serverRequest)
+    public function aspectAction()
     {
         return $this->string('i am working<br>');
     }

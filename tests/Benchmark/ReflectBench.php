@@ -21,7 +21,7 @@ class ReflectBench
 {
     private $class;
 
-    private const COUNT = 100;
+    private const COUNT = 10;
 
     public function before()
     {
