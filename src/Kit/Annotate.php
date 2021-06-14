@@ -46,6 +46,7 @@ final class Annotate
             }
             $exists = isset($this->map[$class][AnnotationInterface::TYPE_CLASS]);
         }
+
         if ($exists) {
             $reflectionClass = new ReflectionClass($instance);
             $annotations = $this->reader->getClassAnnotations($reflectionClass);
@@ -70,12 +71,11 @@ final class Annotate
                 $this->map[$class] = $this->cache->get(self::getAnnotationCacheKey($class), []);
             }
             $properties = [];
-            if (isset($this->map[$class][AnnotationInterface::TYPE_PROPERTY])) {
-                foreach ($this->map[$class][AnnotationInterface::TYPE_PROPERTY] as $name => $v) {
-                    $properties[] = $reflectionClass->getProperty($name);
-                }
+            foreach ($this->map[$class][AnnotationInterface::TYPE_PROPERTY] ?? [] as $name => $v) {
+                $properties[] = $reflectionClass->getProperty($name);
             }
         }
+
         foreach ($properties as $property) {
             $annotations = $this->reader->getPropertyAnnotations($property);
             /** @var AnnotationInterface $annotation */
