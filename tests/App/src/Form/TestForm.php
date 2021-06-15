@@ -20,10 +20,10 @@ class TestForm extends Form
     protected function rules(): array
     {
         return [
-            'username' => [new Required()],
-            'password' => [(new HasLength())->min(3)],
-            'age' => [(new Number())->integer()->skipOnEmpty(true)],
-            'title' => [(new HasLength())->max(5)->min(1)]
+            'username' => [Required::rule()],
+            'password' => [(HasLength::rule())->min(3)],
+            'age' => [(Number::rule())->integer()->skipOnEmpty(true)],
+            'title' => [(HasLength::rule())->max(5)->min(1)]
         ];
     }
 }

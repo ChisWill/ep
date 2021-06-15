@@ -38,12 +38,12 @@ class User extends ActiveRecord
     {
         return [
             'age' => [
-                (new Number)->integer()->max(99)->tooBigMessage('最多99岁')->skipOnEmpty(true),
-                (new InRange([10, 20, 30]))->skipOnEmpty(true)
+                (Number::rule())->integer()->max(99)->tooBigMessage('最多99岁')->skipOnEmpty(true),
+                (InRange::rule([10, 20, 30]))->skipOnEmpty(true)
             ],
-            'username' => [(new HasLength)->max(8)->min(2)->tooLongMessage('用户名最多8个字')->tooShortMessage('最少2个字')],
-            'password' => [(new HasLength)->max(6)->tooLongMessage('最多6个'), (new MatchRegularExpression('/^[a-z\d]{4,6}$/i'))->message('4-8个字符')],
-            'birthday' => [new Callback([self::class, 'checkDate'])]
+            'username' => [(HasLength::rule())->max(8)->min(2)->tooLongMessage('用户名最多8个字')->tooShortMessage('最少2个字')],
+            'password' => [(HasLength::rule())->max(6)->tooLongMessage('最多6个'), (MatchRegularExpression::rule('/^[a-z\d]{4,6}$/i'))->message('4-8个字符')],
+            'birthday' => [Callback::rule([self::class, 'checkDate'])]
         ];
     }
 
