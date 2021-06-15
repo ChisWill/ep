@@ -47,24 +47,24 @@ final class Application
         $this->send($request, $this->handleRequest($request));
     }
 
-    private function createRequest(): ServerRequestInterface
+    public function createRequest(): ServerRequestInterface
     {
         return new ServerRequest($this->serverRequestFactory->createFromGlobals());
     }
 
-    private function register(ServerRequestInterface $request): void
+    public function register(ServerRequestInterface $request): void
     {
         $this->errorHandler->register($request);
     }
 
-    private function handleRequest(ServerRequestInterface $request): ResponseInterface
+    public function handleRequest(ServerRequestInterface $request): ResponseInterface
     {
         return $this->requestHandlerFactory
             ->wrap($this->config->webMiddlewares, $this->notFoundHandler)
             ->handle($request);
     }
 
-    private function send(ServerRequestInterface $request, ResponseInterface $response): void
+    public function send(ServerRequestInterface $request, ResponseInterface $response): void
     {
         $this->sapiEmitter->emit(
             $response,

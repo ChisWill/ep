@@ -8,6 +8,7 @@ use Ep\Base\Config;
 use Ep\Base\ErrorHandler;
 use Ep\Base\Route;
 use Ep\Contract\ConsoleRequestInterface;
+use Ep\Contract\ConsoleResponseInterface;
 use Ep\Contract\NotFoundException;
 
 final class Application
@@ -42,7 +43,7 @@ final class Application
         $this->handleRequest();
     }
 
-    private function register(): void
+    public function register(): void
     {
         $this->errorHandler
             ->configure([
@@ -51,25 +52,26 @@ final class Application
             ->register($this->request);
     }
 
-    private function handleRequest(): void
+    public function handleRequest(): void
     {
         try {
+            $route = $this->request->getRoute();
+
             [, $handler] = $this->route
                 ->configure([
                     'rule' => $this->config->getRouteRule(),
                     'baseUrl' => '/'
                 ])
-                ->match('/' . $this->request->getRoute());
-
+                ->match('/' . $route);
+            /** @var ConsoleResponseInterface $response */
             $response = $this->controllerRunner
                 ->configure(['suffix' => $this->config->commandDirAndSuffix])
                 ->run($handler, $this->request);
 
             exit($response->getCode());
         } catch (NotFoundException $e) {
-            $command = $this->request->getRoute();
             echo <<<HELP
-Error: unknown command "{$command}"\n
+Error: unknown command "{$route}"\n
 HELP;
             exit(Command::FAIL);
         }

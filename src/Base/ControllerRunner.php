@@ -183,12 +183,13 @@ class ControllerRunner implements ConfigurableInterface
                 break;
         }
         $suffix = $this->getControllerSuffix();
-        if ($prefix) {
-            $ns = strpos($prefix, '\\\\') === false ? $prefix . '\\' . $suffix : str_replace('\\\\', '\\' . $suffix . '\\', $prefix);
-        } else {
-            $ns = $suffix;
-        }
-        $class = sprintf('%s\\%s\\%s', $this->config->appNamespace, $ns, Str::toPascalCase($controller) . $suffix);
+
+        $class = sprintf(
+            '%s\\%s\\%s',
+            $this->config->appNamespace,
+            $prefix ? (strpos($prefix, '\\\\') === false ? $prefix . '\\' . $suffix : str_replace('\\\\', '\\' . $suffix . '\\', $prefix)) : $suffix,
+            Str::toPascalCase($controller) . $suffix
+        );
         return [$prefix, $class, $action];
     }
 
