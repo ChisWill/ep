@@ -18,8 +18,7 @@ class ClassAnnotation implements AnnotationInterface
     /**
      * @param ReflectionClass $reflector
      */
-    public function process(object $instance, Reflector $reflector, array $arguments = [])
+    public function process(object $instance, Reflector $reflector, array $arguments = []): void
     {
-
     }
 }
