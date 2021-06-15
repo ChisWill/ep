@@ -200,7 +200,7 @@ final class GenerateService extends Service
             $rules[$field] = [];
             foreach ($items as $rule) {
                 $array = explode(':', $rule);
-                $string = sprintf('(new %s())', array_shift($array));
+                $string = sprintf('(%s::rule())', array_shift($array));
                 foreach ($array as $method) {
                     $string .= '->' . $method;
                 }

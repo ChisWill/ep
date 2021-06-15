@@ -27,10 +27,10 @@ class UserParent extends ActiveRecord
     {
         return [
             'username' => [
-                (new HasLength())->max(255)->skipOnEmpty(true),
+                (HasLength::rule())->max(255)->skipOnEmpty(true),
             ],
             'age' => [
-                (new Number())->integer()->skipOnEmpty(true),
+                (Number::rule())->integer()->skipOnEmpty(true),
             ],
         ];
     }

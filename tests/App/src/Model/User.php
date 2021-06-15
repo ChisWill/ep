@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ep\Tests\App\Model;
 
 use Ep\Db\ActiveRecord;
-use Ep\Helper\Date;
 use Yiisoft\Validator\Result;
 use Yiisoft\Validator\Rule\Callback;
 use Yiisoft\Validator\Rule\HasLength;
