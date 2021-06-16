@@ -22,15 +22,15 @@ final class Service implements AnnotationInterface
     {
         $reflector->setAccessible(true);
 
-        $objects = [];
+        $class = $reflector->getType()->getName();
+
         foreach ($arguments as $item) {
-            if (is_object($item)) {
-                $objects[get_class($item)] = $item;
+            if (is_object($item) && is_subclass_of($item, $class, false)) {
+                $value = $item;
+                break;
             }
         }
 
-        $class = $reflector->getType()->getName();
-
-        $reflector->setValue($instance, $objects[$class] ??  Ep::getDi()->get($class));
+        $reflector->setValue($instance, $value ?? Ep::getDi()->get($class));
     }
 }
