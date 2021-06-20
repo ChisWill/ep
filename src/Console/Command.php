@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\Console;
 
 use Ep;
+use Ep\Contract\ConfigurableTrait;
 use Ep\Contract\ContextTrait;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
@@ -14,10 +15,13 @@ use LogicException;
 
 abstract class Command implements ControllerInterface
 {
-    use ContextTrait, FilterTrait;
+    use ContextTrait, FilterTrait, ConfigurableTrait;
 
     public const OK = 0;
     public const FAIL = 1;
+
+    public string $id;
+    public string $actionId;
 
     /**
      * @return true|ConsoleResponseInterface

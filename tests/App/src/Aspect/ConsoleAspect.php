@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App\Aspect;
 
-use Ep\Annotation\Service;
+use Ep\Annotation\Inject;
 use Ep\Contract\AspectInterface;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
@@ -13,12 +13,12 @@ use Ep\Contract\HandlerInterface;
 class ConsoleAspect implements AspectInterface
 {
     /**
-     * @Service
+     * @Inject
      */
     private ConsoleRequestInterface $request;
 
     /**
-     * @Service
+     * @Inject
      */
     private ConsoleResponseInterface $response;
 

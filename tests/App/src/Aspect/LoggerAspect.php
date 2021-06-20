@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ep\Tests\App\Aspect;
 
 use Ep;
-use Ep\Annotation\Service;
 use Ep\Contract\AnnotationInterface;
 use Reflector;
 

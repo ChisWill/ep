@@ -41,7 +41,7 @@ use Yiisoft\Db\Redis\Connection;
 use Yiisoft\Di\CompositeContainer;
 use Yiisoft\Di\Container;
 use Yiisoft\Strings\StringHelper;
-use Ep\Annotation\Service;
+use Ep\Annotation\Inject;
 use Ep\Base\Container as BaseContainer;
 use Ep\Contract\InjectorInterface;
 use Ep\Tests\App\Aspect\ClassAnnotation;
@@ -59,12 +59,12 @@ use Yiisoft\Injector\Injector;
 class TestController extends Controller
 {
     /**
-     * @Service
+     * @Inject
      */
     private TestService $service;
 
     /**
-     * @Service
+     * @Inject
      */
     private InjectorInterface $injector;
 

@@ -13,7 +13,7 @@ use Reflector;
  * @Annotation
  * @Target("PROPERTY")
  */
-final class Service implements AnnotationInterface
+final class Inject implements AnnotationInterface
 {
     /**
      * @param  ReflectionProperty $reflector

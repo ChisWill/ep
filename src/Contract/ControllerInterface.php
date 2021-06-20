@@ -7,6 +7,6 @@ namespace Ep\Contract;
 /**
  * @property string $actionId
  */
-interface ControllerInterface extends FilterInterface, ContextInterface
+interface ControllerInterface extends ContextInterface, FilterInterface, ConfigurableInterface
 {
 }

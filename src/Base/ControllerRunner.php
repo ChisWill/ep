@@ -74,9 +74,14 @@ class ControllerRunner implements ConfigurableInterface
         if (!class_exists($class)) {
             throw new NotFoundException("{$class} is not found.");
         }
-        $controller = $this->container->get($class);
-        $controller->id = $this->generateContextId($controller);
-        $controller->actionId = $actionId;
+
+        $controller = $this->container
+            ->get($class)
+            ->clone([
+                'id' => $this->generateContextId($class),
+                'actionId' => $actionId
+            ]);
+
         return $controller;
     }
 
@@ -129,15 +134,15 @@ class ControllerRunner implements ConfigurableInterface
     }
 
     /**
-     * @param mixed $handler
+     * @param string|array $handler
      */
     private function parseHandler($handler): array
     {
         switch (gettype($handler)) {
-            case 'array':
-                return $this->parseArrayHandler($handler);
             case 'string':
                 return $this->parseStringHandler($handler);
+            case 'array':
+                return $this->parseArrayHandler($handler);
             default:
                 throw new InvalidArgumentException('The route handler is invalid.');
         }
@@ -201,12 +206,12 @@ class ControllerRunner implements ConfigurableInterface
         return $this->suffix;
     }
 
-    private function generateContextId(ControllerInterface $controller): string
+    private function generateContextId(string $class): string
     {
         return implode('/', array_filter(
             array_map('lcfirst', explode(
                 '\\',
-                str_replace([$this->config->appNamespace, $this->getControllerSuffix()], '', get_class($controller))
+                str_replace([$this->config->appNamespace, $this->getControllerSuffix()], '', $class)
             ))
         ));
     }

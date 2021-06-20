@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\Web;
 
 use Ep;
+use Ep\Contract\ConfigurableTrait;
 use Ep\Contract\ContextTrait;
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\FilterTrait;
@@ -17,7 +18,10 @@ use Psr\Http\Message\ResponseInterface;
  */
 abstract class Controller implements ControllerInterface
 {
-    use ContextTrait, FilterTrait;
+    use ContextTrait, FilterTrait, ConfigurableTrait;
+
+    public string $id;
+    public string $actionId;
 
     /**
      * @return true|ResponseInterface

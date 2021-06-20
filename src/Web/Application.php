@@ -44,7 +44,7 @@ final class Application
 
         $this->register($request);
 
-        $this->send($request, $this->handleRequest($request));
+        $this->emit($request, $this->handleRequest($request));
     }
 
     public function createRequest(): ServerRequestInterface
@@ -64,7 +64,7 @@ final class Application
             ->handle($request);
     }
 
-    public function send(ServerRequestInterface $request, ResponseInterface $response): void
+    public function emit(ServerRequestInterface $request, ResponseInterface $response): void
     {
         $this->sapiEmitter->emit(
             $response,

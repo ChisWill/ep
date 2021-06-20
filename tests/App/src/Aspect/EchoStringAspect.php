@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App\Aspect;
 
-use Ep\Annotation\Service;
 use Ep\Contract\AspectInterface;
 use Ep\Contract\HandlerInterface;
 use Ep\Web\ServerRequest;
