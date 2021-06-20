@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App\Command;
 
+use Ep;
 use Ep\Annotation\Aspect;
 use Ep\Console\Command;
+use Ep\Console\CommandDefinition;
+use Ep\Console\ConsoleRequest;
 use Ep\Console\Service;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
 use Ep\Tests\App\Aspect\ConsoleAspect;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
 class InitCommand extends Command
@@ -65,6 +70,24 @@ class InitCommand extends Command
             'options' => $request->getOptions(),
             'argvs' => $request->getArguments()
         ]);
+
+        return $this->success();
+    }
+
+    public function callAction(ConsoleRequestInterface $request)
+    {
+        $c = Ep::getDi()->get(CurlCommand::class);
+        $request->setArgument('action', 'aspect');
+        $r = new ConsoleRequest(new ArrayInput([
+            'action' => 'string'
+        ]));
+        /** @var CommandDefinition */
+        $inputD = $c->getDefinitions()['single'];
+        $input = new ArrayInput([
+            'action' => 'string'
+        ], new InputDefinition($inputD->getDefinition()));
+
+        $c->singleAction($r);
 
         return $this->success();
     }

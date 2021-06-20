@@ -48,9 +48,9 @@ final class ControllerRunner extends BaseControllerRunner
      */
     protected function runAction(ControllerInterface $command, string $action, $request): ConsoleResponseInterface
     {
-        $this->symfonyApplication->run($request->getInput(), $this->response->getOutput());
-
-        return $this->response;
+        return $this->response->withCode(
+            $this->symfonyApplication->run($request->getInput(), $this->response->getOutput())
+        );
     }
 
     private function wrapCommand(Command $command, string $action, ConsoleRequestInterface $request): SymfonyCommand

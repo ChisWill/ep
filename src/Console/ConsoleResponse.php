@@ -16,6 +16,13 @@ final class ConsoleResponse implements ConsoleResponseInterface
         $this->output = $output;
     }
 
+    public function withOutput(OutputInterface $output): self
+    {
+        $new = clone $this;
+        $new->output = $output;
+        return $new;
+    }
+
     public function getOutput(): OutputInterface
     {
         return $this->output;
@@ -23,15 +30,16 @@ final class ConsoleResponse implements ConsoleResponseInterface
 
     private int $code = Command::OK;
 
+    public function withCode(int $code): ConsoleResponseInterface
+    {
+        $new = clone $this;
+        $new->code = $code;
+        return $new;
+    }
+
     public function getCode(): int
     {
         return $this->code;
-    }
-
-    public function setCode(int $code): ConsoleResponseInterface
-    {
-        $this->code = $code;
-        return $this;
     }
 
     /**

@@ -4,7 +4,7 @@
 declare(strict_types=1);
 
 use Ep\Console\Application;
-use Ep\Contract\ConsoleRequestInterface;
+use Ep\Console\Factory;
 
 (static function () {
     $cwd = getcwd();
@@ -79,7 +79,7 @@ HELP;
     Ep::init($params);
 
     $config = Ep::getConfig();
-    $request = Ep::getDi()->get(ConsoleRequestInterface::class);
+    $request = Ep::getDi()->get(Factory::class)->createRequest();
     if (!$request->getRoute()) {
         $request->setRoute('list');
     }
@@ -89,5 +89,8 @@ HELP;
     $request->setOption('user.defaultAction', $userConfig['defaultAction'] ?? $config->defaultAction);
     $request->setOptions($options);
 
-    Ep::getDi()->get(Application::class)->run();
+    Ep::getDi()
+        ->get(Application::class)
+        ->withRequest($request)
+        ->run();
 })();

@@ -5,9 +5,7 @@ declare(strict_types=1);
 use Ep\Base\Config;
 use Ep\Base\Container;
 use Ep\Base\Injector;
-use Ep\Console\ConsoleRequest;
 use Ep\Console\ConsoleResponse;
-use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
 use Ep\Contract\ErrorRendererInterface;
 use Ep\Contract\InjectorInterface;
@@ -23,7 +21,7 @@ use HttpSoft\Message\StreamFactory;
 use HttpSoft\Message\UploadedFileFactory;
 use HttpSoft\Message\UriFactory;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\Console\Application as ConsoleApplication;
+use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -79,15 +77,14 @@ return [
     // Annotation
     Reader::class => static fn (CacheItemPoolInterface $cache): Reader => $config->debug ? new AnnotationReader() : new PsrCachedReader(new AnnotationReader(), $cache, false),
     // Console
-    ConsoleApplication::class =>  static function (): ConsoleApplication {
-        $application = new ConsoleApplication('Ep', Ep::VERSION);
+    SymfonyApplication::class =>  static function (): SymfonyApplication {
+        $application = new SymfonyApplication('Ep', Ep::VERSION);
         $application->setAutoExit(false);
         $application->setHelperSet(new HelperSet([
             new QuestionHelper()
         ]));
         return $application;
     },
-    ConsoleRequestInterface::class => ConsoleRequest::class,
     ConsoleResponseInterface::class => ConsoleResponse::class,
     InputInterface::class => static fn (): InputInterface => new ArgvInput(null, null),
     OutputInterface::class => ConsoleOutput::class,

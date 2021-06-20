@@ -14,7 +14,7 @@ use Ep\Contract\NotFoundException;
 final class Application
 {
     private Config $config;
-    private ConsoleRequestInterface $request;
+    private Factory $factory;
     private ErrorHandler $errorHandler;
     private ErrorRenderer $errorRenderer;
     private Route $route;
@@ -22,14 +22,14 @@ final class Application
 
     public function __construct(
         Config $config,
-        ConsoleRequestInterface $request,
+        Factory $factory,
         ErrorHandler $errorHandler,
         ErrorRenderer $errorRenderer,
         Route $route,
         ControllerRunner $controllerRunner
     ) {
         $this->config = $config;
-        $this->request = $request;
+        $this->factory = $factory;
         $this->errorHandler = $errorHandler;
         $this->errorRenderer = $errorRenderer;
         $this->route = $route;
@@ -38,24 +38,40 @@ final class Application
 
     public function run(): void
     {
-        $this->register();
+        $request = $this->createRequest();
 
-        $this->handleRequest();
+        $this->register($request);
+
+        $this->handleRequest($request);
     }
 
-    public function register(): void
+    private ?ConsoleRequestInterface $request = null;
+
+    public function withRequest(ConsoleRequestInterface $request): self
+    {
+        $new = clone $this;
+        $new->request = $request;
+        return $new;
+    }
+
+    public function createRequest(): ConsoleRequestInterface
+    {
+        return $this->request ?? $this->factory->createRequest();
+    }
+
+    public function register(ConsoleRequestInterface $request): void
     {
         $this->errorHandler
             ->configure([
                 'errorRenderer' => $this->errorRenderer
             ])
-            ->register($this->request);
+            ->register($request);
     }
 
-    public function handleRequest(): void
+    public function handleRequest(ConsoleRequestInterface $request): void
     {
         try {
-            $route = $this->request->getRoute();
+            $route = $request->getRoute();
 
             [, $handler] = $this->route
                 ->configure([
@@ -66,7 +82,7 @@ final class Application
             /** @var ConsoleResponseInterface $response */
             $response = $this->controllerRunner
                 ->configure(['suffix' => $this->config->commandDirAndSuffix])
-                ->run($handler, $this->request);
+                ->run($handler, $request);
 
             exit($response->getCode());
         } catch (NotFoundException $e) {

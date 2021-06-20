@@ -4,55 +4,63 @@ declare(strict_types=1);
 
 namespace Ep\Console;
 
-use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Helper\HelperInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
 final class Service
 {
     private SymfonyApplication $symfonyApplication;
-    private ConsoleRequestInterface $request;
-    private ConsoleResponseInterface $response;
+    private InputInterface $input;
+    private OutputInterface $output;
+    private Factory $factory;
 
     public function __construct(
         SymfonyApplication $symfonyApplication,
-        ConsoleRequestInterface $request,
-        ConsoleResponseInterface $response
+        InputInterface $input,
+        OutputInterface $output,
+        Factory $factory
     ) {
         $this->symfonyApplication = $symfonyApplication;
-        $this->request = $request;
-        $this->response = $response;
+        $this->input = $input;
+        $this->output = $output;
+        $this->factory = $factory;
     }
 
-    public function getRequest(): ConsoleRequestInterface
+    public function withInput(InputInterface $input): self
     {
-        return $this->request;
+        $new = clone $this;
+        $new->input = $input;
+        return $new;
     }
 
-    public function getResponse(): ConsoleResponseInterface
+    public function withOutput(OutputInterface $output): self
     {
-        return $this->response;
+        $new = clone $this;
+        $new->output = $output;
+        return $new;
     }
 
     public function status(int $code): ConsoleResponseInterface
     {
-        return $this->response->setCode($code);
+        return $this->factory->createResponse($this->output)->withCode($code);
     }
 
     public function write(string $message = '', int $options = 0): void
     {
-        $this->response->write($message, $options);
+        $this->output->write($message, $options);
     }
 
     public function writeln(string $message = '', int $options = 0): void
     {
-        $this->response->writeln($message, $options);
+        $this->output->writeln($message, $options);
     }
 
     public function confirm(string $message, bool $default = false): bool
@@ -60,7 +68,7 @@ final class Service
         /** @var QuestionHelper $helper */
         $helper = $this->getHelper('question');
         $question = new ConfirmationQuestion($message . ' [<comment>' . ($default ? 'Yes' : 'No') . '</>] ', $default);
-        return $helper->ask($this->request->getInput(), $this->response->getOutput(), $question);
+        return $helper->ask($this->input, $this->output, $question);
     }
 
     public function prompt(string $message, string $default = '', bool $hidden = false): string
@@ -71,12 +79,12 @@ final class Service
         if ($hidden) {
             $question->setHidden(true);
         }
-        return $helper->ask($this->request->getInput(), $this->response->getOutput(), $question);
+        return $helper->ask($this->input, $this->output, $question);
     }
 
     public function renderTable(array $headers, array $rows): void
     {
-        $helper = new Table($this->response->getOutput());
+        $helper = new Table($this->output);
 
         $helper
             ->setHeaders($headers)
@@ -86,7 +94,7 @@ final class Service
 
     public function progress(callable $callback, int $max = 100): void
     {
-        $progress = new ProgressBar($this->response->getOutput(), $max);
+        $progress = new ProgressBar($this->output, $max);
 
         $progress->start();
 
