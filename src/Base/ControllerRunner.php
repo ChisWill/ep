@@ -69,6 +69,9 @@ class ControllerRunner implements ConfigurableInterface
         }
     }
 
+    /**
+     * @param mixed $request
+     */
     protected function createController(string $class, string $actionId, $request): ControllerInterface
     {
         if (!class_exists($class)) {

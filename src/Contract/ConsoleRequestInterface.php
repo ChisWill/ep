@@ -45,9 +45,4 @@ interface ConsoleRequestInterface
     public function getOptions(): array;
 
     public function setOptions(array $options): void;
-
-    /**
-     * @param string|array $values
-     */
-    public function hasParameterOption($values): bool;
 }

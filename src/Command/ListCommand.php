@@ -59,12 +59,12 @@ EOF);
         $commands = $this->service->getAllCommands();
         array_walk($commands, [$this->symfonyApplication, 'add']);
 
-        $arguments = array(
+        $arguments = [
             'namespace' => $request->getArgument('namespace'),
             '--raw' => $request->getOption('raw'),
             '--format' => $request->getOption('format'),
             '--short' => $request->getOption('short')
-        );
+        ];
         return $this->getService()->status(
             $this->listCommand->run(new ArrayInput($arguments), $output)
         );

@@ -106,7 +106,7 @@ class TestController extends Controller
      */
     public function aspectAction()
     {
-        return $this->string('i am working<br>');
+        return $this->service->getRandom();
     }
 
     public function testUrlAction(ServerRequest $serverRequest)
@@ -224,7 +224,7 @@ class TestController extends Controller
      */
     public function stringAction(Injector $injector)
     {
-        return $this->string((string) $this->service->getRandom());
+        return $this->service->getRandom();
     }
 
     public function arrayAction(ServerRequestInterface $request)

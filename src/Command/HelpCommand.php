@@ -51,11 +51,11 @@ EOF);
         $commands = $this->service->getAllCommands();
         array_walk($commands, [$this->symfonyApplication, 'add']);
 
-        $arguments = array(
+        $arguments = [
             'command_name' => $request->getArgument('name'),
             '--format' => $request->getOption('format'),
             '--raw' => $request->getOption('raw')
-        );
+        ];
         return $this->getService()->status(
             $this->helpCommand->run(new ArrayInput($arguments), $output)
         );

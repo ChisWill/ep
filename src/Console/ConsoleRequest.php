@@ -129,12 +129,4 @@ final class ConsoleRequest implements ConsoleRequestInterface
             $this->setOption($name, $value);
         }
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function hasParameterOption($values): bool
-    {
-        return $this->input->hasParameterOption($values, true);
-    }
 }
