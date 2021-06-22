@@ -4,15 +4,9 @@ declare(strict_types=1);
 
 namespace Ep\Contract;
 
-use Symfony\Component\Console\Output\OutputInterface;
-
 interface ConsoleResponseInterface
 {
-    public function withOutput(OutputInterface $output): self;
-
-    public function getOutput(): OutputInterface;
-
-    public function withCode(int $code): self;
+    public function setCode(int $code): self;
 
     public function getCode(): int;
 

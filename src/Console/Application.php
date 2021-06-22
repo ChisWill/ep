@@ -8,7 +8,6 @@ use Ep\Base\Config;
 use Ep\Base\ErrorHandler;
 use Ep\Base\Route;
 use Ep\Contract\ConsoleRequestInterface;
-use Ep\Contract\ConsoleResponseInterface;
 use Ep\Contract\NotFoundException;
 
 final class Application
@@ -79,12 +78,12 @@ final class Application
                     'baseUrl' => '/'
                 ])
                 ->match('/' . $route);
-            /** @var ConsoleResponseInterface $response */
-            $response = $this->controllerRunner
+
+            $code = $this->controllerRunner
                 ->configure(['suffix' => $this->config->commandDirAndSuffix])
                 ->run($handler, $request);
 
-            exit($response->getCode());
+            exit($code);
         } catch (NotFoundException $e) {
             echo <<<HELP
 Error: unknown command "{$route}"\n

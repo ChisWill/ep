@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace Ep\Contract;
 
-use Symfony\Component\Console\Input\InputInterface;
-
 interface ConsoleRequestInterface
 {
-    public function getInput(): InputInterface;
-
     public function setRoute(string $route): void;
 
     public function getRoute(): string;

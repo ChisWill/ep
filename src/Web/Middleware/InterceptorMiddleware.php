@@ -83,8 +83,8 @@ final class InterceptorMiddleware implements MiddlewareInterface
             $response = $handler->handle($request);
         }
 
-        /** @var FilterInterface $filter */
         while ($filter = array_pop($stack)) {
+            /** @var FilterInterface $filter */
             $response = $filter->after($request, $response);
         }
 
@@ -96,7 +96,7 @@ final class InterceptorMiddleware implements MiddlewareInterface
      */
     private function before(string $class, ServerRequestInterface $request, array &$stack, array &$middlewares)
     {
-        /** @var FilterInterface $filter */
+        /** @var FilterInterface */
         $filter = $this->container->get($class);
         $result = $filter->before($request);
         if ($result === true || $result instanceof ResponseInterface) {

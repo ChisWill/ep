@@ -16,14 +16,6 @@ final class ConsoleRequest implements ConsoleRequestInterface
         $this->input = $input;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getInput(): InputInterface
-    {
-        return $this->input;
-    }
-
     private ?string $route = null;
 
     /**

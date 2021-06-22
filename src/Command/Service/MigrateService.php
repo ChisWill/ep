@@ -31,21 +31,19 @@ final class MigrateService extends Service
 
         $this->generateService = $generateService;
         $this->tableName = $this->config->migrationTableName;
-
-        $this->init();
     }
 
     private string $migratePath;
     private string $basePath;
     private MigrateBuilder $builder;
 
-    private function init(): void
+    public function init(array $options): void
     {
-        $options = $this->request->getOptions();
+        parent::init($options);
 
         $this->migratePath = $options['path'] ?? $options['migrate.path'] ?? 'Migration';
         $this->basePath = $this->getAppPath() . '/' . trim($this->migratePath, '/');
-        $this->builder = new MigrateBuilder($this->db, $this->consoleService);
+        $this->builder = new MigrateBuilder($this->getDb(), $this->consoleService);
     }
 
     public function new(): void
@@ -59,10 +57,10 @@ final class MigrateService extends Service
     {
         $this->createTable();
 
-        $dbService = new DbService($this->db);
+        $dbService = new DbService($this->getDb());
         $upSql = '';
         $downSql = '';
-        $tables = $dbService->getTables($this->request->getOption('prefix') ?: '');
+        $tables = $dbService->getTables($this->options['prefix'] ?? '');
         foreach ($tables as $tableName) {
             if ($tableName !== $this->tableName) {
                 $upSql .= $dbService->getDDL($tableName) . ";\n";
@@ -78,8 +76,8 @@ final class MigrateService extends Service
 
     public function up(): void
     {
-        $this->all = $this->request->getOption('all');
-        $this->step = (int) ($this->request->getOption('step') ?: 0);
+        $this->all = $this->options['all'];
+        $this->step = (int) ($this->options['step'] ?? 0);
 
         $this->migrate('up', function (array $classList): void {
             $count = count($classList);
@@ -101,8 +99,8 @@ final class MigrateService extends Service
 
     public function down(): void
     {
-        $this->all = $this->request->getOption('all');
-        $this->step = $this->all ? 0 : (int) ($this->request->getOption('step') ?: 1);
+        $this->all = $this->options['all'];
+        $this->step = $this->all ? 0 : (int) ($this->options['step'] ?? 1);
 
         $this->migrate('down', function (array $classList): void {
             $count = count($classList);
@@ -125,7 +123,7 @@ final class MigrateService extends Service
         if ($this->all && $method === 'up') {
             $history = [];
         } else {
-            $history = Query::find($this->db)
+            $history = Query::find($this->getDb())
                 ->select('version')
                 ->from($this->tableName)
                 ->column();
@@ -145,7 +143,7 @@ final class MigrateService extends Service
         }
 
         $classList = [];
-        $transaction = $this->db->beginTransaction();
+        $transaction = $this->getDb()->beginTransaction();
         $count = 0;
         foreach ($files as $file) {
             if ($this->step > 0 && $count === $this->step) {

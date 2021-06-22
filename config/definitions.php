@@ -5,8 +5,6 @@ declare(strict_types=1);
 use Ep\Base\Config;
 use Ep\Base\Container;
 use Ep\Base\Injector;
-use Ep\Console\ConsoleResponse;
-use Ep\Contract\ConsoleResponseInterface;
 use Ep\Contract\ErrorRendererInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Contract\NotFoundHandlerInterface;
@@ -85,7 +83,6 @@ return [
         ]));
         return $application;
     },
-    ConsoleResponseInterface::class => ConsoleResponse::class,
     InputInterface::class => static fn (): InputInterface => new ArgvInput(null, null),
     OutputInterface::class => ConsoleOutput::class,
     // View

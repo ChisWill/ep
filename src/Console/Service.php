@@ -50,12 +50,12 @@ final class Service
 
     public function status(int $code): ConsoleResponseInterface
     {
-        return $this->factory->createResponse($this->output)->withCode($code);
+        return $this->factory->createResponse($this->output)->setCode($code);
     }
 
     public function write(string $message = '', int $options = 0): void
     {
-        $this->output->write($message, $options);
+        $this->output->write($message, false, $options);
     }
 
     public function writeln(string $message = '', int $options = 0): void
@@ -65,7 +65,7 @@ final class Service
 
     public function confirm(string $message, bool $default = false): bool
     {
-        /** @var QuestionHelper $helper */
+        /** @var QuestionHelper */
         $helper = $this->getHelper('question');
         $question = new ConfirmationQuestion($message . ' [<comment>' . ($default ? 'Yes' : 'No') . '</>] ', $default);
         return $helper->ask($this->input, $this->output, $question);
@@ -73,20 +73,16 @@ final class Service
 
     public function prompt(string $message, string $default = '', bool $hidden = false): string
     {
-        /** @var QuestionHelper $helper */
+        /** @var QuestionHelper */
         $helper = $this->getHelper('question');
         $question = new Question($message, $default);
-        if ($hidden) {
-            $question->setHidden(true);
-        }
+        $question->setHidden($hidden);
         return $helper->ask($this->input, $this->output, $question);
     }
 
     public function renderTable(array $headers, array $rows): void
     {
-        $helper = new Table($this->output);
-
-        $helper
+        (new Table($this->output))
             ->setHeaders($headers)
             ->setRows($rows)
             ->render();

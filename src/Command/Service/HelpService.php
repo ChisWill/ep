@@ -67,7 +67,6 @@ final class HelpService extends Service
 
             protected function configure(): void
             {
-                /** @var CommandDefinition[] $definitions */
                 $definitions = $this->data->command->getDefinitions();
                 if (array_key_exists($this->data->actionId, $definitions)) {
                     $this

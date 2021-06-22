@@ -47,8 +47,10 @@ final class MigrateCommand extends Command
     /**
      * 创建一个迁移记录
      */
-    public function newAction(): ConsoleResponseInterface
+    public function newAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
+        $this->service->init($request->getOptions());
+
         $this->service->new();
 
         return $this->success();
@@ -57,8 +59,10 @@ final class MigrateCommand extends Command
     /**
      * 初始化所有表结构
      */
-    public function ddlAction(): ConsoleResponseInterface
+    public function ddlAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
+        $this->service->init($request->getOptions());
+
         $this->service->ddl();
 
         return $this->success();
@@ -73,6 +77,8 @@ final class MigrateCommand extends Command
             return $this->success('Skipped.');
         }
 
+        $this->service->init($request->getOptions());
+
         $this->service->up();
 
         return $this->success();
@@ -86,6 +92,8 @@ final class MigrateCommand extends Command
         if ($request->getOption('all') && !$this->confirm('Are you sure downgrade all migrations?')) {
             return $this->success('Skipped.');
         }
+
+        $this->service->init($request->getOptions());
 
         $this->service->down();
 

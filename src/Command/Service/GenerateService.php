@@ -39,11 +39,13 @@ final class GenerateService extends Service
 
     public function initModel(array $options): void
     {
+        $this->init($options);
+
         $this->table = $options['table'];
         $this->path = $options['path'] ?? $options['generate.model.path'] ?? 'Model';
         $this->prefix = $options['prefix'] ?? $options['generate.model.prefix'] ?? '';
 
-        $tableSchema = $this->db->getTableSchema($this->table);
+        $tableSchema = $this->getDb()->getTableSchema($this->table);
         if (!$tableSchema) {
             $this->invalid('table', $this->table);
         }
@@ -110,7 +112,7 @@ final class GenerateService extends Service
 
     private function getTableName(): string
     {
-        return substr($this->table, strlen($this->db->getTablePrefix()));
+        return substr($this->table, strlen($this->getDb()->getTablePrefix()));
     }
 
     private function getModelClassName(): string

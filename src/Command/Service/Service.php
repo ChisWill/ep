@@ -7,7 +7,6 @@ namespace Ep\Command\Service;
 use Ep;
 use Ep\Base\Config;
 use Ep\Console\Service as ConsoleService;
-use Ep\Contract\ConsoleRequestInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Factory\Exception\NotFoundException;
@@ -20,7 +19,6 @@ abstract class Service
 {
     protected ContainerInterface $container;
     protected Config $config;
-    protected ConsoleRequestInterface $request;
     protected ConsoleService $consoleService;
     protected Aliases $aliases;
 
@@ -28,33 +26,38 @@ abstract class Service
     {
         $this->container = $container;
         $this->config = $container->get(Config::class);
-        $this->request = $container->get(ConsoleRequestInterface::class);
         $this->consoleService = $container->get(ConsoleService::class);
         $this->aliases = $container->get(Aliases::class);
-
-        $this->init();
     }
 
-    protected Connection $db;
+    protected array $options;
     protected string $userAppNamespace;
     protected string $userCommandDirAndSuffix;
     protected string $userActionSuffix;
     protected string $userDefaultAction;
 
-    private function init(): void
+    public function init(array $options): void
     {
-        $options = $this->request->getOptions();
+        $this->options = $options;
         $this->userAppNamespace = $options['user.appNamespace'];
         $this->userCommandDirAndSuffix = $options['user.commandDirAndSuffix'];
         $this->userActionSuffix = $options['user.actionSuffix'];
         $this->userDefaultAction = $options['user.defaultAction'];
+    }
 
-        $db = $options['db'] ?? $options['common.db'] ?? null;
-        try {
-            $this->db = Ep::getDb($db);
-        } catch (NotFoundException $e) {
-            $this->invalid('db', $db);
+    protected ?Connection $db = null;
+
+    protected function getDb(): Connection
+    {
+        if ($this->db === null) {
+            $db = $this->options['db'] ?? $this->options['common.db'] ?? null;
+            try {
+                $this->db = Ep::getDb($db);
+            } catch (NotFoundException $e) {
+                $this->invalid('db', $db);
+            }
         }
+        return $this->db;
     }
 
     protected function getEpConfig(): array

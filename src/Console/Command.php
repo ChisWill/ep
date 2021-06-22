@@ -38,6 +38,9 @@ abstract class Command implements ControllerInterface
 
     private array $definitions = [];
 
+    /**
+     * @return CommandDefinition[]
+     */
     public function getDefinitions(): array
     {
         return $this->definitions;

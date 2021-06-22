@@ -44,7 +44,7 @@ class ControllerRunner implements ConfigurableInterface
 
         $module = $this->createModule($prefix);
 
-        $controller = $this->createController($class, $actionId, $request);
+        $controller = $this->createController($class, $actionId);
 
         $action = $this->createAction($actionId);
 
@@ -69,10 +69,7 @@ class ControllerRunner implements ConfigurableInterface
         }
     }
 
-    /**
-     * @param mixed $request
-     */
-    protected function createController(string $class, string $actionId, $request): ControllerInterface
+    protected function createController(string $class, string $actionId): ControllerInterface
     {
         if (!class_exists($class)) {
             throw new NotFoundException("{$class} is not found.");

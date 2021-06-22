@@ -50,8 +50,8 @@ final class Annotate
         if ($exists) {
             $reflectionClass = new ReflectionClass($instance);
             $annotations = $this->reader->getClassAnnotations($reflectionClass);
-            /** @var AnnotationInterface $annotation */
             foreach ($annotations as $annotation) {
+                /** @var AnnotationInterface $annotation */
                 $annotation->process($instance, $reflectionClass);
             }
         }
@@ -78,8 +78,8 @@ final class Annotate
 
         foreach ($properties as $property) {
             $annotations = $this->reader->getPropertyAnnotations($property);
-            /** @var AnnotationInterface $annotation */
             foreach ($annotations as $annotation) {
+                /** @var AnnotationInterface $annotation */
                 $annotation->process($instance, $property, $arguments);
             }
         }
@@ -105,8 +105,8 @@ final class Annotate
         $fn = fn () => $this->injector->invoke([$instance, $method], $arguments);
         if (isset($reflectionMethod)) {
             $annotations = $this->reader->getMethodAnnotations($reflectionMethod);
-            /** @var AnnotationInterface $annotation */
             foreach ($annotations as $annotation) {
+                /** @var AnnotationInterface $annotation */
                 $result = $annotation->process($instance, new ReflectionFunction($fn), $arguments);
                 if ($result === false) {
                     return false;
