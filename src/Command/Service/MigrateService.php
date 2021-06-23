@@ -200,7 +200,7 @@ final class MigrateService extends Service
             File::mkdir($this->basePath);
         }
 
-        $namespace = $this->userAppNamespace . '\\' . $this->migratePath;
+        $namespace = $this->userAppNamespace . '\\' . trim(str_replace('/', '\\', $this->migratePath), '/');
 
         $params['className'] = $className;
         $params['namespace'] = $namespace;
