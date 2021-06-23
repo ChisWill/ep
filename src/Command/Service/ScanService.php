@@ -41,6 +41,9 @@ final class ScanService extends Service
     {
         $data = [];
         foreach ($classes as $class) {
+            if (!class_exists($class)) {
+                continue;
+            }
             $reflectionClass = new ReflectionClass($class);
             $properties = $reflectionClass->getProperties();
             $methods = $reflectionClass->getMethods();
