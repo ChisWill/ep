@@ -9,6 +9,8 @@ use Ep;
 use Ep\Base\Config;
 use Ep\Db\Query;
 use Ep\Tests\App\Component\Controller;
+use Ep\Tests\App\Facade\Cache as FacadeCache;
+use Ep\Tests\App\Facade\Logger;
 use Ep\Tests\App\Form\TestForm;
 use Ep\Tests\App\Model\User;
 use Ep\Web\ServerRequest;
@@ -260,6 +262,19 @@ class DemoController extends Controller
             'count' => $count,
             'all' => $query->getPaginator()->all((int) $page, 3),
         ];
+    }
+
+    public function facadeAction()
+    {
+        FacadeCache::set('a', 123);
+        $r = FacadeCache::get('a');
+        Logger::alert('alaa');
+        $alert = Ep::getLogger('alert');
+        Logger::swap($alert);
+        Logger::alert('i am alert');
+        Logger::clear();
+        Logger::alert('i am reset');
+        return $r;
     }
 
     public function testAction()
