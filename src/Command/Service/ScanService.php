@@ -30,7 +30,7 @@ final class ScanService extends Service
 
     public function annotation(): void
     {
-        $classes = array_map([$this, 'getClassNameByFile'], $this->findClassFiles($this->getAppPath()));
+        $classes = array_map([$this, 'getClassNameByFile'], $this->findClassFiles($this->getAppPath(), $this->options['ignore']));
 
         $this->consoleService->progress(fn ($progressBar) => $this->cacheAnnotations($classes, $progressBar), count($classes));
 

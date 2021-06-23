@@ -95,14 +95,13 @@ abstract class Service
             }
             $content = json_decode(file_get_contents($composerPath), true);
             $autoload = ($content['autoload']['psr-4'] ?? []) + ($content['autoload-dev']['psr-4'] ?? []);
-            $appPath = null;
             foreach ($autoload as $ns => $path) {
                 if ($ns === $this->userAppNamespace . '\\') {
                     $appPath = $path;
                     break;
                 }
             }
-            if ($appPath === null) {
+            if (!isset($appPath)) {
                 $this->throw('You should set the "autoload[psr-4]" configuration in your composer.json first.');
             }
             $this->appPath = str_replace('\\', '/', $vendorDirname . '/' . $appPath);
@@ -116,10 +115,10 @@ abstract class Service
         return str_replace([$this->getAppPath(), '.php', '/'], [$this->userAppNamespace, '', '\\'], $file);
     }
 
-    protected function findClassFiles(string $path): array
+    protected function findClassFiles(string $path, array $exceptPatterns = []): array
     {
         return FileHelper::findFiles($path, [
-            'filter' => (new PathMatcher())->only('**.php')
+            'filter' => (new PathMatcher())->only('**.php')->except(...$exceptPatterns)
         ]);
     }
 

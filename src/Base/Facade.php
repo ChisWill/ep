@@ -9,23 +9,23 @@ use LogicException;
 
 abstract class Facade
 {
-    protected static array $instances = [];
+    private static array $instances = [];
 
     public static function __callStatic($name, $arguments)
     {
-        $instance = static::getInstance();
+        $instance = self::getInstance();
 
         return $instance->$name(...$arguments);
     }
 
     public static function swap(object $instance): void
     {
-        static::$instances[static::getFacadeAccessor()] = $instance;
+        self::$instances[static::getFacadeAccessor()] = $instance;
     }
 
     public static function clear(): void
     {
-        unset(static::$instances[static::getFacadeAccessor()]);
+        unset(self::$instances[static::getFacadeAccessor()]);
     }
 
     protected static function getFacadeAccessor(): string
@@ -37,10 +37,10 @@ abstract class Facade
     {
         $id = static::getFacadeAccessor();
 
-        if (isset(static::$instances[$id])) {
-            return static::$instances[$id];
+        if (isset(self::$instances[$id])) {
+            return self::$instances[$id];
         }
 
-        return static::$instances[$id] = Ep::getDi()->get($id);
+        return self::$instances[$id] = Ep::getDi()->get($id);
     }
 }

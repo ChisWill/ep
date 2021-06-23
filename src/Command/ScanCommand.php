@@ -8,6 +8,7 @@ use Ep\Command\Service\ScanService;
 use Ep\Console\Command;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 final class ScanCommand extends Command
 {
@@ -17,7 +18,10 @@ final class ScanCommand extends Command
     {
         $this->service = $service;
 
-        $this->setDefinition('annotation')->setDescription('Scan root path to generate annotation cache');
+        $this->setDefinition('annotation', [
+            new InputOption('ignore', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'The pattern to ignore files')
+        ])
+            ->setDescription('Scan root path to generate annotation cache');
     }
 
     public function annotationAction(ConsoleRequestInterface $request): ConsoleResponseInterface
