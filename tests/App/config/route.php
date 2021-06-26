@@ -10,4 +10,5 @@ return function (RouteCollector $route) {
     $route->get('/site', 'index/index');
     $route->get('/ping', [StateController::class, 'ping']);
     $route->get('/advance/say', [AdTestController::class, 'say']);
+    $route->get('/advance/run', [AdTestController::class, 'run']);
 };

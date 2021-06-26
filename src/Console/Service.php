@@ -10,6 +10,7 @@ use Symfony\Component\Console\Helper\HelperInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -18,17 +19,20 @@ use Symfony\Component\Console\Question\Question;
 final class Service
 {
     private SymfonyApplication $symfonyApplication;
+    private ControllerRunner $controllerRunner;
     private InputInterface $input;
     private OutputInterface $output;
     private Factory $factory;
 
     public function __construct(
         SymfonyApplication $symfonyApplication,
+        ControllerRunner $controllerRunner,
         InputInterface $input,
         OutputInterface $output,
         Factory $factory
     ) {
         $this->symfonyApplication = $symfonyApplication;
+        $this->controllerRunner = $controllerRunner;
         $this->input = $input;
         $this->output = $output;
         $this->factory = $factory;
@@ -102,5 +106,14 @@ final class Service
     public function getHelper(string $name): HelperInterface
     {
         return $this->symfonyApplication->getHelperSet()->get($name);
+    }
+
+    public function call(string $command, array $arguments = []): int
+    {
+        $input = new ArrayInput(compact('command') + $arguments);
+
+        return $this->controllerRunner
+            ->withInput($input)
+            ->run($command, $this->factory->createRequest($input));
     }
 }

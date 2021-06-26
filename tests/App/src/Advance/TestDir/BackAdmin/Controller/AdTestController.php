@@ -12,4 +12,9 @@ final class AdTestController extends Controller
     {
         return $this->render('index');
     }
+
+    public function runAction()
+    {
+        return $this->string('I am running');
+    }
 }

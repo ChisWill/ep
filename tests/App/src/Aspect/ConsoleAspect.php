@@ -12,19 +12,8 @@ use Ep\Contract\HandlerInterface;
 
 class ConsoleAspect implements AspectInterface
 {
-    /**
-     * @Inject
-     */
-    private ConsoleRequestInterface $request;
-
-    /**
-     * @Inject
-     */
-    private ConsoleResponseInterface $response;
-
     public function process(HandlerInterface $handler)
     {
-        $this->response->writeln('aspect start');
         /** @var ConsoleResponseInterface */
         $response = $handler->handle();
         $response->writeln('aspect after');

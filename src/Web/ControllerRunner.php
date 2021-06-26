@@ -25,6 +25,11 @@ final class ControllerRunner extends BaseControllerRunner
         $this->service = $service;
     }
 
+    protected function getControllerSuffix(): string
+    {
+        return $this->config->controllerDirAndSuffix;
+    }
+
     /**
      * @param  ServerRequestInterface $request
      * 

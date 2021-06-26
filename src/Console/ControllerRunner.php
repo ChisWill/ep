@@ -36,16 +36,36 @@ final class ControllerRunner extends BaseControllerRunner
         $this->output = $output;
     }
 
+    public function withInput(InputInterface $input): self
+    {
+        $new = clone $this;
+        $new->input = $input;
+        return $new;
+    }
+
+    public function withOutput(OutputInterface $output): self
+    {
+        $new = clone $this;
+        $new->output = $output;
+        return $new;
+    }
+
+    protected function getControllerSuffix(): string
+    {
+        return $this->config->commandDirAndSuffix;
+    }
+
+    private bool $runned = false;
+
     /**
      * {@inheritDoc}
      */
     protected function runModule(ModuleInterface $module, ControllerInterface $command, string $action, $request)
     {
-        $this->symfonyApplication->add($this->wrapCommand($command, $request, fn () => parent::runModule($module, $command, $action, $request)));
-
-        $this->symfonyApplication->running = true;
-
-        return $this->symfonyApplication->run($this->input, $this->output);
+        $this->runned = true;
+        return $this->runCommand(
+            $this->wrapCommand($command, $request, fn () => parent::runModule($module, $command, $action, $request))
+        );
     }
 
     /**
@@ -53,12 +73,28 @@ final class ControllerRunner extends BaseControllerRunner
      */
     protected function runAction(ControllerInterface $command, string $action, $request)
     {
-        if (!empty($this->symfonyApplication->running)) {
+        if ($this->runned) {
+            $this->runned = false;
             return parent::runAction($command, $action, $request);
         } else {
-            $this->symfonyApplication->add($this->wrapCommand($command, $request, fn () => parent::runAction($command, $action, $request)));
+            return $this->runCommand(
+                $this->wrapCommand($command, $request, fn () => parent::runAction($command, $action, $request))
+            );
+        }
+    }
+
+    private function runCommand(SymfonyCommand $command): int
+    {
+        if (empty($this->symfonyApplication->running)) {
+            $this->symfonyApplication->add($command);
+
+            $this->symfonyApplication->running = true;
 
             return $this->symfonyApplication->run($this->input, $this->output);
+        } else {
+            $command->setApplication($this->symfonyApplication);
+
+            return $command->run($this->input, $this->output);
         }
     }
 

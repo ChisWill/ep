@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
-use Ep\Contract\ConfigurableInterface;
-use Ep\Contract\ConfigurableTrait;
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Contract\ModuleInterface;
@@ -14,15 +12,11 @@ use Ep\Helper\Str;
 use Psr\Container\ContainerInterface;
 use InvalidArgumentException;
 
-class ControllerRunner implements ConfigurableInterface
+abstract class ControllerRunner
 {
-    use ConfigurableTrait;
-
-    protected ?string $suffix = null;
-
-    private ContainerInterface $container;
-    private Config $config;
-    private InjectorInterface $injector;
+    protected ContainerInterface $container;
+    protected Config $config;
+    protected InjectorInterface $injector;
 
     public function __construct(ContainerInterface $container)
     {
@@ -32,8 +26,8 @@ class ControllerRunner implements ConfigurableInterface
     }
 
     /**
-     * @param  mixed $handler
-     * @param  mixed $request
+     * @param  string|array $handler
+     * @param  mixed        $request
      * 
      * @return mixed
      * @throws NotFoundException
@@ -61,7 +55,7 @@ class ControllerRunner implements ConfigurableInterface
         if (strpos($prefix, '\\\\') !== false) {
             $prefix = explode('\\\\', trim($prefix, '\\'))[0];
         }
-        $class = $this->config->appNamespace . '\\' . ($prefix ? $prefix . '\\' : '') . $this->suffix . '\\' . $this->config->moduleName;
+        $class = $this->config->appNamespace . '\\' . ($prefix ? $prefix . '\\' : '') . $this->getControllerSuffix() . '\\' . $this->config->moduleName;
         if (class_exists($class)) {
             return $this->container->get($class);
         } else {
@@ -198,14 +192,6 @@ class ControllerRunner implements ConfigurableInterface
         return [$prefix, $class, $action];
     }
 
-    private function getControllerSuffix(): string
-    {
-        if ($this->suffix === null) {
-            $this->suffix = $this->config->controllerDirAndSuffix;
-        }
-        return $this->suffix;
-    }
-
     private function generateContextId(string $class): string
     {
         return implode('/', array_filter(
@@ -215,4 +201,6 @@ class ControllerRunner implements ConfigurableInterface
             ))
         ));
     }
+
+    abstract protected function getControllerSuffix(): string;
 }
