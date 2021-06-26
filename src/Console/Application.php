@@ -69,9 +69,8 @@ final class Application
 
     public function handleRequest(ConsoleRequestInterface $request): void
     {
+        $route = $request->getRoute();
         try {
-            $route = $request->getRoute();
-
             [, $handler] = $this->route
                 ->configure([
                     'rule' => $this->config->getRouteRule(),
