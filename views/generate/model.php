@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace <?= $namespace ?>;
 
-use Ep\Db\ActiveRecord;
-<?= $rules[0] ?>
+<?= $use ?>
 
 /**
 <?= $property ?>
@@ -19,20 +18,13 @@ class <?= $className ?> extends ActiveRecord
         return '{{%<?= $tableName ?>}}';
     }
 
-    public function rules(): array
+    final protected function rules(): array
     {
-<?php if ($rules[1]): ?>
-        return [
-<?php foreach ($rules[1] as $field => $items): ?>
-            '<?= $field ?>' => [
-    <?php foreach ($items as $rule): ?>
-            <?= $rule ?>,
-    <?php endforeach ?>
-        ],
-<?php endforeach ?>
-        ];
-<?php else: ?>
+        <?= $rules ?>
+    }
+
+    protected function userRules(): array
+    {
         return [];
-<?php endif ?>
     }
 }

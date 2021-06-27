@@ -18,20 +18,27 @@ use Yiisoft\Validator\Rule\{
  */
 class UserParent extends ActiveRecord
 {
+    public const PK = ['id', 'gid'];
+
     public function tableName(): string
     {
         return '{{%user_parent}}';
     }
 
-    public function rules(): array
+    final protected function rules(): array
     {
-        return [
+        return $this->userRules() + [
             'username' => [
-                (HasLength::rule())->max(255)->skipOnEmpty(true),
+                (HasLength::rule())->max(50)->skipOnEmpty(true),
             ],
             'age' => [
                 (Number::rule())->integer()->skipOnEmpty(true),
             ],
         ];
+    }
+
+    protected function userRules(): array
+    {
+        return [];
     }
 }

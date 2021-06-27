@@ -45,7 +45,7 @@ final class GenerateService extends Service
         $this->path = $options['path'] ?? $options['generate.model.path'] ?? 'Model';
         $this->prefix = $options['prefix'] ?? $options['generate.model.prefix'] ?? '';
 
-        $tableSchema = $this->getDb()->getTableSchema($this->table);
+        $tableSchema = $this->getDb()->getTableSchema($this->table, true);
         if (!$tableSchema) {
             $this->invalid('table', $this->table);
         }
@@ -58,13 +58,15 @@ final class GenerateService extends Service
         if (!file_exists($filePath)) {
             File::mkdir($filePath);
         }
+        [$use, $rules] = $this->getModelRuleData();
         if (@file_put_contents($this->getModelFileName(), $this->render('model', [
             'namespace' => $this->getNamespace(),
             'primaryKey' => $this->getPrimaryKey(),
             'tableName' => $this->getTableName(),
             'className' => $this->getModelClassName(),
             'property' => $this->getModelProperty(),
-            'rules' => $this->getModelRules()
+            'use' => $this->getModelUseStatement($use),
+            'rules' => $this->getModelRules($rules)
         ]))) {
             $this->consoleService->writeln(sprintf('The file "%s.php" has been created in "%s".', $this->getModelClassName(), $filePath));
         } else {
@@ -75,12 +77,13 @@ final class GenerateService extends Service
     public function updateModel(): void
     {
         $filename = $this->getModelFileName();
-        $rules = [
-            '~(/\*\*\s).+( \*/\sclass)~s' => '$1' . $this->getModelProperty() . '$2',
-            '~(public const PK = ).+(;)~' => '$1' . $this->getPrimaryKey() . '$2',
+        [, $rules] = $this->getModelRuleData();
+        $replace = [
+            '~(/\*\*\s).+( \*/\sclass)~Us' => '$1' . $this->getModelProperty() . '$2',
+            '~(const PK = ).+(;)~U' => '$1' . $this->getPrimaryKey() . '$2',
+            '~(function rules\(\): array\s+\{\s+)return.*;\s(\s+\})~Us' => '$1' . $this->getModelRules($rules) . '$2'
         ];
-        $content = preg_replace(array_keys($rules), array_values($rules), file_get_contents($filename));
-        if (@file_put_contents($filename, $content)) {
+        if (@file_put_contents($filename, preg_replace(array_keys($replace), array_values($replace), file_get_contents($filename), 1))) {
             $this->consoleService->writeln(sprintf('%s.php has been overrided in %s', $this->getModelClassName(), $this->getFilePath()));
         } else {
             $this->consoleService->writeln('Overwrite model failed.');
@@ -129,10 +132,7 @@ final class GenerateService extends Service
         return $property;
     }
 
-    /**
-     * @return string[]
-     */
-    private function getModelRules(): array
+    private function getModelRuleData(): array
     {
         $fields = [];
         $types = [];
@@ -210,6 +210,30 @@ final class GenerateService extends Service
             }
         }
         return [$use, $rules];
+    }
+
+    private function getModelUseStatement(string $use): string
+    {
+        return "use Ep\Db\ActiveRecord;\n" . $use;
+    }
+
+    private function getModelRules(array $rules): string
+    {
+        $string = 'return $this->userRules() + ';
+        if ($rules) {
+            $string .= "[\n";
+            foreach ($rules as $field => $items) {
+                $string .= sprintf("%s'%s' => [\n", str_repeat(' ', 12), $field);
+                foreach ($items as $rule) {
+                    $string .= str_repeat(' ', 16) . $rule . ",\n";
+                }
+                $string .= str_repeat(' ', 12) . "],\n";
+            }
+            $string .= str_repeat(' ', 8) . '];';
+        } else {
+            $string .= '[];';
+        }
+        return $string . "\n";
     }
 
     private function getFilePath(): string

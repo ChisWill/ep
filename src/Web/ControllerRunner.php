@@ -8,7 +8,6 @@ use Ep\Base\ControllerRunner as BaseControllerRunner;
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\ModuleInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Closure;
 

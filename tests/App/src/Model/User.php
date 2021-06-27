@@ -6,12 +6,15 @@ namespace Ep\Tests\App\Model;
 
 use Ep\Db\ActiveRecord;
 use Yiisoft\Validator\Result;
+use Yiisoft\Validator\Rule\{
+    Number,
+    HasLength,
+    Email,
+};
+use Yiisoft\Validator\ValidationContext;
 use Yiisoft\Validator\Rule\Callback;
-use Yiisoft\Validator\Rule\HasLength;
 use Yiisoft\Validator\Rule\InRange;
 use Yiisoft\Validator\Rule\MatchRegularExpression;
-use Yiisoft\Validator\Rule\Number;
-use Yiisoft\Validator\ValidationContext;
 
 /**
  * @property string $id
@@ -33,7 +36,35 @@ class User extends ActiveRecord
         return 'user';
     }
 
-    public function rules(string $scene = null): array
+    final protected function rules(): array
+    {
+        return $this->userRules() + [
+            'pid' => [
+                (Number::rule())->integer()->skipOnEmpty(true),
+            ],
+            'name' => [
+                (HasLength::rule())->max(255)->skipOnEmpty(true),
+            ],
+            'username' => [
+                (HasLength::rule())->max(220)->skipOnEmpty(true),
+            ],
+            'password' => [
+                (HasLength::rule())->max(200)->skipOnEmpty(true),
+            ],
+            'sex' => [
+                (Number::rule())->integer()->skipOnEmpty(true),
+            ],
+            'age' => [
+                (Number::rule())->skipOnEmpty(true),
+            ],
+            'email' => [
+                (HasLength::rule())->max(255)->skipOnEmpty(true),
+                (Email::rule())->skipOnEmpty(true),
+            ],
+        ];
+    }
+
+    protected function userRules(): array
     {
         return [
             'age' => [
