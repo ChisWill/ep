@@ -44,9 +44,6 @@ final class MigrateCommand extends Command
             ->setDescription('Downgrades old migrations');
     }
 
-    /**
-     * 创建一个迁移记录
-     */
     public function newAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
         $this->service->init($request->getOptions());
@@ -56,9 +53,6 @@ final class MigrateCommand extends Command
         return $this->success();
     }
 
-    /**
-     * 初始化所有表结构
-     */
     public function ddlAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
         $this->service->init($request->getOptions());
@@ -68,9 +62,6 @@ final class MigrateCommand extends Command
         return $this->success();
     }
 
-    /**
-     * 执行所有还未同步的迁移
-     */
     public function upAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
         if ($request->getOption('all') && !$this->confirm('Are you sure apply all migrations?')) {
@@ -84,9 +75,6 @@ final class MigrateCommand extends Command
         return $this->success();
     }
 
-    /**
-     * 回退已执行过的迁移
-     */
     public function downAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
         if ($request->getOption('all') && !$this->confirm('Are you sure downgrade all migrations?')) {

@@ -21,9 +21,6 @@ final class ClearCommand extends Command
         $this->setDefinition('index')->setDescription('Clear runtime cache');
     }
 
-    /**
-     * 清除缓存
-     */
     public function indexAction(Aliases $aliases): ConsoleResponseInterface
     {
         $runtimeDir = $aliases->get($this->config->runtimeDir);

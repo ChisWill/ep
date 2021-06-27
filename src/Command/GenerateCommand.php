@@ -28,9 +28,6 @@ final class GenerateCommand extends Command
             ->setDescription('Generate model');
     }
 
-    /**
-     * 生成模型
-     */
     public function modelAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
         foreach ($request->getArgument('table') as $table) {
