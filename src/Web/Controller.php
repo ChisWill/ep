@@ -46,9 +46,12 @@ abstract class Controller implements ControllerInterface
         return $this->service;
     }
 
-    protected function string(string $data = '', int $statusCode = Status::OK): ResponseInterface
+    /**
+     * @param mixed $data
+     */
+    protected function string($data = '', int $statusCode = Status::OK): ResponseInterface
     {
-        return $this->getService()->string($data, $statusCode);
+        return $this->getService()->string((string) $data, $statusCode);
     }
 
     /**

@@ -98,6 +98,7 @@ class TestController extends Controller
 
     public function tAction(ServerRequest $serverRequest)
     {
+        return $this->string();
     }
 
     /**
@@ -111,12 +112,12 @@ class TestController extends Controller
 
     public function testUrlAction(ServerRequest $serverRequest)
     {
-        return [
+        return $this->json([
             $serverRequest->getCurrentUrl(),
             $serverRequest->getCurrentUrl('/test/shop/admin'),
             $serverRequest->getCurrentUrl('', ['a' => 1, 'b' => 'abc']),
             $serverRequest->getCurrentUrl('/test/shop/admin', ['a' => 1, 'b' => 'abc'])
-        ];
+        ]);
     }
 
     public function attrAction(ServerRequest $serverRequest)
@@ -161,17 +162,19 @@ class TestController extends Controller
         $composite->attach($third);
 
 
-        return [
-            'result' => $composite->get(MegaBird::class)
-        ];
+        return $this->json([
+            'result' => $composite->get(AngelWing::class)
+        ]);
     }
 
     public function mapAction()
     {
-        return User::find()
+        $map = User::find()
             ->joinWith('parent')
             ->where('user.age > 100')
             ->map('parent.id', 'user.age');
+
+        return $this->json($map);
     }
 
     public function lockAction(Connection $redis)
@@ -180,9 +183,9 @@ class TestController extends Controller
             Query::find()->update('user', ['age' => new Expression('age+1')], ['AND', ['id' => 2], ['<', 'age', 100]]);
         }, 1000);
 
-        return [
+        return $this->json([
             'r' => $r
-        ];
+        ]);
     }
 
     private function lock(callable $callback, int $expire = 1, int $count = 1)
@@ -214,10 +217,6 @@ class TestController extends Controller
         return !!$ok;
     }
 
-    public function emptyAction()
-    {
-    }
-
     /**
      * @LoggerAspect
      * @Aspect(class=EchoIntAspect::class)
@@ -229,21 +228,23 @@ class TestController extends Controller
 
     public function arrayAction(ServerRequestInterface $request)
     {
-        return [
+        return $this->json([
             'state' => 1,
             'data' => [
                 'msg' => 'ok'
             ],
             'query' => $request->getQueryParams(),
             'attributes' => $request->getAttributes()
-        ];
+        ]);
     }
 
     public function sqliteAction()
     {
         $db = Ep::getDb('sqlite');
 
-        return Query::find($db)->from('user')->all();
+        $result = Query::find($db)->from('user')->all();
+
+        return $this->json($result);
     }
 
     public function errorAction(ServerRequestInterface $request)

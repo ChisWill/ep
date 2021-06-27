@@ -51,22 +51,4 @@ final class Service
         return $this->responseFactory
             ->createResponse($statusCode);
     }
-
-    /**
-     * @param mixed $result
-     */
-    public function toResponse($result): ResponseInterface
-    {
-        if ($result instanceof ResponseInterface) {
-            return $result;
-        } elseif (is_array($result)) {
-            return $this->json($result);
-        } elseif ($result === false) {
-            return $this->status(Status::FORBIDDEN);
-        } elseif (is_scalar($result)) {
-            return $this->string((string) $result);
-        } else {
-            return $this->string();
-        }
-    }
 }

@@ -50,11 +50,6 @@ final class ControllerRunner extends BaseControllerRunner
         return $new;
     }
 
-    protected function getControllerSuffix(): string
-    {
-        return $this->config->commandDirAndSuffix;
-    }
-
     private bool $runned = false;
 
     /**
@@ -133,5 +128,13 @@ final class ControllerRunner extends BaseControllerRunner
                 return $response->getCode();
             }
         };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getControllerSuffix(): string
+    {
+        return $this->config->commandDirAndSuffix;
     }
 }
