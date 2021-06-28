@@ -64,7 +64,7 @@ final class ScanService extends Service
         }
 
         foreach ($data as $class => $value) {
-            $this->cache->set(Annotate::getAnnotationCacheKey($class), $value);
+            $this->cache->set(Annotate::getAnnotationCacheKey($class), $value, 86400 * 365 * 50);
         }
     }
 }
