@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\Db;
 
 use Ep\Widget\Paginator;
+use Closure;
 
 trait QueryTrait
 {
@@ -44,5 +45,24 @@ trait QueryTrait
             $command->getRawSql(),
             $command->getParams()
         );
+    }
+
+    protected function getBatchProducer(string $primaryKey, int &$startId): Closure
+    {
+        return function () use ($primaryKey, &$startId): array {
+            $query = clone $this;
+            $select = $query->getSelect();
+            if ($select && !in_array($primaryKey, $select)) {
+                $query->addSelect($primaryKey);
+            }
+            $data = $query
+                ->andWhere(['>', $primaryKey, $startId])
+                ->orderBy($primaryKey)
+                ->all();
+            if ($data) {
+                $startId = max(array_column($data, $primaryKey));
+            }
+            return $data;
+        };
     }
 }

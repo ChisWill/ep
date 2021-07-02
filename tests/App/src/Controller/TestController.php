@@ -98,7 +98,23 @@ class TestController extends Controller
 
     public function tAction(ServerRequest $serverRequest)
     {
-        return $this->string();
+    }
+
+    public function reduceAction(ServerRequest $serverRequest)
+    {
+        $n1 = 0;
+        $r1 = User::find()->limit(2)->select(['id', 'username', 'age'])->reduce($n1, function ($data) {
+            $ages = array_column($data, 'age');
+            return array_sum($ages);
+        });
+
+        $n2 = 0;
+        $r2 = Query::find()->from('user')->limit(2)->reduce($n2, function ($data) {
+            $ages = array_column($data, 'age');
+            return array_sum($ages);
+        });
+
+        return $this->json([$r1, $n1, $r2, $n2]);
     }
 
     /**

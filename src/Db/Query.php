@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Ep\Db;
 
 use Ep;
+use Ep\Helper\Batch;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\Query as BaseQuery;
+use LogicException;
 
 class Query extends BaseQuery
 {
@@ -86,5 +88,28 @@ class Query extends BaseQuery
             }
         }
         return $this->update($table, $columns, $condition, $params);
+    }
+
+    /**
+     * @param  callable[] $callbacks 最后一个参数如果是字符串，表示主键字段名称
+     * 
+     * @return mixed
+     * @throws LogicException
+     */
+    public function reduce(int &$startId = 0, ...$callbacks)
+    {
+        $count = count($callbacks);
+        if ($count === 0 || !is_callable($callbacks[0])) {
+            throw new LogicException('It must be at least one callback.');
+        }
+
+        if (is_string($callbacks[$count - 1])) {
+            $primaryKey = $callbacks[$count - 1];
+            array_pop($callbacks);
+        } else {
+            $primaryKey = ActiveRecord::PK;
+        }
+
+        return Batch::reduce($this->getBatchProducer($primaryKey, $startId), ...$callbacks);
     }
 }
