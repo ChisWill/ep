@@ -93,10 +93,9 @@ class Query extends BaseQuery
     /**
      * @param  callable[] $callbacks 最后一个参数如果是字符串，表示主键字段名称
      * 
-     * @return mixed
      * @throws LogicException
      */
-    public function reduce(int &$startId = 0, ...$callbacks)
+    public function reduce(int &$startId = 0, ...$callbacks): array
     {
         $count = count($callbacks);
         if ($count === 0 || !is_callable($callbacks[0])) {

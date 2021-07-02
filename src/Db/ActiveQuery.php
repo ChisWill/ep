@@ -31,10 +31,9 @@ class ActiveQuery extends BaseActiveQuery
     }
 
     /**
-     * @return mixed
      * @throws LogicException
      */
-    public function reduce(int &$startId, callable ...$callbacks)
+    public function reduce(int &$startId, callable ...$callbacks): array
     {
         $primaryKey = $this->getARClass()::PK;
         if (is_array($primaryKey)) {
