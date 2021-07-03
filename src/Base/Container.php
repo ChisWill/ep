@@ -28,7 +28,7 @@ final class Container implements ContainerInterface
         $instance = $this->container->get($id);
 
         if (!isset($this->map[$id])) {
-            $this->map[$id] = 1;
+            $this->map[$id] = true;
             $this->annotate->property($instance);
         }
 

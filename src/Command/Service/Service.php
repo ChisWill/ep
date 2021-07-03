@@ -39,10 +39,24 @@ abstract class Service
     public function init(array $options): void
     {
         $this->options = $options;
+
         $this->userAppNamespace = $options['user.appNamespace'];
         $this->userCommandDirAndSuffix = $options['user.commandDirAndSuffix'];
         $this->userActionSuffix = $options['user.actionSuffix'];
         $this->userDefaultAction = $options['user.defaultAction'];
+
+        $this->initDefaultOptions();
+    }
+
+    protected array $defaultOptions;
+
+    private function initDefaultOptions(): void
+    {
+        if (!empty($this->options['app'])) {
+            $this->defaultOptions = $this->options['apps'][$this->options['app']][$this->getId()] ?? [];
+        } else {
+            $this->defaultOptions = $this->options[$this->getId()] ?? [];
+        }
     }
 
     protected ?Connection $db = null;
@@ -50,7 +64,7 @@ abstract class Service
     protected function getDb(): Connection
     {
         if ($this->db === null) {
-            $db = $this->options['db'] ?? $this->options['common.db'] ?? null;
+            $db = $this->options['db'] ?? $this->defaultOptions['db'] ?? $this->options['common']['db'] ?? null;
             try {
                 $this->db = Ep::getDb($db);
             } catch (NotFoundException $e) {
@@ -136,4 +150,6 @@ abstract class Service
     {
         throw new InvalidArgumentException($message);
     }
+
+    abstract protected function getId(): string;
 }

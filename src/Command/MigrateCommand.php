@@ -19,18 +19,23 @@ final class MigrateCommand extends Command
         $this->service = $service;
 
         $this->setDefinition('new', [
-            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations')
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
+            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'The app name'),
         ])
             ->setDescription('Create migration template');
 
         $this->setDefinition('ddl', [
             new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
+            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'The app name'),
+            new InputOption('db', null, InputOption::VALUE_REQUIRED, 'The db name'),
             new InputOption('prefix', null, InputOption::VALUE_REQUIRED, 'The table prefix')
         ])
             ->setDescription('Initialize DDL');
 
         $this->setDefinition('up', [
             new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
+            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'The app name'),
+            new InputOption('db', null, InputOption::VALUE_REQUIRED, 'The db name'),
             new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The number of migrations to apply'),
             new InputOption('all', null, InputOption::VALUE_NONE, 'Whether apply all migrations')
         ])
@@ -38,6 +43,8 @@ final class MigrateCommand extends Command
 
         $this->setDefinition('down', [
             new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
+            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'The app name'),
+            new InputOption('db', null, InputOption::VALUE_REQUIRED, 'The db name'),
             new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The number of migtions to downgrade'),
             new InputOption('all', null, InputOption::VALUE_NONE, 'Whether downgrade all migration history')
         ])

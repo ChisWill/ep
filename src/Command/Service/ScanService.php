@@ -67,4 +67,12 @@ final class ScanService extends Service
             $this->cache->set(Annotate::getAnnotationCacheKey($class), $value, 86400 * 365 * 50);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getId(): string
+    {
+        return 'scan';
+    }
 }

@@ -42,8 +42,8 @@ final class GenerateService extends Service
         $this->init($options);
 
         $this->table = $options['table'];
-        $this->path = $options['path'] ?? $options['generate.model.path'] ?? 'Model';
-        $this->prefix = $options['prefix'] ?? $options['generate.model.prefix'] ?? '';
+        $this->path = $options['path'] ?? $this->defaultOptions['model.path'] ?? 'Model';
+        $this->prefix = $options['prefix'] ?? $this->defaultOptions['model.prefix'] ?? '';
 
         $tableSchema = $this->getDb()->getTableSchema($this->table, true);
         if (!$tableSchema) {
@@ -264,5 +264,13 @@ final class GenerateService extends Service
             default:
                 return $type;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getId(): string
+    {
+        return 'generate';
     }
 }

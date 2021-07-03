@@ -1,0 +1,29 @@
+{
+    "bootstrap": "vendor/autoload.php",
+    "config": "tests/App/config/main.php",
+    "common": {
+        "db": null
+    },
+    "apps": {
+        "ep": {
+            "generate": {
+                "db": null,
+                "model.path": "Model",
+                "model.prefix": null
+            },
+            "migrate": {
+                "path": "Migration",
+                "db": null
+            }
+        }
+    },
+    "generate": {
+        "db": null,
+        "model.path": "Model",
+        "model.prefix": null
+    },
+    "migrate": {
+        "path": "Migration",
+        "db": null
+    }
+}

@@ -21,6 +21,7 @@ final class GenerateCommand extends Command
 
         $this->setDefinition('model', [
             new InputArgument('table', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'The table name'),
+            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'The app name'),
             new InputOption('db', null, InputOption::VALUE_REQUIRED, 'The db name'),
             new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The path of model'),
             new InputOption('prefix', null, InputOption::VALUE_REQUIRED, 'The prefix of table'),

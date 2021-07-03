@@ -113,6 +113,14 @@ final class HelpService extends Service
             return $basename . $action;
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getId(): string
+    {
+        return 'help';
+    }
 }
 
 class CommandDataSet

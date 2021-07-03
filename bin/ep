@@ -7,57 +7,26 @@ use Ep\Console\Application;
 use Ep\Console\Factory;
 
 (static function () {
+
     $cwd = getcwd();
 
-    $options = [];
-    if (file_exists($cwd . '/.ep')) {
-        $content = str_replace("\r\n", "\n", file_get_contents($cwd . '/.ep'));
-        $result = explode("\n", $content);
-        foreach ($result as $row) {
-            $pieces = explode('=', $row);
-            if (count($pieces) == 2) {
-                $options[trim($pieces[0])] = trim($pieces[1]);
-            }
-        }
-    }
-
-    $possibleAutoloadPaths = [
-        $options['autoload'] ?? '',
-        $cwd . '/vendor/autoload.php',
-        dirname($cwd) . '/autoload.php'
-    ];
-    unset($options['autoload']);
-
-    $autoloadPath = null;
-    foreach ($possibleAutoloadPaths as $path) {
-        if (file_exists($path)) {
-            $autoloadPath = $path;
-            break;
-        }
-    }
-    if ($autoloadPath === null) {
-        $message = <<<HELP
-
-Unable to find vendor/autoload.php in your current directory.
-
-You should:
-- run ./bin/ep from project root.
-- run ./ep from vendor/bin.
-
-HELP;
+    if (file_exists($cwd . '/ep.json')) {
+        $options = json_decode(file_get_contents($cwd . '/ep.json'), true);
+    } else {
+        $message = "Could not find a ep.json file in {$cwd}\n";
         fwrite(STDERR, $message);
         exit(1);
     }
-    require($autoloadPath);
+    require($options['bootstrap']);
+    unset($options['bootstrap']);
 
-    $configPath = $options['config'] ?? dirname($autoloadPath, 2) . '/config/main.php';
+    if (!file_exists($options['config'])) {
+        $message = "Unable to find config file in {$options['config']}\n";
+        fwrite(STDERR, $message);
+        exit(1);
+    }
+    $userConfig = require($options['config']);
     unset($options['config']);
-    if (!file_exists($configPath)) {
-        $message = "Unable to find config path in \"{$configPath}\".\n";
-        fwrite(STDERR, $message);
-        exit(1);
-    }
-    $userConfig = require($configPath);
 
     $params = [
         'appNamespace' => 'Ep',

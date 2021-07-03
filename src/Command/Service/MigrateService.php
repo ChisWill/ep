@@ -41,7 +41,7 @@ final class MigrateService extends Service
     {
         parent::init($options);
 
-        $this->migratePath = $options['path'] ?? $options['migrate.path'] ?? 'Migration';
+        $this->migratePath = $options['path'] ?? $this->defaultOptions['path'] ?? 'Migration';
         $this->basePath = $this->getAppPath() . '/' . trim($this->migratePath, '/');
         $this->builder = new MigrateBuilder($this->getDb(), $this->consoleService);
     }
@@ -242,5 +242,13 @@ final class MigrateService extends Service
                 ActiveRecord::CREATED_AT => $this->builder->dateTime()->notNull()
             ]);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getId(): string
+    {
+        return 'migrate';
     }
 }
