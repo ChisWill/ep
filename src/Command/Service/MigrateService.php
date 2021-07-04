@@ -212,7 +212,7 @@ final class MigrateService extends Service
                 }
             } catch (Throwable $t) {
                 $transaction->rollBack();
-                $this->error(sprintf("%s::%s() failed, because of %s.", $className, $method, $t->getMessage()));
+                $this->error(sprintf("%s::%s() failed, because %s.", $className, $method, $t->getMessage()));
             }
 
             try {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Ep\Base\Config;
 use Ep\Base\Container;
 use Ep\Base\Injector;
+use Ep\Console\CommandLoader;
 use Ep\Contract\ErrorRendererInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Contract\NotFoundHandlerInterface;
@@ -20,6 +21,7 @@ use HttpSoft\Message\UploadedFileFactory;
 use HttpSoft\Message\UriFactory;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Console\Application as SymfonyApplication;
+use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -40,7 +42,9 @@ use Yiisoft\Db\Redis\Connection as RedisConnection;
 use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
 use Yiisoft\EventDispatcher\Provider\ListenerCollection;
 use Yiisoft\EventDispatcher\Provider\Provider;
+use Yiisoft\Factory\Definition\Reference;
 use Yiisoft\Log\Logger;
+use Yiisoft\Log\Target;
 use Yiisoft\Log\Target\File\FileRotator;
 use Yiisoft\Log\Target\File\FileTarget;
 use Yiisoft\Profiler\Profiler;
@@ -75,14 +79,16 @@ return [
     // Annotation
     Reader::class => static fn (CacheItemPoolInterface $cache): Reader => $config->debug ? new AnnotationReader() : new PsrCachedReader(new AnnotationReader(), $cache, false),
     // Console
-    SymfonyApplication::class =>  static function (): SymfonyApplication {
-        $application = new SymfonyApplication('Ep', Ep::VERSION);
-        $application->setAutoExit(false);
-        $application->setHelperSet(new HelperSet([
-            new QuestionHelper()
-        ]));
-        return $application;
-    },
+    CommandLoaderInterface::class => CommandLoader::class,
+    SymfonyApplication::class => [
+        'class' => SymfonyApplication::class,
+        '__construct()' => ['Ep', Ep::VERSION],
+        'setAutoExit()' => [false],
+        'setCommandLoader()' => [Reference::to(CommandLoaderInterface::class)],
+        'setHelperSet()' => [
+            new HelperSet([new QuestionHelper()])
+        ]
+    ],
     InputInterface::class => static fn (): InputInterface => new ArgvInput(null, null),
     OutputInterface::class => ConsoleOutput::class,
     // View
@@ -98,8 +104,11 @@ return [
     // Response
     ResponseFactoryInterface::class => ResponseFactory::class,
     // Logger
-    FileTarget::class => static fn (Aliases $aliases): FileTarget => new FileTarget($aliases->get($config->runtimeDir . '/logs/app.log'), new FileRotator()),
-    LoggerInterface::class => static fn (FileTarget $fileTarget): LoggerInterface => new Logger([$fileTarget]),
+    Target::class => static fn (Aliases $aliases): Target => new FileTarget($aliases->get($config->runtimeDir . '/logs/app.log'), new FileRotator()),
+    LoggerInterface::class => [
+        'class' => Logger::class,
+        '__construct()' => [[Reference::to(Target::class)]]
+    ],
     // Cache
     CacheItemPoolInterface::class => static fn (Aliases $aliases): CacheItemPoolInterface => new FilesystemAdapter('item-caches', 0, $aliases->get($config->runtimeDir)),
     CacheInterface::class => static fn (Aliases $aliases): CacheInterface => new FileCache($aliases->get($config->runtimeDir . '/simple-caches')),
