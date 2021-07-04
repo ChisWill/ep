@@ -14,75 +14,75 @@ use InvalidArgumentException;
 final class Config
 {
     /**
-     * 项目根命名空间
+     * Application root namespace
      */
     public string $appNamespace = 'App';
     /**
-     * 项目根目录地址，必填
+     * Application root path
      */
     public string $rootPath = '';
     /**
-     * 路径别名
+     * Path aliases
      */
     public array $aliases = [];
     /**
-     * 默认路由的根 URL
+     * Default base url
      */
     public string $baseUrl = '';
     /**
-     * 是否开启调试模式
+     * Is debug
      */
     public bool $debug = true;
     /**
-     * 项目运行的当前环境
+     * Current environment
      */
     public string $env = 'prod';
     /**
-     * 模块类名
+     * Module class
      */
     public string $moduleName = 'Module';
     /**
-     * Web 控制器所在目录名以及类名后缀，强制统一
+     * Web controller directory and suffix
      */
     public string $controllerDirAndSuffix = 'Controller';
     /**
-     * Console 控制器所在目录名以及类名后缀，强制统一
+     * Console controller directory and suffix
      */
     public string $commandDirAndSuffix = 'Command';
     /**
-     * 数据迁移表名
+     * Database migration table name
      */
     public string $migrationTableName = 'migration';
     /**
-     * Action 后缀
+     * Action suffix
      */
     public string $actionSuffix = 'Action';
     /**
-     * 默认 Controller
+     * Default Controller
      */
     public string $defaultController = 'index';
     /**
-     * 默认 Action
+     * Default action
      */
     public string $defaultAction = 'index';
     /**
-     * 运行时缓存目录路径
+     * Runtime directory
      */
     public string $runtimeDir = '@root/runtime';
     /**
-     * Vendor 目录路径
+     * Vendor directory
      */
     public string $vendorPath = '@root/vendor';
     /**
-     * View 目录路径
+     * View directory
      */
     public string $viewPath = '@root/views';
     /**
-     * Layout 目录名称
+     * Layout directory
      */
     public string $layoutDir = '_layouts';
     /**
-     * Web 中间件
+     * Web middlewares
      */
     public array $webMiddlewares = [
         RouteMiddleware::class,
@@ -90,7 +90,7 @@ final class Config
         InterceptorMiddleware::class
     ];
     /**
-     * 事件配置
+     * Events
      */
     public array $events = [];
     /**
@@ -98,11 +98,11 @@ final class Config
      */
     public string $mysqlDsn = '';
     /**
-     * Mysql 用户
+     * Mysql username
      */
     public string $mysqlUsername = '';
     /**
-     * Mysql 密码
+     * Mysql password
      */
     public string $mysqlPassword = '';
     /**
@@ -122,20 +122,14 @@ final class Config
      */
     public ?string $redisPassword = null;
     /**
-     * 项目基础秘钥，必填
+     * Application secretKey
      */
     public string $secretKey = '';
     /**
-     * 当前语言
-     */
-    public string $language = 'zh-CN';
-    /**
-     * 常规配置项
+     * Params
      */
     public array $params = [];
     /**
-     * di 配置
-     * 
      * ```php
      * 
      * use Ep\Base\Config;
@@ -148,8 +142,6 @@ final class Config
      */
     private ?Closure $di = null;
     /**
-     * 路由规则
-     * 
      * ```php
      * 
      * use FastRoute\RouteCollector;
@@ -191,7 +183,7 @@ final class Config
     }
 
     /**
-     * 默认路由规则
+     * Default route rule
      */
     private array $defaultRoute = [Method::ALL, '{prefix:[\w/-]*?}{controller:/?[a-zA-Z][\w-]*|}{action:/?[a-zA-Z][\w-]*|}', '<prefix>/<controller>/<action>'];
 
