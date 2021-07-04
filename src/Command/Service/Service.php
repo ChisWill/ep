@@ -36,7 +36,7 @@ abstract class Service
     protected string $userActionSuffix;
     protected string $userDefaultAction;
 
-    public function init(array $options): void
+    public function initialize(array $options): void
     {
         $this->options = $options;
 
@@ -68,7 +68,7 @@ abstract class Service
             try {
                 $this->db = Ep::getDb($db);
             } catch (NotFoundException $e) {
-                $this->invalid('db', $db);
+                $this->error(sprintf('The db "%s" is invalid.', $db));
             }
         }
         return $this->db;
@@ -105,7 +105,7 @@ abstract class Service
             $vendorDirname = dirname($this->aliases->get($this->config->vendorPath));
             $composerPath = $vendorDirname . '/composer.json';
             if (!file_exists($composerPath)) {
-                $this->throw('Unable to find composer.json in your project root.');
+                $this->error('Unable to find composer.json in your project root.');
             }
             $content = json_decode(file_get_contents($composerPath), true);
             $autoload = ($content['autoload']['psr-4'] ?? []) + ($content['autoload-dev']['psr-4'] ?? []);
@@ -116,7 +116,7 @@ abstract class Service
                 }
             }
             if (!isset($appPath)) {
-                $this->throw('You should set the "autoload[psr-4]" configuration in your composer.json first.');
+                $this->error('You should set the "autoload[psr-4]" configuration in your composer.json first.');
             }
             $this->appPath = str_replace('\\', '/', $vendorDirname . '/' . $appPath);
         }
@@ -136,20 +136,13 @@ abstract class Service
         ]);
     }
 
-    protected function required(string $option): void
-    {
-        $this->throw("The \"{$option}\" option is required.");
-    }
-
-    protected function invalid(string $option, string $value): void
-    {
-        $this->throw("The value \"{$value}\" of the option \"{$option}\" is invalid.");
-    }
-
-    protected function throw(string $message): void
+    /**
+     * @throws InvalidArgumentException
+     */
+    protected function error(string $message): void
     {
         throw new InvalidArgumentException($message);
     }
 
-    abstract protected function getId(): string;
+    abstract protected function getId(): ?string;
 }

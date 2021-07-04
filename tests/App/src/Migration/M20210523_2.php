@@ -7,8 +7,13 @@ namespace Ep\Tests\App\Migration;
 use Ep\Command\Helper\MigrateBuilder;
 use Ep\Contract\MigrateInterface;
 
-final class Migration_20210523_2 implements MigrateInterface
+final class M20210523_2 implements MigrateInterface
 {
+    public static function getName(): string
+    {
+        return 'test2';
+    }
+
     public function up(MigrateBuilder $builder): void
     {
         $builder->createTable('story', [

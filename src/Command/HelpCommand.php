@@ -48,7 +48,7 @@ EOF);
 
     public function indexAction(ConsoleRequestInterface $request, OutputInterface $output): ConsoleResponseInterface
     {
-        $this->service->init($request->getOptions());
+        $this->service->initialize($request->getOptions());
 
         $commands = $this->service->getAllCommands();
         array_walk($commands, [$this->symfonyApplication, 'add']);

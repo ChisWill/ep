@@ -71,8 +71,8 @@ final class ScanService extends Service
     /**
      * {@inheritDoc}
      */
-    protected function getId(): string
+    protected function getId(): ?string
     {
-        return 'scan';
+        return null;
     }
 }

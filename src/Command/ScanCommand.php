@@ -26,7 +26,7 @@ final class ScanCommand extends Command
 
     public function annotationAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->init($request->getOptions());
+        $this->service->initialize($request->getOptions());
 
         $this->service->annotation();
 

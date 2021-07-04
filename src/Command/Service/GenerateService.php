@@ -39,7 +39,7 @@ final class GenerateService extends Service
 
     public function initModel(array $options): void
     {
-        $this->init($options);
+        $this->initialize($options);
 
         $this->table = $options['table'];
         $this->path = $options['path'] ?? $this->defaultOptions['model.path'] ?? 'Model';
@@ -47,7 +47,7 @@ final class GenerateService extends Service
 
         $tableSchema = $this->getDb()->getTableSchema($this->table, true);
         if (!$tableSchema) {
-            $this->invalid('table', $this->table);
+            $this->error(sprintf('The table "%s" is not exists.', $this->table));
         }
         $this->tableSchema = $tableSchema;
     }
@@ -68,9 +68,9 @@ final class GenerateService extends Service
             'use' => $this->getModelUseStatement($use),
             'rules' => $this->getModelRules($rules)
         ]))) {
-            $this->consoleService->writeln(sprintf('The file "%s.php" has been created in "%s".', $this->getModelClassName(), $filePath));
+            $this->consoleService->writeln(sprintf('The model file <info>%s.php</> has been created in <comment>%s</>.', $this->getModelClassName(), $filePath));
         } else {
-            $this->consoleService->writeln('Generate failed.');
+            $this->consoleService->writeln('<error>Generate failed.</>');
         }
     }
 
@@ -86,7 +86,7 @@ final class GenerateService extends Service
         if (@file_put_contents($filename, preg_replace(array_keys($replace), array_values($replace), file_get_contents($filename), 1))) {
             $this->consoleService->writeln(sprintf('%s.php has been overrided in %s', $this->getModelClassName(), $this->getFilePath()));
         } else {
-            $this->consoleService->writeln('Overwrite model failed.');
+            $this->consoleService->writeln('<error>Overwrite model failed.</>');
         }
     }
 
@@ -269,7 +269,7 @@ final class GenerateService extends Service
     /**
      * {@inheritDoc}
      */
-    protected function getId(): string
+    protected function getId(): ?string
     {
         return 'generate';
     }

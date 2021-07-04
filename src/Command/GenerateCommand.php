@@ -20,11 +20,11 @@ final class GenerateCommand extends Command
         $this->service = $service;
 
         $this->setDefinition('model', [
-            new InputArgument('table', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'The table name'),
-            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'The app name'),
-            new InputOption('db', null, InputOption::VALUE_REQUIRED, 'The db name'),
-            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The path of model'),
-            new InputOption('prefix', null, InputOption::VALUE_REQUIRED, 'The prefix of table'),
+            new InputArgument('table', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Table name'),
+            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'App name'),
+            new InputOption('db', null, InputOption::VALUE_REQUIRED, 'Db name'),
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'Save path'),
+            new InputOption('prefix', null, InputOption::VALUE_REQUIRED, 'Table prefix'),
         ])
             ->setDescription('Generate model');
     }

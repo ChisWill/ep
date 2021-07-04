@@ -1,26 +1,30 @@
-<?php
+<?= "<?php\n" ?>
 
 declare(strict_types=1);
 
-namespace Ep\Tests\App\Migration;
+namespace <?= $namespace ?>;
 
 use Ep\Command\Helper\MigrateBuilder;
 use Ep\Contract\MigrateInterface;
 
-final class DDL implements MigrateInterface
+final class <?= $className ?> implements MigrateInterface
 {
+    public function getName(): string
+    {
+        return '<?= $name ?>';
+    }
+
     public function up(MigrateBuilder $builder): void
     {
+<?php if ($upSql): ?>
         $builder->execute(<<<'DDL'
-CREATE TABLE "school" (
-"id"  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-"name"  TEXT NOT NULL
-);
+<?= $upSql ?>
 DDL);
+<?php endif ?>
     }
 
     public function down(MigrateBuilder $builder): void
     {
-        $builder->dropTable('school');
+<?= $downSql ?>
     }
 }

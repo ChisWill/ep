@@ -8,6 +8,7 @@ use Ep\Command\Service\MigrateService;
 use Ep\Console\Command;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
 final class MigrateCommand extends Command
@@ -18,64 +19,77 @@ final class MigrateCommand extends Command
     {
         $this->service = $service;
 
-        $this->setDefinition('new', [
-            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
-            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'The app name'),
+        $this->setDefinition('create', [
+            new InputArgument('name', InputArgument::REQUIRED, 'Migration name'),
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'Save path'),
+            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'App name'),
         ])
-            ->setDescription('Create migration template');
+            ->setDescription('Create an empty migration');
 
-        $this->setDefinition('ddl', [
-            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
-            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'The app name'),
-            new InputOption('db', null, InputOption::VALUE_REQUIRED, 'The db name'),
-            new InputOption('prefix', null, InputOption::VALUE_REQUIRED, 'The table prefix')
+        $this->setDefinition('init', [
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'Save path'),
+            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'App name'),
+            new InputOption('db', null, InputOption::VALUE_REQUIRED, 'Db name'),
+            new InputOption('prefix', null, InputOption::VALUE_REQUIRED, 'Table prefix')
         ])
-            ->setDescription('Initialize DDL');
+            ->setDescription('Initialize all tables');
+
+        $this->setDefinition('list', [
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'Save path'),
+            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'App name'),
+            new InputOption('db', null, InputOption::VALUE_REQUIRED, 'Db name'),
+        ])
+            ->setDescription('Print list of all migrations');
 
         $this->setDefinition('up', [
-            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
-            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'The app name'),
-            new InputOption('db', null, InputOption::VALUE_REQUIRED, 'The db name'),
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'Save path'),
+            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'App name'),
+            new InputOption('db', null, InputOption::VALUE_REQUIRED, 'Db name'),
             new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The number of migrations to apply'),
             new InputOption('all', null, InputOption::VALUE_NONE, 'Whether apply all migrations')
         ])
-            ->setDescription('Upgrades new migrations');
+            ->setDescription('Execute all new migrations');
 
         $this->setDefinition('down', [
-            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'The save path of migrations'),
-            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'The app name'),
-            new InputOption('db', null, InputOption::VALUE_REQUIRED, 'The db name'),
+            new InputOption('path', null, InputOption::VALUE_REQUIRED, 'Save path'),
+            new InputOption('app', 'a', InputOption::VALUE_REQUIRED, 'App name'),
+            new InputOption('db', null, InputOption::VALUE_REQUIRED, 'Db name'),
             new InputOption('step', null, InputOption::VALUE_REQUIRED, 'The number of migtions to downgrade'),
             new InputOption('all', null, InputOption::VALUE_NONE, 'Whether downgrade all migration history')
         ])
-            ->setDescription('Downgrades old migrations');
+            ->setDescription('Rollback last migration');
     }
 
-    public function newAction(ConsoleRequestInterface $request): ConsoleResponseInterface
+    public function createAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->init($request->getOptions());
+        $this->service->initialize($request->getOptions());
 
-        $this->service->new();
+        $this->service->create($request->getArgument('name'));
 
         return $this->success();
     }
 
-    public function ddlAction(ConsoleRequestInterface $request): ConsoleResponseInterface
+    public function initAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->init($request->getOptions());
+        $this->service->initialize($request->getOptions());
 
-        $this->service->ddl();
+        $this->service->init();
+
+        return $this->success();
+    }
+
+    public function listAction(ConsoleRequestInterface $request): ConsoleResponseInterface
+    {
+        $this->service->initialize($request->getOptions());
+
+        $this->service->list();
 
         return $this->success();
     }
 
     public function upAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        if ($request->getOption('all') && !$this->confirm('Are you sure apply all migrations?')) {
-            return $this->success('Skipped.');
-        }
-
-        $this->service->init($request->getOptions());
+        $this->service->initialize($request->getOptions());
 
         $this->service->up();
 
@@ -84,11 +98,7 @@ final class MigrateCommand extends Command
 
     public function downAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        if ($request->getOption('all') && !$this->confirm('Are you sure downgrade all migrations?')) {
-            return $this->success('Skipped.');
-        }
-
-        $this->service->init($request->getOptions());
+        $this->service->initialize($request->getOptions());
 
         $this->service->down();
 
