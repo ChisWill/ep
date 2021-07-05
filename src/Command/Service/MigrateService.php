@@ -104,6 +104,10 @@ final class MigrateService extends Service
         $this->step = (int) ($this->options['step'] ?? 0);
 
         $this->migrate('up', function (array $instances): bool {
+            if (!$instances) {
+                $this->consoleService->writeln('Already up to date.');
+                return false;
+            }
             $count = count($instances);
             $this->consoleService->writeln(sprintf('<comment>%d migration%s to be applied:</>', $count, $count > 1 ? 's' : ''));
             foreach ($instances as $instance) {
@@ -112,20 +116,15 @@ final class MigrateService extends Service
             }
             return $this->consoleService->confirm(sprintf('Apply the above migration%s?', $count > 1 ? 's' : ''), true);
         }, function (array $instances): void {
-            $count = count($instances);
-            if ($count === 0) {
-                $this->consoleService->writeln('Already up to date.');
-            } else {
-                $rows = [];
-                $now = Date::fromUnix();
-                foreach ($instances as $instance) {
-                    $rows[] = [$this->replaceFromClassName($instance), $now];
-                }
-
-                $this->builder->batchInsert($this->tableName, ['version', ActiveRecord::CREATED_AT], $rows);
-
-                $this->consoleService->writeln(sprintf('Commit count: %d.', $count));
+            $rows = [];
+            $now = Date::fromUnix();
+            foreach ($instances as $instance) {
+                $rows[] = [$this->replaceFromClassName($instance), $now];
             }
+
+            $this->builder->batchInsert($this->tableName, ['version', ActiveRecord::CREATED_AT], $rows);
+
+            $this->consoleService->writeln(sprintf('Commit count: %d.', count($instances)));
         });
     }
 
@@ -135,6 +134,10 @@ final class MigrateService extends Service
         $this->step = $this->all ? 0 : (int) ($this->options['step'] ?? 1);
 
         $this->migrate('down', function (array $instances): bool {
+            if (!$instances) {
+                $this->consoleService->writeln('No commits.');
+                return false;
+            }
             $count = count($instances);
             $this->consoleService->writeln(sprintf('<comment>%d migration%s to be reverted:</>', $count, $count > 1 ? 's' : ''));
             foreach ($instances as $instance) {
@@ -143,14 +146,9 @@ final class MigrateService extends Service
             }
             return $this->consoleService->confirm(sprintf('Revert the above migration%s?', $count > 1 ? 's' : ''));
         }, function (array $instances): void {
-            $count = count($instances);
-            if ($count === 0) {
-                $this->consoleService->writeln('No commits.');
-            } else {
-                $this->builder->delete($this->tableName, ['version' => array_map([$this, 'replaceFromClassName'], $instances)]);
+            $this->builder->delete($this->tableName, ['version' => array_map([$this, 'replaceFromClassName'], $instances)]);
 
-                $this->consoleService->writeln(sprintf('Revert count: %d.', $count));
-            }
+            $this->consoleService->writeln(sprintf('Revert count: %d.', count($instances)));
         });
     }
 
