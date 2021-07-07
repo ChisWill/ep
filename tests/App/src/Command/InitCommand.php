@@ -108,4 +108,10 @@ class InitCommand extends Command
 
         return $this->success();
     }
+
+    public function echoArrAction()
+    {
+        $message = 'con';
+        return $this->success(json_encode(compact('message')));
+    }
 }

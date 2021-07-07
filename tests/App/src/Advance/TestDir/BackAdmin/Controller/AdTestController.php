@@ -17,4 +17,9 @@ final class AdTestController extends Controller
     {
         return $this->string('I am running');
     }
+
+    public function sayGoodByeAction()
+    {
+        return $this->string('good bye');
+    }
 }

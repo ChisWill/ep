@@ -161,6 +161,7 @@ final class ControllerLoader
             $prefix ? (strpos($prefix, '\\\\') === false ? $prefix . '\\' . $this->suffix : str_replace('\\\\', '\\' . $this->suffix . '\\', $prefix)) : $this->suffix,
             Str::toPascalCase($controller) . $this->suffix
         );
+        $action = lcfirst(Str::toPascalCase($action));
         return [$prefix, $class, $action];
     }
 

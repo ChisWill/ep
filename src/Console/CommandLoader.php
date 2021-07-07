@@ -155,7 +155,7 @@ final class CommandLoader implements CommandLoaderInterface
 
             $this->commandNames[$name] = $this->getCommandName(
                 preg_replace('~' . str_replace('\\', '/', $this->config->rootNamespace) . '/~', '', str_replace('\\', '/', $class), 1),
-                $actionId
+                Str::camelToId($actionId, '-'),
             );
         }
         return $this->commandNames[$name];
@@ -201,7 +201,7 @@ final class CommandLoader implements CommandLoaderInterface
             foreach ($actions as $ref) {
                 $commands[] = $this->getCommandName(
                     $subClassName,
-                    Str::rtrim($ref->getName(), $this->config->actionSuffix)
+                    Str::camelToId(Str::rtrim($ref->getName(), $this->config->actionSuffix), '-', true)
                 );
             }
         }
