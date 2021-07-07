@@ -5,17 +5,27 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep\Kit\Annotate;
+use Yiisoft\Di\Container as YiiContainer;
 use Psr\Container\ContainerInterface;
 
 final class Container implements ContainerInterface
 {
-    private ContainerInterface $container;
+    private ContainerInterface $rootContainer;
     private Annotate $annotate;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $rootContainer)
     {
-        $this->container = $container;
-        $this->annotate = $container->get(Annotate::class);
+        $this->rootContainer = $rootContainer;
+        $this->annotate = $rootContainer->get(Annotate::class);
+    }
+
+    private array $definitions = [];
+    private ?ContainerInterface $container = null;
+
+    public function set(array $definitions): void
+    {
+        $this->definitions = $definitions;
+        $this->container = new YiiContainer($definitions, [], [], $this->rootContainer);
     }
 
     private array $map = [];
@@ -25,10 +35,16 @@ final class Container implements ContainerInterface
      */
     public function get($id)
     {
-        $instance = $this->container->get($id);
+        if (array_key_exists($id, $this->definitions)) {
+            $instance = $this->container->get($id);
+            $key = $id;
+        } else {
+            $instance = $this->rootContainer->get($id);
+            $key = 'root-' . $id;
+        }
 
-        if (!isset($this->map[$id])) {
-            $this->map[$id] = true;
+        if (!isset($this->map[$key])) {
+            $this->map[$key] = true;
             $this->annotate->property($instance);
         }
 
@@ -40,6 +56,17 @@ final class Container implements ContainerInterface
      */
     public function has($id)
     {
-        return $this->container->has($id);
+        return $this->rootContainer->has($id) || $this->container && $this->container->has($id);
+    }
+
+    /**
+     * @param string|array $id
+     */
+    public function clear($ids): void
+    {
+        foreach ((array) $ids as $id) {
+            unset($this->definitions[$id]);
+            unset($this->map[$id]);
+        }
     }
 }

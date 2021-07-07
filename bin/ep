@@ -38,6 +38,7 @@ use Ep\Console\Factory;
 
     $options['common'] ??= [];
     $options['common']['userRootNamespace'] = $userConfig['rootNamespace'] ?? 'App';
+
     $request = Ep::getDi()->get(Factory::class)->createRequest();
     $request->setOptions($options);
 
