@@ -7,6 +7,7 @@ namespace Ep\Command\Service;
 use Ep;
 use Ep\Base\Config;
 use Ep\Console\Service as ConsoleService;
+use Ep\Kit\Util;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Factory\Exception\NotFoundException;
@@ -20,6 +21,7 @@ abstract class Service
     protected ContainerInterface $container;
     protected Config $config;
     protected ConsoleService $consoleService;
+    protected Util $util;
     protected Aliases $aliases;
 
     public function __construct(ContainerInterface $container)
@@ -27,23 +29,17 @@ abstract class Service
         $this->container = $container;
         $this->config = $container->get(Config::class);
         $this->consoleService = $container->get(ConsoleService::class);
+        $this->util = $container->get(Util::class);
         $this->aliases = $container->get(Aliases::class);
     }
 
     protected array $options;
-    protected string $userAppNamespace;
-    protected string $userCommandDirAndSuffix;
-    protected string $userActionSuffix;
-    protected string $userDefaultAction;
+    protected string $userRootNamespace;
 
     public function initialize(array $options): void
     {
         $this->options = $options;
-
-        $this->userAppNamespace = $options['user.appNamespace'];
-        $this->userCommandDirAndSuffix = $options['user.commandDirAndSuffix'];
-        $this->userActionSuffix = $options['user.actionSuffix'];
-        $this->userDefaultAction = $options['user.defaultAction'];
+        $this->userRootNamespace = $options['common']['userRootNamespace'];
 
         $this->initDefaultOptions();
     }
@@ -74,59 +70,17 @@ abstract class Service
         return $this->db;
     }
 
-    protected function getEpConfig(): array
-    {
-        return [
-            'appNamespace' => $this->config->appNamespace,
-            'commandDirAndSuffix' => $this->config->commandDirAndSuffix,
-            'actionSuffix' => $this->config->actionSuffix,
-            'defaultAction' => $this->config->defaultAction
-        ];
-    }
-
-    protected function getUserConfig(): array
-    {
-        return [
-            'appNamespace' => $this->userAppNamespace,
-            'commandDirAndSuffix' => $this->userCommandDirAndSuffix,
-            'actionSuffix' => $this->userActionSuffix,
-            'defaultAction' => $this->userDefaultAction
-        ];
-    }
-
-    private ?string $appPath = null;
-
     /**
      * @throws InvalidArgumentException
      */
     public function getAppPath(): string
     {
-        if ($this->appPath === null) {
-            $vendorDirname = dirname($this->aliases->get($this->config->vendorPath));
-            $composerPath = $vendorDirname . '/composer.json';
-            if (!file_exists($composerPath)) {
-                $this->error('Unable to find composer.json in your project root.');
-            }
-            $content = json_decode(file_get_contents($composerPath), true);
-            $autoload = ($content['autoload']['psr-4'] ?? []) + ($content['autoload-dev']['psr-4'] ?? []);
-            foreach ($autoload as $ns => $path) {
-                if ($ns === $this->userAppNamespace . '\\') {
-                    $appPath = $path;
-                    break;
-                }
-            }
-            if (!isset($appPath)) {
-                $this->error('You should set the "autoload[psr-4]" configuration in your composer.json first.');
-            }
-            $this->appPath = str_replace('\\', '/', $vendorDirname . '/' . $appPath);
-        }
-
-        return $this->appPath;
+        return $this->util->getAppPath($this->userRootNamespace);
     }
 
     protected function getClassNameByFile(string $file): string
     {
-        return str_replace([$this->getAppPath(), '.php', '/'], [$this->userAppNamespace, '', '\\'], $file);
+        return str_replace([$this->getAppPath(), '.php', '/'], [$this->userRootNamespace, '', '\\'], $file);
     }
 
     protected function findClassFiles(string $path, array $exceptPatterns = []): array

@@ -68,7 +68,7 @@ final class GenerateService extends Service
             'use' => $this->getModelUseStatement($use),
             'rules' => $this->getModelRules($rules)
         ]))) {
-            $this->consoleService->writeln(sprintf('The model file <info>%s.php</> has been created in <comment>%s</>.', $this->getModelClassName(), $filePath));
+            $this->consoleService->writeln(sprintf('The model file <info>%s.php</> has been created in <comment>%s</>', $this->getModelClassName(), $filePath));
         } else {
             $this->consoleService->writeln('<error>Generate failed.</>');
         }
@@ -84,7 +84,7 @@ final class GenerateService extends Service
             '~(function rules\(\): array\s+\{\s+)return.*;\s(\s+\})~Us' => '$1' . $this->getModelRules($rules) . '$2'
         ];
         if (@file_put_contents($filename, preg_replace(array_keys($replace), array_values($replace), file_get_contents($filename), 1))) {
-            $this->consoleService->writeln(sprintf('%s.php has been overrided in %s', $this->getModelClassName(), $this->getFilePath()));
+            $this->consoleService->writeln(sprintf('The model file <info>%s.php</> has been <fg=magenta>overrided</> in <comment>%s</>', $this->getModelClassName(), $this->getFilePath()));
         } else {
             $this->consoleService->writeln('<error>Overwrite model failed.</>');
         }
@@ -97,7 +97,7 @@ final class GenerateService extends Service
 
     private function getNamespace(): string
     {
-        return sprintf('%s\\%s', $this->userAppNamespace, implode('\\', array_map([Str::class, 'toPascalCase'], explode('/', $this->path))));
+        return sprintf('%s\\%s', $this->userRootNamespace, implode('\\', array_map([Str::class, 'toPascalCase'], explode('/', $this->path))));
     }
 
     private function getPrimaryKey(): string

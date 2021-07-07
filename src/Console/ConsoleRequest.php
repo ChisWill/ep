@@ -16,22 +16,12 @@ final class ConsoleRequest implements ConsoleRequestInterface
         $this->input = $input;
     }
 
-    private ?string $route = null;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setRoute(string $route): void
-    {
-        $this->route = $route;
-    }
-
     /**
      * {@inheritDoc}
      */
     public function getRoute(): string
     {
-        return $this->route ?? $this->input->getFirstArgument() ?? '';
+        return $this->input->getFirstArgument() ?? '';
     }
 
     private array $arguments = [];

@@ -4,44 +4,56 @@ declare(strict_types=1);
 
 namespace Ep\Console;
 
-use Ep\Base\Config;
+use Ep;
 use Ep\Base\ErrorHandler;
-use Ep\Base\Route;
 use Ep\Contract\ConsoleRequestInterface;
-use Ep\Contract\NotFoundException;
+use Ep\Contract\InjectorInterface;
+use Symfony\Component\Console\Application as SymfonyApplication;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
-final class Application
+final class Application extends SymfonyApplication
 {
-    private Config $config;
+    private InjectorInterface $injector;
+    private InputInterface $input;
+    private OutputInterface $output;
     private Factory $factory;
     private ErrorHandler $errorHandler;
     private ErrorRenderer $errorRenderer;
-    private Route $route;
-    private ControllerRunner $controllerRunner;
 
     public function __construct(
-        Config $config,
+        InjectorInterface $injector,
+        InputInterface $input,
+        OutputInterface $output,
         Factory $factory,
         ErrorHandler $errorHandler,
-        ErrorRenderer $errorRenderer,
-        Route $route,
-        ControllerRunner $controllerRunner
+        ErrorRenderer $errorRenderer
     ) {
-        $this->config = $config;
+        $this->injector = $injector;
+        $this->input = $input;
+        $this->output = $output;
         $this->factory = $factory;
         $this->errorHandler = $errorHandler;
         $this->errorRenderer = $errorRenderer;
-        $this->route = $route;
-        $this->controllerRunner = $controllerRunner;
+
+        parent::__construct('Ep', Ep::VERSION);
     }
 
-    public function run(): void
+    /**
+     * {@inheritDoc}
+     */
+    public function run(?InputInterface $input = null, ?OutputInterface $output = null)
     {
-        $request = $this->createRequest();
+        $input ??= $this->input;
+        $output ??= $this->output;
 
-        $this->register($request);
+        $request = $this->createRequest($input);
 
-        $this->handleRequest($request);
+        $this->registerEvent($request);
+
+        $this->setCommandLoader($this->injector->make(CommandLoader::class, compact('request')));
+
+        return parent::run($input ?? $this->input, $output ?? $this->output);
     }
 
     private ?ConsoleRequestInterface $request = null;
@@ -53,12 +65,12 @@ final class Application
         return $new;
     }
 
-    public function createRequest(): ConsoleRequestInterface
+    public function createRequest(InputInterface $input = null): ConsoleRequestInterface
     {
-        return $this->request ?? $this->factory->createRequest();
+        return $this->request ?? $this->factory->createRequest($input);
     }
 
-    public function register(ConsoleRequestInterface $request): void
+    public function registerEvent(ConsoleRequestInterface $request): void
     {
         $this->errorHandler
             ->configure([
@@ -67,22 +79,13 @@ final class Application
             ->register($request);
     }
 
-    public function handleRequest(ConsoleRequestInterface $request): void
+    /**
+     * {@inheritDoc}
+     */
+    public function extractNamespace(string $name, int $limit = null)
     {
-        $route = $request->getRoute();
-        try {
-            [, $handler] = $this->route
-                ->configure([
-                    'rule' => $this->config->getRouteRule(),
-                ])
-                ->match('/' . $route);
+        $parts = explode('/', $name, -1);
 
-            exit($this->controllerRunner->run($handler, $request));
-        } catch (NotFoundException $e) {
-            echo <<<HELP
-Error: unknown command "{$route}"\n
-HELP;
-            exit(Command::FAIL);
-        }
+        return ucfirst(implode('/', null === $limit ? $parts : array_slice($parts, 0, $limit)));
     }
 }

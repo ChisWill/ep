@@ -6,8 +6,6 @@ namespace Ep\Contract;
 
 interface ConsoleRequestInterface
 {
-    public function setRoute(string $route): void;
-
     public function getRoute(): string;
 
     public function hasArgument(string $name): bool;

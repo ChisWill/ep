@@ -53,6 +53,8 @@ class InitCommand extends Command
     {
         $message = 'Welcome Basic, ' . $request->getArgument('name');
 
+        echo 'show over';
+
         return $this->success($message);
     }
 
@@ -76,20 +78,9 @@ class InitCommand extends Command
 
     public function callAction(ConsoleRequestInterface $request)
     {
-        $c = Ep::getDi()->get(CurlCommand::class);
-        $request->setArgument('action', 'aspect');
-        $r = new ConsoleRequest(new ArrayInput([
-            'action' => 'string'
-        ]));
-        /** @var CommandDefinition */
-        $inputD = $c->getDefinitions()['single'];
-        $input = new ArrayInput([
-            'action' => 'string'
-        ], new InputDefinition($inputD->getDefinition()));
+        $this->service->call('init/table');
 
-        $c->singleAction($r);
-
-        return $this->success();
+        return $this->success('call over');
     }
 
     public function tableAction()
@@ -102,7 +93,7 @@ class InitCommand extends Command
             ['gvb', 51, 315],
         ]);
 
-        return $this->success();
+        return $this->success('table over');
     }
 
     public function progressAction()

@@ -16,7 +16,7 @@ final class Config
     /**
      * Application root namespace
      */
-    public string $appNamespace = 'App';
+    public string $rootNamespace = 'App';
     /**
      * Application root path
      */

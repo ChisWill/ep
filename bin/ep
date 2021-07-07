@@ -7,13 +7,12 @@ use Ep\Console\Application;
 use Ep\Console\Factory;
 
 (static function () {
-
     $cwd = getcwd();
 
     if (file_exists($cwd . '/ep.json')) {
         $options = json_decode(file_get_contents($cwd . '/ep.json'), true);
     } else {
-        $message = "Could not find a ep.json file in {$cwd}\n";
+        $message = "Could not find a ep.json file in {$cwd}" . PHP_EOL;
         fwrite(STDERR, $message);
         exit(1);
     }
@@ -21,45 +20,30 @@ use Ep\Console\Factory;
     unset($options['bootstrap']);
 
     if (!file_exists($options['config'])) {
-        $message = "Unable to find config file in {$options['config']}\n";
+        $message = "Unable to find config file in {$options['config']}" . PHP_EOL;
         fwrite(STDERR, $message);
         exit(1);
     }
-    $userConfig = require($options['config']);
+
+    Ep::init(array_merge(
+        $userConfig = require($options['config']),
+        [
+            'rootNamespace' => 'Ep',
+            'commandDirAndSuffix' => 'Command',
+            'actionSuffix' => 'Action',
+            'defaultAction' => 'index'
+        ]
+    ));
     unset($options['config']);
 
-    $params = [
-        'appNamespace' => 'Ep',
-        'rootPath' => $userConfig['rootPath'] ?? '',
-        'di' => $userConfig['di'] ?? null,
-        'params' => $userConfig['params'] ?? [],
-        'mysqlDsn' => $userConfig['mysqlDsn'] ?? '',
-        'mysqlUsername' => $userConfig['mysqlUsername'] ?? '',
-        'mysqlPassword' => $userConfig['mysqlPassword'] ?? '',
-        'secretKey' => $userConfig['secretKey'] ?? ''
-    ];
-    if (isset($userConfig['vendorPath'])) {
-        $params['vendorPath'] = $userConfig['vendorPath'];
-    }
-    if (isset($userConfig['runtimeDir'])) {
-        $params['runtimeDir'] = $userConfig['runtimeDir'];
-    }
-
-    Ep::init($params);
-
-    $config = Ep::getConfig();
+    $options['common'] ??= [];
+    $options['common']['userRootNamespace'] = $userConfig['rootNamespace'] ?? 'App';
     $request = Ep::getDi()->get(Factory::class)->createRequest();
-    if (!$request->getRoute()) {
-        $request->setRoute('list');
-    }
-    $request->setOption('user.appNamespace',  $userConfig['appNamespace'] ?? 'App');
-    $request->setOption('user.commandDirAndSuffix', $userConfig['commandDirAndSuffix'] ?? $config->commandDirAndSuffix);
-    $request->setOption('user.actionSuffix', $userConfig['actionSuffix'] ?? $config->actionSuffix);
-    $request->setOption('user.defaultAction', $userConfig['defaultAction'] ?? $config->defaultAction);
     $request->setOptions($options);
 
-    Ep::getDi()
+    $exitCode = Ep::getDi()
         ->get(Application::class)
         ->withRequest($request)
         ->run();
+    exit($exitCode);
 })();

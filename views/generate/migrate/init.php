@@ -9,7 +9,7 @@ use Ep\Contract\MigrateInterface;
 
 final class <?= $className ?> implements MigrateInterface
 {
-    public function getName(): string
+    public static function getName(): string
     {
         return '<?= $name ?>';
     }

@@ -19,13 +19,13 @@ class StringBench
 {
     private const COUNT = 100;
 
-    private string $appNamespace;
+    private string $rootNamespace;
     private string $controllerNamespace;
     private string $suffix;
 
     public function before()
     {
-        $this->appNamespace = 'Ep\Tests\App';
+        $this->rootNamespace = 'Ep\Tests\App';
         $this->controllerNamespace = 'Ep\Tests\App\Shop\Admin\Controller\v1\user\DemoController';
         $this->suffix = 'Controller';
     }
@@ -33,14 +33,14 @@ class StringBench
     public function benchStrReplace()
     {
         for ($i = 0; $i < self::COUNT; $i++) {
-            str_replace($this->appNamespace . '\\', '', substr($this->controllerNamespace, 0, strpos($this->controllerNamespace, $this->suffix) - 1));
+            str_replace($this->rootNamespace . '\\', '', substr($this->controllerNamespace, 0, strpos($this->controllerNamespace, $this->suffix) - 1));
         }
     }
 
     public function benchSubstr()
     {
         for ($i = 0; $i < self::COUNT; $i++) {
-            substr(substr($this->controllerNamespace, 0, strpos($this->controllerNamespace, $this->suffix) - 1), strlen($this->appNamespace) + 1);
+            substr(substr($this->controllerNamespace, 0, strpos($this->controllerNamespace, $this->suffix) - 1), strlen($this->rootNamespace) + 1);
         }
     }
 

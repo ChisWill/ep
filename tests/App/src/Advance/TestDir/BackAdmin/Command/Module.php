@@ -18,7 +18,7 @@ final class Module extends ConsoleModule
 
     public function after(ConsoleRequestInterface $request, ConsoleResponseInterface $response): ConsoleResponseInterface
     {
-        $this->getService()->writeln('Advance module before');
+        $this->getService()->writeln('Advance module after');
         return $response;
     }
 }

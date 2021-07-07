@@ -11,12 +11,13 @@ use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Sqlite\Connection as SqliteConnection;
 use Yiisoft\Log\Logger;
+use Yiisoft\Log\Target;
 use Yiisoft\Log\Target\File\FileTarget;
 
 return static fn (Config $config): array => [
     WebErrorRendererInterface::class => ErrorRenderer::class,
     InterceptorInterface::class => Interceptor::class,
-    FileTarget::class => static fn (Aliases $aliases): FileTarget => new FileTarget($aliases->get($config->runtimeDir . '/logs/' . date('Y-m-d') . '.log')),
+    Target::class => static fn (Aliases $aliases): FileTarget => new FileTarget($aliases->get($config->runtimeDir . '/logs/' . date('Y-m-d') . '.log')),
     // Sqlite
     'sqlite' => [
         'class' => SqliteConnection::class,

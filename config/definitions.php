@@ -5,7 +5,8 @@ declare(strict_types=1);
 use Ep\Base\Config;
 use Ep\Base\Container;
 use Ep\Base\Injector;
-use Ep\Console\CommandLoader;
+use Ep\Console\Application as ConsoleApplication;
+use Ep\Console\SymfonyEventDispatcher;
 use Ep\Contract\ErrorRendererInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Contract\NotFoundHandlerInterface;
@@ -20,14 +21,13 @@ use HttpSoft\Message\StreamFactory;
 use HttpSoft\Message\UploadedFileFactory;
 use HttpSoft\Message\UriFactory;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\Console\Application as SymfonyApplication;
-use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as SymfonyEventDispatcherInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Assets\AssetLoader;
 use Yiisoft\Assets\AssetLoaderInterface;
@@ -79,12 +79,11 @@ return [
     // Annotation
     Reader::class => static fn (CacheItemPoolInterface $cache): Reader => $config->debug ? new AnnotationReader() : new PsrCachedReader(new AnnotationReader(), $cache, false),
     // Console
-    CommandLoaderInterface::class => CommandLoader::class,
-    SymfonyApplication::class => [
-        'class' => SymfonyApplication::class,
-        '__construct()' => ['Ep', Ep::VERSION],
+    SymfonyEventDispatcherInterface::class => SymfonyEventDispatcher::class,
+    ConsoleApplication::class => [
+        'class' => ConsoleApplication::class,
         'setAutoExit()' => [false],
-        'setCommandLoader()' => [Reference::to(CommandLoaderInterface::class)],
+        'setDispatcher()' => [Reference::to(SymfonyEventDispatcherInterface::class)],
         'setHelperSet()' => [
             new HelperSet([new QuestionHelper()])
         ]

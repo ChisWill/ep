@@ -42,7 +42,7 @@ final class Application
     {
         $request = $this->createRequest();
 
-        $this->register($request);
+        $this->registerEvent($request);
 
         $this->emit($request, $this->handleRequest($request));
     }
@@ -52,7 +52,7 @@ final class Application
         return new ServerRequest($this->serverRequestFactory->createFromGlobals());
     }
 
-    public function register(ServerRequestInterface $request): void
+    public function registerEvent(ServerRequestInterface $request): void
     {
         $this->errorHandler->register($request);
     }

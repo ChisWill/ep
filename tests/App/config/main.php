@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 return [
-    'appNamespace' => 'Ep\Tests\App',
+    'rootNamespace' => 'Ep\Tests\App',
     'rootPath' => dirname(__DIR__, 1),
     'vendorPath' => dirname(__DIR__, 3) . '/vendor',
     'mysqlDsn' => 'mysql:host=127.0.0.1;dbname=test',

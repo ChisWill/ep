@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ep\Tests\App\Advance\TestDir\BackAdmin\Command;
 
 use Ep\Console\Command;
-use Ep\Tests\App\Command\InitCommand;
 
 final class ADGTeCommand extends Command
 {
@@ -16,8 +15,11 @@ final class ADGTeCommand extends Command
 
     public function callAction()
     {
-        $code = $this->getService()->call('init/index', ['name' => 'ChisWill']);
+        ob_start();
+        $code = $this->getService()->call('init', ['name' => 'ChisWill']);
+        $od = ob_get_clean();
+        tt($od, 'over');
 
-        return $this->success('call over');
+        return $this->success('call over, code: ' . $code);
     }
 }

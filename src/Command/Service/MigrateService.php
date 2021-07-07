@@ -215,7 +215,9 @@ final class MigrateService extends Service
 
             try {
                 call_user_func($after, $instances);
-                $transaction->commit();
+                if ($this->getDb()->getPDO()->inTransaction()) {
+                    $transaction->commit();
+                }
             } catch (Throwable $t) {
                 $transaction->rollBack();
                 $this->error($t->getMessage());
@@ -252,13 +254,13 @@ final class MigrateService extends Service
             File::mkdir($this->basePath);
         }
 
-        $namespace = $this->userAppNamespace . '\\' . trim(str_replace('/', '\\', $this->migratePath), '/');
+        $namespace = $this->userRootNamespace . '\\' . trim(str_replace('/', '\\', $this->migratePath), '/');
 
         $params['className'] = $className;
         $params['namespace'] = $namespace;
 
         if (@file_put_contents($this->basePath . '/' . $className . '.php', $this->generateService->render($view, $params))) {
-            $this->consoleService->writeln(sprintf('New migration file <info>%s.php</> has been created in <comment>%s</>.', $className, $this->basePath));
+            $this->consoleService->writeln(sprintf('New migration file <info>%s.php</> has been created in <comment>%s</>', $className, $this->basePath));
             return true;
         } else {
             $this->consoleService->writeln('<error>Generate failed.</>');

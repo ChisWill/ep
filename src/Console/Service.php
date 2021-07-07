@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ep\Console;
 
 use Ep\Contract\ConsoleResponseInterface;
-use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Helper\HelperInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -18,21 +17,18 @@ use Symfony\Component\Console\Question\Question;
 
 final class Service
 {
-    private SymfonyApplication $symfonyApplication;
-    private ControllerRunner $controllerRunner;
+    private Application $application;
     private InputInterface $input;
     private OutputInterface $output;
     private Factory $factory;
 
     public function __construct(
-        SymfonyApplication $symfonyApplication,
-        ControllerRunner $controllerRunner,
+        Application $application,
         InputInterface $input,
         OutputInterface $output,
         Factory $factory
     ) {
-        $this->symfonyApplication = $symfonyApplication;
-        $this->controllerRunner = $controllerRunner;
+        $this->application = $application;
         $this->input = $input;
         $this->output = $output;
         $this->factory = $factory;
@@ -105,15 +101,16 @@ final class Service
 
     public function getHelper(string $name): HelperInterface
     {
-        return $this->symfonyApplication->getHelperSet()->get($name);
+        return $this->application->getHelperSet()->get($name);
     }
 
     public function call(string $command, array $arguments = []): int
     {
-        $input = new ArrayInput(compact('command') + $arguments);
-
-        return $this->controllerRunner
-            ->withInput($input)
-            ->run($command, $this->factory->createRequest($input));
+        return $this->application
+            ->find($command)
+            ->run(
+                new ArrayInput(compact('command') + $arguments),
+                $this->output
+            );
     }
 }
