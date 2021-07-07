@@ -162,6 +162,7 @@ final class ControllerLoader
             Str::toPascalCase($controller) . $this->suffix
         );
         $action = lcfirst(Str::toPascalCase($action));
+
         return [$prefix, $class, $action];
     }
 
