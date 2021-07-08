@@ -38,7 +38,7 @@ final class Route implements ConfigurableInterface
     public function match(string $path, string $method = Method::GET): array
     {
         return $this->solveRouteInfo(
-            cachedDispatcher(function (RouteCollector $route) {
+            cachedDispatcher(function (RouteCollector $route): void {
                 if (isset($this->rule)) {
                     $route->addGroup($this->baseUrl, $this->rule);
                 }

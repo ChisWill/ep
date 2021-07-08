@@ -146,7 +146,7 @@ final class Config
      * 
      * use FastRoute\RouteCollector;
      *
-     * return function (RouteCollector $route) {
+     * return function (RouteCollector $route): void {
      *     $route->addGroup('/api', function (RouteCollector $route) {
      *         $route->get('/error/index', 'error/index');
      *     });

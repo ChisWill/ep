@@ -98,7 +98,7 @@ class InitCommand extends Command
 
     public function progressAction()
     {
-        $this->service->progress(function (ProgressBar $bar) {
+        $this->service->progress(function (ProgressBar $bar): void {
             $i = 0;
             while ($i++ < 50) {
                 $bar->advance(2);

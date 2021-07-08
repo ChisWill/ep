@@ -16,5 +16,8 @@ interface InjectorInterface
      */
     public function invoke(callable $callable, array $arguments = []);
 
-    public function make(string $class, array $arguments = []): object;
+    /**
+     * @return mixed
+     */
+    public function make(string $class, array $arguments = []);
 }

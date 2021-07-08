@@ -41,7 +41,7 @@ final class Injector implements InjectorInterface
     /**
      * {@inheritDoc}
      */
-    public function make(string $class, array $arguments = []): object
+    public function make(string $class, array $arguments = [])
     {
         $instance = $this->injector->make($class, $arguments);
 

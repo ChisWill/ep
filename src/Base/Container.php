@@ -25,7 +25,7 @@ final class Container implements ContainerInterface
 
     public function set(array $definitions): void
     {
-        $this->definitions = $definitions;
+        $this->definitions = $definitions + $this->definitions;
         $this->container = new YiiContainer($definitions, [], [], $this->rootContainer);
     }
 
@@ -67,7 +67,7 @@ final class Container implements ContainerInterface
     {
         foreach ((array) $ids as $id) {
             unset($this->definitions[$id]);
-            unset($this->map[$id]);
+            unset($this->map['new-' . $id]);
         }
     }
 }
