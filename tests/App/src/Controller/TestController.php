@@ -98,6 +98,7 @@ class TestController extends Controller
 
     public function tAction(ServerRequest $serverRequest)
     {
+        return $this->success();
     }
 
     public function reduceAction(ServerRequest $serverRequest)

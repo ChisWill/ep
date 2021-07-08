@@ -9,6 +9,7 @@ use Ep\Base\Config;
 use Ep\Contract\AnnotationInterface;
 use Doctrine\Common\Annotations\Reader;
 use Yiisoft\Injector\Injector;
+use Psr\Container\ContainerInterface;
 use Psr\SimpleCache\CacheInterface;
 use ReflectionClass;
 use ReflectionFunction;
@@ -21,15 +22,15 @@ final class Annotate
     private Injector $injector;
 
     public function __construct(
+        ContainerInterface $container,
         Config $config,
         Reader $reader,
-        CacheInterface $cache,
-        Injector $injector
+        CacheInterface $cache
     ) {
         $this->config = $config;
         $this->reader = $reader;
         $this->cache = $cache;
-        $this->injector = $injector;
+        $this->injector = new Injector($container);
     }
 
     private array $map = [];

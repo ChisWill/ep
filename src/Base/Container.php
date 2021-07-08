@@ -6,6 +6,7 @@ namespace Ep\Base;
 
 use Ep\Kit\Annotate;
 use Yiisoft\Di\Container as YiiContainer;
+use Yiisoft\Injector\Injector;
 use Psr\Container\ContainerInterface;
 
 final class Container implements ContainerInterface
@@ -13,10 +14,10 @@ final class Container implements ContainerInterface
     private ContainerInterface $rootContainer;
     private Annotate $annotate;
 
-    public function __construct(ContainerInterface $rootContainer)
+    public function __construct(ContainerInterface $rootContainer, Injector $injector)
     {
         $this->rootContainer = $rootContainer;
-        $this->annotate = $rootContainer->get(Annotate::class);
+        $this->annotate = $injector->make(Annotate::class, [$this]);
     }
 
     private array $definitions = [];
@@ -37,7 +38,7 @@ final class Container implements ContainerInterface
     {
         if (array_key_exists($id, $this->definitions)) {
             $instance = $this->container->get($id);
-            $key = $id;
+            $key = 'new-' . $id;
         } else {
             $instance = $this->rootContainer->get($id);
             $key = 'root-' . $id;

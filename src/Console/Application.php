@@ -65,12 +65,12 @@ final class Application extends SymfonyApplication
         return $new;
     }
 
-    public function createRequest(InputInterface $input = null): ConsoleRequestInterface
+    private function createRequest(InputInterface $input = null): ConsoleRequestInterface
     {
         return $this->request ?? $this->factory->createRequest($input);
     }
 
-    public function registerEvent(ConsoleRequestInterface $request): void
+    private function registerEvent(ConsoleRequestInterface $request): void
     {
         $this->errorHandler
             ->configure([
