@@ -15,24 +15,24 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class Application extends SymfonyApplication
 {
     private InjectorInterface $injector;
+    private Factory $factory;
     private InputInterface $input;
     private OutputInterface $output;
-    private Factory $factory;
     private ErrorHandler $errorHandler;
     private ErrorRenderer $errorRenderer;
 
     public function __construct(
         InjectorInterface $injector,
+        Factory $factory,
         InputInterface $input,
         OutputInterface $output,
-        Factory $factory,
         ErrorHandler $errorHandler,
         ErrorRenderer $errorRenderer
     ) {
         $this->injector = $injector;
+        $this->factory = $factory;
         $this->input = $input;
         $this->output = $output;
-        $this->factory = $factory;
         $this->errorHandler = $errorHandler;
         $this->errorRenderer = $errorRenderer;
 
@@ -53,7 +53,7 @@ final class Application extends SymfonyApplication
 
         $this->setCommandLoader($this->injector->make(CommandLoader::class, compact('request')));
 
-        return parent::run($input ?? $this->input, $output ?? $this->output);
+        return parent::run($input, $output);
     }
 
     private ?ConsoleRequestInterface $request = null;
