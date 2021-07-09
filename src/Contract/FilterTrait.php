@@ -8,10 +8,11 @@ trait FilterTrait
 {
     /**
      * @param  mixed $request
+     * @param  mixed $response
      * 
      * @return mixed
      */
-    public function before($request)
+    public function before($request, $response = null)
     {
         return true;
     }

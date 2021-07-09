@@ -122,7 +122,7 @@ final class CommandLoader implements CommandLoaderInterface
                     $request = $this->request;
                 }
                 return $this->runner
-                    ->runLoader($this->loader, $request)
+                    ->runLoader($this->loader, $request, $this->factory->createResponse($output))
                     ->getCode();
             }
         };

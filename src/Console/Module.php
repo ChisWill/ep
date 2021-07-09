@@ -17,7 +17,7 @@ abstract class Module implements ModuleInterface
     /**
      * @return true|ConsoleResponseInterface
      */
-    public function before(ConsoleRequestInterface $request)
+    public function before(ConsoleRequestInterface $request, ConsoleResponseInterface $response)
     {
         return true;
     }

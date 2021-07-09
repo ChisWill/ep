@@ -34,7 +34,7 @@ class InitCommand extends Command
         ]);
     }
 
-    public function before(ConsoleRequestInterface $request)
+    public function before(ConsoleRequestInterface $request, ConsoleResponseInterface $response)
     {
         $this->getService()->writeln('command before');
         return true;

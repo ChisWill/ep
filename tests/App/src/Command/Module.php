@@ -10,7 +10,7 @@ use Ep\Contract\ConsoleResponseInterface;
 
 final class Module extends ConsoleModule
 {
-    public function before(ConsoleRequestInterface $request)
+    public function before(ConsoleRequestInterface $request, ConsoleResponseInterface $response)
     {
         $this->getService()->writeln('App module before');
         return true;

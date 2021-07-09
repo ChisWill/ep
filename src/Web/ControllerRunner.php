@@ -27,7 +27,7 @@ final class ControllerRunner extends BaseControllerRunner
      * 
      * @return mixed
      */
-    protected function runModule(ModuleInterface $module, ControllerInterface $controller, string $action, $request)
+    protected function runModule(ModuleInterface $module, ControllerInterface $controller, string $action, $request, $response = null)
     {
         $middlewares = $module->getMiddlewares();
         if ($middlewares) {
@@ -44,7 +44,7 @@ final class ControllerRunner extends BaseControllerRunner
      * 
      * @return mixed
      */
-    protected function runAction(ControllerInterface $controller, string $action, $request)
+    protected function runAction(ControllerInterface $controller, string $action, $request, $response = null)
     {
         $middlewares = $controller->getMiddlewares();
         if ($middlewares) {

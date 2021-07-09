@@ -26,11 +26,12 @@ abstract class ControllerRunner
     /**
      * @param  mixed $handler
      * @param  mixed $request
+     * @param  mixed $response
      * 
      * @return mixed
      * @throws NotFoundException
      */
-    public function run($handler, $request)
+    public function run($handler, $request, $response = null)
     {
         return $this->runLoader(
             $this->injector
@@ -38,64 +39,69 @@ abstract class ControllerRunner
                     'suffix' => $this->getControllerSuffix()
                 ])
                 ->parse($handler),
-            $request
+            $request,
+            $response
         );
     }
 
     /**
      * @param  mixed $request
+     * @param  mixed $response
      * 
      * @return mixed
      */
-    public function runLoader(ControllerLoader $loader, $request)
+    public function runLoader(ControllerLoader $loader, $request, $response = null)
     {
-        return $this->runAll($loader->getModule(), $loader->getController(), $loader->getAction(), $request);
+        return $this->runAll($loader->getModule(), $loader->getController(), $loader->getAction(), $request, $response);
     }
 
     /**
      * @param  mixed $request
+     * @param  mixed $response
      * 
      * @return mixed
      */
-    private function runAll(?ModuleInterface $module, ControllerInterface $controller, string $action, $request)
+    private function runAll(?ModuleInterface $module, ControllerInterface $controller, string $action, $request, $response = null)
     {
         if ($module instanceof ModuleInterface) {
-            return $this->runModule($module, $controller, $action, $request);
+            return $this->runModule($module, $controller, $action, $request, $response);
         } else {
-            return $this->runAction($controller, $action, $request);
+            return $this->runAction($controller, $action, $request, $response);
         }
     }
 
     /**
      * @param  mixed $request
+     * @param  mixed $response
      * 
      * @return mixed
      */
-    protected function runModule(ModuleInterface $module, ControllerInterface $controller, string $action, $request)
+    protected function runModule(ModuleInterface $module, ControllerInterface $controller, string $action, $request, $response = null)
     {
-        $response = $module->before($request);
-        if ($response === true) {
-            return $module->after($request, $this->runAction($controller, $action, $request));
+        $result = $module->before($request, $response);
+        if ($result === true) {
+            return $module->after($request, $this->runAction($controller, $action, $request, $response));
         } else {
-            return $response;
+            return $result;
         }
     }
 
     /**
      * @param  mixed $request
+     * @param  mixed $response
      * 
      * @return mixed
      */
-    protected function runAction(ControllerInterface $controller, string $action, $request)
+    protected function runAction(ControllerInterface $controller, string $action, $request, $response = null)
     {
         if (!is_callable([$controller, $action])) {
             throw new NotFoundException(sprintf('%s::%s() is not found.', get_class($controller), $action));
         }
-        $response = $controller->before($request);
-        if ($response === true) {
-            return $controller->after($request, $this->injector->call($controller, $action, [$request]));
+        $result = $controller->before($request, $response);
+        if ($result === true) {
+            return $controller->after($request, $this->injector->call($controller, $action, array_filter([$request, $response])));
         } else {
-            return $response;
+            return $result;
         }
     }
 
