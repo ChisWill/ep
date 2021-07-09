@@ -4,19 +4,7 @@
     "common": {
         "db": null
     },
-    "apps": {
-        "ep": {
-            "generate": {
-                "db": null,
-                "model.path": "Model",
-                "model.prefix": null
-            },
-            "migrate": {
-                "path": "Migration",
-                "db": null
-            }
-        }
-    },
+    "apps": {},
     "generate": {
         "db": null,
         "model.path": "Model",
@@ -25,5 +13,11 @@
     "migrate": {
         "path": "Migration",
         "db": null
+    },
+    "serve": {
+        "address": "localhost",
+        "port": "8080",
+        "docroot": "tests/App/public",
+        "router": "tests/App/public/index.php"
     }
 }
