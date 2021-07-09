@@ -104,13 +104,13 @@ final class Service
         return $this->application->getHelperSet()->get($name);
     }
 
-    public function call(string $command, array $arguments = []): int
+    public function call(string $command, array $arguments = [], OutputInterface $output = null): int
     {
         return $this->application
             ->find($command)
             ->run(
                 new ArrayInput(compact('command') + $arguments),
-                $this->output
+                $output ?? $this->output
             );
     }
 }

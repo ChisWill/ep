@@ -6,6 +6,7 @@ use Ep\Base\Config;
 use Ep\Base\Container;
 use Ep\Base\Injector;
 use Ep\Console\Application as ConsoleApplication;
+use Ep\Console\CommandLoader;
 use Ep\Console\SymfonyEventDispatcher;
 use Ep\Contract\ErrorRendererInterface;
 use Ep\Contract\InjectorInterface;
@@ -21,6 +22,7 @@ use HttpSoft\Message\StreamFactory;
 use HttpSoft\Message\UploadedFileFactory;
 use HttpSoft\Message\UriFactory;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -79,15 +81,17 @@ return [
     // Annotation
     Reader::class => static fn (CacheItemPoolInterface $cache): Reader => $config->debug ? new AnnotationReader() : new PsrCachedReader(new AnnotationReader(), $cache, false),
     // Console
-    SymfonyEventDispatcherInterface::class => SymfonyEventDispatcher::class,
     ConsoleApplication::class => [
         'class' => ConsoleApplication::class,
         'setAutoExit()' => [false],
+        'setCommandLoader()' => [Reference::to(CommandLoaderInterface::class)],
         'setDispatcher()' => [Reference::to(SymfonyEventDispatcherInterface::class)],
         'setHelperSet()' => [
             new HelperSet([new QuestionHelper()])
         ]
     ],
+    CommandLoaderInterface::class => CommandLoader::class,
+    SymfonyEventDispatcherInterface::class => SymfonyEventDispatcher::class,
     InputInterface::class => static fn (): InputInterface => new ArgvInput(null, null),
     OutputInterface::class => ConsoleOutput::class,
     // View

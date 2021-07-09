@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ep\Console;
 
 use Ep\Base\ErrorRenderer as BaseErrorRenderer;
-use Ep\Contract\ConsoleRequestInterface;
+use Symfony\Component\Console\Input\InputInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -19,7 +19,7 @@ final class ErrorRenderer extends BaseErrorRenderer
     }
 
     /**
-     * @param ConsoleRequestInterface $request
+     * @param InputInterface $request
      */
     public function log(Throwable $t, $request): void
     {
@@ -27,7 +27,7 @@ final class ErrorRenderer extends BaseErrorRenderer
             'category' => self::class
         ];
         if ($request) {
-            $context['route'] = $request->getRoute();
+            $context['route'] = $request->getFirstArgument();
             $context['arguments'] = $request->getArguments();
             $context['options'] = $request->getOptions();
         }

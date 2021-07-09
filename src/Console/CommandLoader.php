@@ -7,14 +7,12 @@ namespace Ep\Console;
 use Ep\Base\Config;
 use Ep\Base\ControllerLoader;
 use Ep\Base\Route;
-use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Contract\NotFoundException;
 use Ep\Helper\Str;
 use Ep\Kit\Util;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Files\FileHelper;
@@ -25,17 +23,14 @@ use ReflectionMethod;
 
 final class CommandLoader implements CommandLoaderInterface
 {
-    private ConsoleRequestInterface $request;
     private Config $config;
     private Route $route;
     private ControllerRunner $controllerRunner;
     private Factory $factory;
-    private InjectorInterface $injector;
     private Util $util;
     private ControllerLoader $controllerLoader;
 
     public function __construct(
-        ConsoleRequestInterface $request,
         Config $config,
         Route $route,
         ControllerRunner $controllerRunner,
@@ -43,18 +38,15 @@ final class CommandLoader implements CommandLoaderInterface
         InjectorInterface $injector,
         Util $util
     ) {
-        $this->request = $request;
         $this->config = $config;
         $this->route = $route;
         $this->controllerRunner = $controllerRunner;
         $this->factory = $factory;
-        $this->injector = $injector;
         $this->util = $util;
 
-        $this->controllerLoader = $this->injector
-            ->make(ControllerLoader::class, [
-                'suffix' => $this->controllerRunner->getControllerSuffix()
-            ]);
+        $this->controllerLoader = $injector->make(ControllerLoader::class, [
+            'suffix' => $this->controllerRunner->getControllerSuffix()
+        ]);
     }
 
     /**
@@ -68,25 +60,22 @@ final class CommandLoader implements CommandLoaderInterface
     private function wrapCommand(string $name): SymfonyCommand
     {
         $commandName = $this->parse($name);
-        return new class ($this->controllerLoader->parse($commandName), $this->controllerRunner, $this->factory, $commandName, $name, $this->request) extends SymfonyCommand
+        return new class ($this->controllerLoader->parse($commandName), $this->controllerRunner, $this->factory, $commandName, $name) extends SymfonyCommand
         {
             private ControllerLoader $loader;
             private ControllerRunner $runner;
             private Factory $factory;
-            private ConsoleRequestInterface $request;
 
             public function __construct(
                 ControllerLoader $loader,
                 ControllerRunner $runner,
                 Factory $factory,
                 string $name,
-                string $alias,
-                ConsoleRequestInterface $request
+                string $alias
             ) {
                 $this->loader = $loader;
                 $this->runner = $runner;
                 $this->factory = $factory;
-                $this->request = $request;
 
                 if ($name !== $alias) {
                     $this->setAliases([$alias]);
@@ -116,13 +105,12 @@ final class CommandLoader implements CommandLoaderInterface
              */
             protected function execute(InputInterface $input, OutputInterface $output)
             {
-                if (!$input instanceof ArgvInput) {
-                    $request = $this->factory->createRequest($input);
-                } else {
-                    $request = $this->request;
-                }
                 return $this->runner
-                    ->runLoader($this->loader, $request, $this->factory->createResponse($output))
+                    ->runLoader(
+                        $this->loader,
+                        $this->factory->createRequest($input),
+                        $this->factory->createResponse($output)
+                    )
                     ->getCode();
             }
         };

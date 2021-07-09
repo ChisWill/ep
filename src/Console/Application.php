@@ -6,31 +6,23 @@ namespace Ep\Console;
 
 use Ep;
 use Ep\Base\ErrorHandler;
-use Ep\Contract\ConsoleRequestInterface;
-use Ep\Contract\InjectorInterface;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class Application extends SymfonyApplication
 {
-    private InjectorInterface $injector;
-    private Factory $factory;
     private InputInterface $input;
     private OutputInterface $output;
     private ErrorHandler $errorHandler;
     private ErrorRenderer $errorRenderer;
 
     public function __construct(
-        InjectorInterface $injector,
-        Factory $factory,
         InputInterface $input,
         OutputInterface $output,
         ErrorHandler $errorHandler,
         ErrorRenderer $errorRenderer
     ) {
-        $this->injector = $injector;
-        $this->factory = $factory;
         $this->input = $input;
         $this->output = $output;
         $this->errorHandler = $errorHandler;
@@ -47,36 +39,18 @@ final class Application extends SymfonyApplication
         $input ??= $this->input;
         $output ??= $this->output;
 
-        $request = $this->createRequest($input);
-
-        $this->registerEvent($request);
-
-        $this->setCommandLoader($this->injector->make(CommandLoader::class, compact('request')));
+        $this->registerEvent($input);
 
         return parent::run($input, $output);
     }
 
-    private ?ConsoleRequestInterface $request = null;
-
-    public function withRequest(ConsoleRequestInterface $request): self
-    {
-        $new = clone $this;
-        $new->request = $request;
-        return $new;
-    }
-
-    private function createRequest(InputInterface $input = null): ConsoleRequestInterface
-    {
-        return $this->request ?? $this->factory->createRequest($input);
-    }
-
-    private function registerEvent(ConsoleRequestInterface $request): void
+    private function registerEvent(InputInterface $input): void
     {
         $this->errorHandler
             ->configure([
                 'errorRenderer' => $this->errorRenderer
             ])
-            ->register($request);
+            ->register($input);
     }
 
     /**
