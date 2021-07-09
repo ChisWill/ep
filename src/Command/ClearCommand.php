@@ -18,7 +18,7 @@ final class ClearCommand extends Command
     {
         $this->config = $config;
 
-        $this->setDefinition('index')->setDescription('Clear runtime cache');
+        $this->createDefinition('index')->setDescription('Clear runtime cache');
     }
 
     public function indexAction(Aliases $aliases): ConsoleResponseInterface

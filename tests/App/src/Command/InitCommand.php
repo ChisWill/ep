@@ -28,10 +28,10 @@ class InitCommand extends Command
     {
         $this->service = $service;
 
-        $this->setDefinition('index', [
-            new InputArgument('name', null, 'your name'),
-            new InputOption('type', 't', InputOption::VALUE_NONE)
-        ]);
+        $this
+            ->createDefinition('index')
+            ->addArgument('name', null, 'your name')
+            ->addOption('type', 't', InputOption::VALUE_NONE);
     }
 
     public function before(ConsoleRequestInterface $request, ConsoleResponseInterface $response)

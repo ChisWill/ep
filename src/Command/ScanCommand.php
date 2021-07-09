@@ -18,9 +18,9 @@ final class ScanCommand extends Command
     {
         $this->service = $service;
 
-        $this->setDefinition('annotation', [
-            new InputOption('ignore', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'The pattern to ignore files')
-        ])
+        $this
+            ->createDefinition('annotation')
+            ->addOption('ignore', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'The pattern to ignore files')
             ->setDescription('Scan root path to generate annotation cache');
     }
 

@@ -18,12 +18,12 @@ final class ServeCommand extends Command
     {
         $this->service = $service;
 
-        $this->setDefinition('index', [
-            new InputOption('address', null, InputOption::VALUE_REQUIRED, 'Host to serve at'),
-            new InputOption('port', null, InputOption::VALUE_REQUIRED, 'Port to serve at'),
-            new InputOption('docroot', null, InputOption::VALUE_REQUIRED, 'Document root to serve from'),
-            new InputOption('router', null, InputOption::VALUE_REQUIRED, 'Path to router script')
-        ])
+        $this
+            ->createDefinition('index')
+            ->addOption('address', null, InputOption::VALUE_REQUIRED, 'Host to serve at')
+            ->addOption('port', null, InputOption::VALUE_REQUIRED, 'Port to serve at')
+            ->addOption('docroot', null, InputOption::VALUE_REQUIRED, 'Document root to serve from')
+            ->addOption('router', null, InputOption::VALUE_REQUIRED, 'Path to router script')
             ->setDescription('Runs PHP built-in web server');
     }
 

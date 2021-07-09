@@ -46,9 +46,9 @@ abstract class Command implements ControllerInterface
         return $this->definitions;
     }
 
-    protected function setDefinition(string $action, array $definition = []): CommandDefinition
+    protected function createDefinition(string $action): CommandDefinition
     {
-        $this->definitions[$action] ??= new CommandDefinition($definition);
+        $this->definitions[$action] ??= new CommandDefinition();
 
         return $this->definitions[$action];
     }

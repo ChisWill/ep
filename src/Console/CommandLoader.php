@@ -94,9 +94,12 @@ final class CommandLoader implements CommandLoaderInterface
                 $definitions = $command->getDefinitions();
                 if (isset($definitions[$command->actionId])) {
                     $this
-                        ->setDefinition($definitions[$command->actionId]->getDefinition())
+                        ->setDefinition($definitions[$command->actionId]->getDefinitions())
                         ->setDescription($definitions[$command->actionId]->getDescription())
                         ->setHelp($definitions[$command->actionId]->getHelp());
+                    foreach ($definitions[$command->actionId]->getUsages() as $usage) {
+                        $this->addUsage($usage);
+                    }
                 }
             }
 

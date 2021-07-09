@@ -13,9 +13,9 @@ class CurlCommand extends Command
 {
     public function __construct()
     {
-        $this->setDefinition('single', [
-            new InputArgument('action', InputArgument::REQUIRED, 'target url')
-        ]);
+        $this
+            ->createDefinition('single')
+            ->addArgument('action', InputArgument::REQUIRED, 'target url');
     }
 
     public function multiLockAction()

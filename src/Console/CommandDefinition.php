@@ -4,18 +4,34 @@ declare(strict_types=1);
 
 namespace Ep\Console;
 
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+
 final class CommandDefinition
 {
-    private array $definition;
+    private array $definitions = [];
 
-    public function __construct(array $definition = [])
+    public function getDefinitions(): array
     {
-        $this->definition = $definition;
+        return $this->definitions;
     }
 
-    public function getDefinition(): array
+    /**
+     * @param mixed $default
+     */
+    public function addArgument(string $name, int $mode = null, string $description = '', $default = null): self
     {
-        return $this->definition;
+        $this->definitions[] = new InputArgument($name, $mode, $description, $default);
+        return $this;
+    }
+
+    /**
+     * @param mixed $default
+     */
+    public function addOption(string $name, ?string $shortcut = null, int $mode = null, string $description = '', $default = null): self
+    {
+        $this->definitions[] = new InputOption($name, $shortcut, $mode, $description, $default);
+        return $this;
     }
 
     private string $description = '';
@@ -28,6 +44,19 @@ final class CommandDefinition
     public function setDescription(string $description): self
     {
         $this->description = $description;
+        return $this;
+    }
+
+    private array $usages = [];
+
+    public function getUsages(): array
+    {
+        return $this->usages;
+    }
+
+    public function addUsage(string $usage): self
+    {
+        $this->usages[] = $usage;
         return $this;
     }
 
