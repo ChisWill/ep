@@ -49,6 +49,7 @@ use Ep\Tests\App\Aspect\EchoIntAspect;
 use Ep\Tests\App\Aspect\EchoStringAspect;
 use Ep\Tests\App\Aspect\LoggerAspect;
 use Ep\Tests\App\Middleware\TimeMiddleware;
+use Ep\Tests\App\Service\DemoService;
 use Ep\Tests\Support\Container\Bird;
 use Psr\Http\Message\ResponseInterface;
 use Yiisoft\Injector\Injector;
@@ -59,9 +60,13 @@ use Yiisoft\Injector\Injector;
 class TestController extends Controller
 {
     /**
-     * @Inject
+     * @Inject(name="mary")
      */
     private TestService $service;
+    /**
+     * @Inject
+     */
+    private DemoService $demoService;
 
     /**
      * @Inject
@@ -94,6 +99,14 @@ class TestController extends Controller
         $message = 'test';
 
         return $this->render('/index/index', compact('message'));
+    }
+
+    public function injectAction()
+    {
+        return $this->json([
+            'self' => $this->service->getAttr(),
+            'demo' => $this->demoService->getAttr()
+        ]);
     }
 
     public function tAction(ServerRequest $serverRequest)

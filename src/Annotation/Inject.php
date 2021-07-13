@@ -15,6 +15,13 @@ use Reflector;
  */
 final class Inject implements AnnotationInterface
 {
+    private array $properties = [];
+
+    public function __construct(array $values)
+    {
+        $this->properties = $values;
+    }
+
     /**
      * @param  ReflectionProperty $reflector
      */
@@ -26,11 +33,19 @@ final class Inject implements AnnotationInterface
 
         foreach ($arguments as $item) {
             if (is_object($item) && is_subclass_of($item, $class, false)) {
-                $value = $item;
+                $target = $item;
                 break;
             }
         }
+        $target ??= Ep::getDi()->get($class);
 
-        $reflector->setValue($instance, $value ?? Ep::getDi()->get($class));
+        if ($this->properties) {
+            $target = clone $target;
+            foreach ($this->properties as $name => $value) {
+                $target->$name = $value;
+            }
+        }
+
+        $reflector->setValue($instance, $target);
     }
 }

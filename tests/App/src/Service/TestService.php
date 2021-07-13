@@ -15,8 +15,23 @@ final class TestService
      */
     private Service $service;
 
+    public string $name = 'empty';
+
+    protected int $age = 18;
+
+    private bool $is = false;
+
     public function getRandom(): ResponseInterface
     {
         return $this->service->string((string) mt_rand(10, 100) . '<br>');
+    }
+
+    public function getAttr(): array
+    {
+        return [
+            'name' => $this->name,
+            'age' => $this->age,
+            'is' => $this->is
+        ];
     }
 }
