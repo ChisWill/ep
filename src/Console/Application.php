@@ -44,7 +44,7 @@ final class Application extends SymfonyApplication
         return parent::run($input, $output);
     }
 
-    private function registerEvent(InputInterface $input): void
+    public function registerEvent(InputInterface $input): void
     {
         $this->errorHandler
             ->configure([

@@ -7,7 +7,7 @@ namespace Ep\Console;
 use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as SymfonyEventDispatcherInterface;
 
-class SymfonyEventDispatcher implements SymfonyEventDispatcherInterface
+class EventDispatcher implements SymfonyEventDispatcherInterface
 {
     private PsrEventDispatcherInterface $dispatcher;
 

@@ -29,15 +29,15 @@ final class Inject implements AnnotationInterface
     {
         $reflector->setAccessible(true);
 
-        $class = $reflector->getType()->getName();
+        $className = $reflector->getType()->getName();
 
-        foreach ($arguments as $item) {
-            if (is_object($item) && is_subclass_of($item, $class, false)) {
-                $target = $item;
+        foreach ($arguments as $argv) {
+            if (is_object($argv) && is_subclass_of($argv, $className, false)) {
+                $target = $argv;
                 break;
             }
         }
-        $target ??= Ep::getDi()->get($class);
+        $target ??= Ep::getDi()->get($className);
 
         if ($this->properties) {
             $target = clone $target;

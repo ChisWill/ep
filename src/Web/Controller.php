@@ -20,7 +20,13 @@ abstract class Controller implements ControllerInterface
 {
     use ContextTrait, FilterTrait, ConfigurableTrait;
 
+    /**
+     * {@inheritDoc}
+     */
     public string $id;
+    /**
+     * {@inheritDoc}
+     */
     public string $actionId;
 
     /**
@@ -62,7 +68,7 @@ abstract class Controller implements ControllerInterface
         return $this->getService()->json($data);
     }
 
-    protected function status(int $statusCode): ResponseInterface
+    protected function status(int $statusCode = Status::OK): ResponseInterface
     {
         return $this->getService()->status($statusCode);
     }

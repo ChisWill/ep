@@ -7,7 +7,7 @@ use Ep\Base\Container;
 use Ep\Base\Injector;
 use Ep\Console\Application as ConsoleApplication;
 use Ep\Console\CommandLoader;
-use Ep\Console\SymfonyEventDispatcher;
+use Ep\Console\EventDispatcher;
 use Ep\Contract\ErrorRendererInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Contract\NotFoundHandlerInterface;
@@ -91,7 +91,7 @@ return [
         ]
     ],
     CommandLoaderInterface::class => CommandLoader::class,
-    SymfonyEventDispatcherInterface::class => SymfonyEventDispatcher::class,
+    SymfonyEventDispatcherInterface::class => EventDispatcher::class,
     InputInterface::class => static fn (): InputInterface => new ArgvInput(null, null),
     OutputInterface::class => ConsoleOutput::class,
     // View

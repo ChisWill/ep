@@ -20,7 +20,13 @@ abstract class Command implements ControllerInterface
     public const OK = 0;
     public const FAIL = 1;
 
+    /**
+     * {@inheritDoc}
+     */
     public string $id;
+    /**
+     * {@inheritDoc}
+     */
     public string $actionId;
 
     /**
@@ -46,11 +52,11 @@ abstract class Command implements ControllerInterface
         return $this->definitions;
     }
 
-    protected function createDefinition(string $action): CommandDefinition
+    protected function createDefinition(string $actionId): CommandDefinition
     {
-        $this->definitions[$action] ??= new CommandDefinition();
+        $this->definitions[$actionId] ??= new CommandDefinition();
 
-        return $this->definitions[$action];
+        return $this->definitions[$actionId];
     }
 
     private ?Service $service = null;
