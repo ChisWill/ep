@@ -60,6 +60,10 @@ trait QueryTrait
                 ->orderBy($primaryKey)
                 ->all();
             if ($data) {
+                $pos = strpos($primaryKey, '.');
+                if ($pos !== false) {
+                    $primaryKey = substr($primaryKey, $pos + 1);
+                }
                 $startId = max(array_column($data, $primaryKey));
             }
             return $data;
