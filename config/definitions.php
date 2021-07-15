@@ -72,8 +72,8 @@ return [
     // Base
     ContainerInterface::class => Container::class,
     InjectorInterface::class => Injector::class,
-    Config::class => static fn (): Config => $config,
-    Aliases::class => static fn (): Aliases => new Aliases([
+    Config::class => $config,
+    Aliases::class => new Aliases([
         '@root' => $config->rootPath,
         '@vendor' => $config->vendorPath,
         '@ep' => dirname(__DIR__, 1)

@@ -39,4 +39,20 @@ class NewCloneBench
             clone $this->class;
         }
     }
+
+    public function benchArrow()
+    {
+        for ($i = 0; $i < self::COUNT; $i++) {
+            fn () => new SapiEmitter();
+        }
+    }
+
+    public function benchClosure()
+    {
+        for ($i = 0; $i < self::COUNT; $i++) {
+            function () use ($i) {
+                new SapiEmitter();
+            };
+        }
+    }
 }
