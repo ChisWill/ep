@@ -28,8 +28,7 @@ final class Module extends WebModule
 
     public function after(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        return $response;
-        $response->getBody()->write('module after');
+        $response->getBody()->write('<br>module after<br>');
         return $response;
     }
 }
