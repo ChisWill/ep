@@ -110,7 +110,10 @@ class DemoController extends Controller
     public function queryAction(Aliases $aliases, Config $config)
     {
         $result = [];
-        $query = User::find()->where(['like', 'username', 'Peter%', false]);
+        $query = User::find()
+            ->joinWith('parent')
+            ->where(['like', 'user.username', 'Peter%', false])
+            ->andWhere(['parent.gid' => 3]);
         $result['RawSql'] = $query->getRawSql();
         $user = $query->one();
         if ($user) {

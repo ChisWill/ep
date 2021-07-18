@@ -6,6 +6,7 @@ namespace Ep\Tests\App\Aspect;
 
 use Ep;
 use Ep\Contract\AnnotationInterface;
+use ReflectionMethod;
 use Reflector;
 
 /**
@@ -14,7 +15,10 @@ use Reflector;
  */
 class LoggerAspect implements AnnotationInterface
 {
-    public function process(object $instance, Reflector $reflector, array $arguments = [])
+    /**
+     * @param ReflectionMethod  $reflector
+     */
+    public function process(object $instance, Reflector $reflector, array $arguments = []): void
     {
         Ep::getLogger()->info('i am logged');
     }

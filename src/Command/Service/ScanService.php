@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ep\Command\Service;
 
+use Ep\Base\Constant;
 use Ep\Contract\AnnotationInterface;
-use Ep\Kit\Annotate;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Psr\Container\ContainerInterface;
@@ -63,9 +63,7 @@ final class ScanService extends Service
             $progressBar->advance();
         }
 
-        foreach ($data as $class => $value) {
-            $this->cache->set(Annotate::getAnnotationCacheKey($class), $value, 86400 * 365 * 50);
-        }
+        $this->cache->set(Constant::CACHE_ANNOTATION_DATA, $data, 86400 * 365 * 100);
     }
 
     /**

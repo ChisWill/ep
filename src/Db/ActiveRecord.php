@@ -7,6 +7,7 @@ namespace Ep\Db;
 use Ep;
 use Ep\Contract\NotFoundException;
 use Ep\Helper\Date;
+use Ep\Helper\Str;
 use Ep\Helper\System;
 use Ep\Widget\FormTrait;
 use Yiisoft\ActiveRecord\ActiveQuery as BaseActiveQuery;
@@ -79,7 +80,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     public function hasOne($class, array $link): BaseActiveQuery
     {
         return parent::hasOne($class, $link)
-            ->alias(lcfirst(substr(System::getCallerMethod(), 3)));
+            ->alias(lcfirst(Str::ltrim(System::getCallerMethod(), 'get')));
     }
 
     /**
@@ -88,7 +89,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     public function hasMany($class, array $link): BaseActiveQuery
     {
         return parent::hasMany($class, $link)
-            ->alias(lcfirst(substr(System::getCallerMethod(), 3)));
+            ->alias(lcfirst(Str::ltrim(System::getCallerMethod(), 'get')));
     }
 
     /**

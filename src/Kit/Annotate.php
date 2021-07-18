@@ -6,6 +6,7 @@ namespace Ep\Kit;
 
 use Ep\Annotation\Aspect;
 use Ep\Base\Config;
+use Ep\Base\Constant;
 use Ep\Contract\AnnotationInterface;
 use Doctrine\Common\Annotations\Reader;
 use Yiisoft\Injector\Injector;
@@ -16,36 +17,30 @@ use ReflectionFunction;
 
 final class Annotate
 {
-    private Config $config;
     private Reader $reader;
-    private CacheInterface $cache;
     private Injector $injector;
+    private ?array $cacheData = null;
 
     public function __construct(
         ContainerInterface $container,
-        Config $config,
         Reader $reader,
+        Config $config,
         CacheInterface $cache
     ) {
-        $this->config = $config;
         $this->reader = $reader;
-        $this->cache = $cache;
         $this->injector = new Injector($container);
+        if (!$config->debug) {
+            $this->cacheData = $cache->get(Constant::CACHE_ANNOTATION_DATA) ?: [];
+        }
     }
-
-    private array $map = [];
 
     public function class(object $instance): ?ReflectionClass
     {
         $reflectionClass = null;
-        if ($this->config->debug) {
+        if ($this->cacheData === null) {
             $exists = true;
         } else {
-            $class = get_class($instance);
-            if (!isset($this->map[$class])) {
-                $this->map[$class] = $this->cache->get(self::getAnnotationCacheKey($class), []);
-            }
-            $exists = isset($this->map[$class][AnnotationInterface::TYPE_CLASS]);
+            $exists = isset($this->cacheData[get_class($instance)][AnnotationInterface::TYPE_CLASS]);
         }
 
         if ($exists) {
@@ -64,15 +59,11 @@ final class Annotate
     {
         $reflectionClass = $this->class($instance) ?? new ReflectionClass($instance);
 
-        if ($this->config->debug) {
+        if ($this->cacheData === null) {
             $properties = $reflectionClass->getProperties();
         } else {
-            $class = get_class($instance);
-            if (!isset($this->map[$class])) {
-                $this->map[$class] = $this->cache->get(self::getAnnotationCacheKey($class), []);
-            }
             $properties = [];
-            foreach ($this->map[$class][AnnotationInterface::TYPE_PROPERTY] ?? [] as $name => $v) {
+            foreach ($this->cacheData[get_class($instance)][AnnotationInterface::TYPE_PROPERTY] ?? [] as $name => $v) {
                 $properties[] = $reflectionClass->getProperty($name);
             }
         }
@@ -91,14 +82,10 @@ final class Annotate
      */
     public function method(object $instance, string $method, array $arguments = [])
     {
-        if ($this->config->debug) {
+        if ($this->cacheData === null) {
             $reflectionMethod = (new ReflectionClass($instance))->getMethod($method);
         } else {
-            $class = get_class($instance);
-            if (!isset($this->map[$class])) {
-                $this->map[$class] = $this->cache->get(self::getAnnotationCacheKey($class), []);
-            }
-            if (isset($this->map[$class][AnnotationInterface::TYPE_METHOD][$method])) {
+            if (isset($this->cacheData[get_class($instance)][AnnotationInterface::TYPE_METHOD][$method])) {
                 $reflectionMethod = (new ReflectionClass($instance))->getMethod($method);
             }
         }
@@ -108,23 +95,13 @@ final class Annotate
             $annotations = $this->reader->getMethodAnnotations($reflectionMethod);
             foreach ($annotations as $annotation) {
                 /** @var AnnotationInterface $annotation */
-                $result = $annotation->process($instance, new ReflectionFunction($fn), $arguments);
-                if ($result === false) {
-                    return false;
-                }
                 if ($annotation instanceof Aspect) {
-                    $returnValue = $result;
+                    return $annotation->process($instance, new ReflectionFunction($fn), $arguments);
+                } else {
+                    $annotation->process($instance, $reflectionMethod, $arguments);
                 }
-            }
-            if (isset($returnValue)) {
-                return $returnValue;
             }
         }
         return $fn();
-    }
-
-    public static function getAnnotationCacheKey(string $class): string
-    {
-        return 'Ep-Annotation-' . rawurlencode($class);
     }
 }
