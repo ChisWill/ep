@@ -265,12 +265,4 @@ final class GenerateService extends Service
                 return $type;
         }
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function getId(): ?string
-    {
-        return 'generate';
-    }
 }

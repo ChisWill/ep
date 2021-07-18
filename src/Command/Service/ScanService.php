@@ -65,12 +65,4 @@ final class ScanService extends Service
 
         $this->cache->set(Constant::CACHE_ANNOTATION_DATA, $data, 86400 * 365 * 100);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function getId(): ?string
-    {
-        return null;
-    }
 }

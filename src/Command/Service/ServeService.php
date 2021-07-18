@@ -58,9 +58,4 @@ final class ServeService extends Service
         }
         return true;
     }
-
-    protected function getId(): ?string
-    {
-        return 'serve';
-    }
 }

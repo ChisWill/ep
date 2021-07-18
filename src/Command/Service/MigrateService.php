@@ -314,12 +314,4 @@ final class MigrateService extends Service
             $this->builder->createIndex('idx_version', $this->tableName, 'version');
         }
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function getId(): ?string
-    {
-        return 'migrate';
-    }
 }

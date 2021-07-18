@@ -73,7 +73,7 @@ abstract class Service
     /**
      * @throws InvalidArgumentException
      */
-    public function getAppPath(): string
+    protected function getAppPath(): string
     {
         return $this->util->getAppPath($this->userRootNamespace);
     }
@@ -98,5 +98,8 @@ abstract class Service
         throw new InvalidArgumentException($message);
     }
 
-    abstract protected function getId(): ?string;
+    private function getId(): string
+    {
+        return lcfirst(basename(str_replace('\\', '/', static::class), 'Service'));
+    }
 }
