@@ -15,7 +15,7 @@ class EchoIntAspect implements AspectInterface
     {
         /** @var ResponseInterface */
         $response = $handler->handle();
-        $response->getBody()->write('who:int<br>');
+        $response->getBody()->write(sprintf('echo int: %d<br>', mt_rand(10, 20)));
         return $response;
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ep\Tests\App\Advance\TestDir\BackAdmin\Command;
+namespace Ep\Tests\App\Advance\BackEnd\Command;
 
 use Ep\Console\Module as ConsoleModule;
 use Ep\Contract\ConsoleRequestInterface;

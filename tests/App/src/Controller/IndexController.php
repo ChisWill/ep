@@ -17,9 +17,4 @@ class IndexController extends Controller
 
         return $this->render('index', compact('message'));
     }
-
-    public function errorAction()
-    {
-        return $this->string('我错了');
-    }
 }

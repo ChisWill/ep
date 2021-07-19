@@ -20,6 +20,6 @@ class LoggerAspect implements AnnotationInterface
      */
     public function process(object $instance, Reflector $reflector, array $arguments = []): void
     {
-        Ep::getLogger()->info('i am logged');
+        Ep::getLogger()->info(sprintf('Aspect %s logged', __METHOD__));
     }
 }

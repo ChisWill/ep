@@ -6,28 +6,34 @@ namespace Ep\Tests\App\Controller;
 
 use DateInterval;
 use Ep;
-use Ep\Base\Config;
 use Ep\Db\Query;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Facade\Cache as FacadeCache;
 use Ep\Tests\App\Facade\Logger;
 use Ep\Tests\App\Form\TestForm;
-use Ep\Tests\App\Model\User;
+use Ep\Tests\App\Model\Student;
 use Ep\Web\ServerRequest;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
-use Yiisoft\Db\Redis\Connection;
+use Yiisoft\Db\Connection\Connection;
+use Yiisoft\Db\Redis\Connection as RedisConnection;
 use Yiisoft\Http\Method;
 use Yiisoft\Session\SessionInterface;
 
 class DemoController extends Controller
 {
     public string $title = 'Demo';
+
+    private Connection $db;
+
+    public function __construct()
+    {
+        $this->db = Ep::getDb('sqlite');
+    }
 
     public function indexAction()
     {
@@ -74,15 +80,15 @@ class DemoController extends Controller
 
     public function redirectAction(ServerRequestInterface $request)
     {
-        $id = User::find()->orderBy('id DESC')->select('id')->scalar();
+        $id = Student::find($this->db)->orderBy('id DESC')->select('id')->scalar();
 
         return $this->redirect('arform?id=' . $id);
     }
 
-    public function loggerAction(LoggerInterface $logger)
+    public function logAction(LoggerInterface $logger)
     {
-        $logger->info('halo');
-        return $this->string('over');
+        $logger->info(sprintf('%s logged', __METHOD__));
+        return $this->string('logged');
     }
 
     public function cacheAction(Cache $cache)
@@ -94,26 +100,27 @@ class DemoController extends Controller
 
     public function saveAction()
     {
-        $user = new User;
-        $user->username = 'Peter' . mt_rand(0, 1000);
+        $user = new Student($this->db);
+        $user->username = '路人甲' . mt_rand(0, 100);
+        $user->class_id = 3;
         $user->age = mt_rand(0, 100);
         $r1 = $user->insert();
 
 
-        $user = User::findModel(1);
-        $user->username = 'Mary' . mt_rand(0, 1000);
+        $user = Student::findModel(1, $this->db);
+        $user->desc = 'desc has been updated' . mt_rand(0, 100);
         $r2 = $user->update();
 
         return $this->json(compact('r1', 'r2'));
     }
 
-    public function queryAction(Aliases $aliases, Config $config)
+    public function queryAction()
     {
         $result = [];
-        $query = User::find()
-            ->joinWith('parent')
-            ->where(['like', 'user.username', 'Peter%', false])
-            ->andWhere(['parent.gid' => 3]);
+        $query = Student::find($this->db)
+            ->joinWith('class')
+            ->where(['like', 'student.name', 'A%', false])
+            ->andWhere(['class.id' => 3]);
         $result['RawSql'] = $query->getRawSql();
         $user = $query->one();
         if ($user) {
@@ -134,22 +141,22 @@ class DemoController extends Controller
         $upsert = 0;
         $delete = 0;
 
-        $insert = Query::find()->insert('user', [
-            'pid' => 1,
-            'username' => 'a'
+        $insert = Query::find($this->db)->insert('student', [
+            'class_id' => 1,
+            'name' => '路人乙' . mt_rand(0, 100)
         ]);
-        $insert = Query::find()->insert('user', Query::find()->from('user')->select(['username', 'age'])->where('id=69'));
-        $update =  Query::find()->update('user', ['username' => 'mary-bob-' . mt_rand()], 'id=:id', [':id' => 76]);
+        $insert = Query::find($this->db)->insert('student', Query::find($this->db)->from('student')->select(['name', 'age'])->where(['id' => 1]));
+        $update =  Query::find($this->db)->update('student', ['desc' => 'code: ' . mt_rand()], 'id=:id', [':id' => 2]);
 
-        $batchInsert = Query::find()->batchInsert('user', ['username', 'age'], [
+        $batchInsert = Query::find($this->db)->batchInsert('student', ['name', 'age'], [
             ['a1', 11],
             ['b1', 22],
             ['c1', 33],
         ]);
-        $upsert = Query::find()->upsert('user', ['id' => 72, 'username' => 'julia', 'age' => 99], ['age' => 33]);
-        $delete = Query::find()->delete('user', ['id' => 75]);
+        $upsert = Query::find($this->db)->upsert('student', ['id' => 72, 'name' => 'julia', 'age' => 99], ['age' => 33]);
+        $delete = Query::find($this->db)->delete('student', ['id' => 75]);
 
-        $increment = Query::find()->increment('user', ['age' => -1, 'name' => 'peter'], 'id=:id', [':id' => 9]);
+        $increment = Query::find($this->db)->increment('student', ['age' => -1, 'name' => 'peter'], 'id=:id', [':id' => 9]);
 
         return compact('insert', 'update', 'batchInsert', 'upsert', 'delete', 'increment');
     }
@@ -161,7 +168,7 @@ class DemoController extends Controller
         return $this->string();
     }
 
-    public function redisAction(Connection $redis)
+    public function redisAction(RedisConnection $redis)
     {
         $result = [];
         $r = $redis->set('a', mt_rand(0, 100), 'ex', 5, 'nx');
@@ -174,7 +181,7 @@ class DemoController extends Controller
 
     public function validateAction()
     {
-        $user = User::findModel(1);
+        $user = Student::findModel(1, $this->db);
         $r = $user->validate();
         if ($r) {
             return $this->string('validate ok');
@@ -185,8 +192,8 @@ class DemoController extends Controller
 
     public function getUserAction()
     {
-        $data = User::find()
-            ->joinWith('parent')
+        $data = Student::find($this->db)
+            ->joinWith('class')
             ->asArray()
             ->one();
 
@@ -208,21 +215,21 @@ class DemoController extends Controller
 
     public function arformAction(ServerRequestInterface $request)
     {
-        $user = User::findModel($request->getQueryParams()['id'] ?? 0);
-        if ($user->load($request)) {
-            $trans = Ep::getDb()->beginTransaction();
-            if (!$user->validate()) {
-                return $this->error($user->getErrors());
+        $student = Student::findModel($request->getQueryParams()['id'] ?? 0, $this->db);
+        if ($student->load($request)) {
+            $trans = $this->db->beginTransaction();
+            if (!$student->validate()) {
+                return $this->error($student->getErrors());
             }
-            if ($user->save()) {
+            if ($student->save()) {
                 $trans->commit();
                 return $this->success();
             } else {
                 $trans->rollBack();
-                return $this->error($user->getErrors());
+                return $this->error($student->getErrors());
             }
         }
-        return $this->render('arform', compact('user'));
+        return $this->render('arform', compact('student'));
     }
 
     public function wsAction()
@@ -258,13 +265,13 @@ class DemoController extends Controller
 
     public function paginateAction(ServerRequest $serverRequest)
     {
-        $page = $serverRequest->getQueryParams()['page'] ?? 1;
-        $query = User::find()->asArray();
+        $page = (int) ($serverRequest->getQueryParams()['page'] ?? 1);
+        $query = Student::find($this->db)->asArray();
         $count = $query->count();
 
         return $this->json([
             'count' => $count,
-            'all' => $query->getPaginator()->all((int) $page, 3),
+            'all' => $query->getPaginator()->all($page, 3),
         ]);
     }
 

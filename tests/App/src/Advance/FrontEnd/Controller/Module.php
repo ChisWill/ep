@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ep\Tests\App\Advance\TestDir\BackAdmin\Controller;
+namespace Ep\Tests\App\Advance\FrontEnd\Controller;
 
 use Ep\Web\Module as WebModule;
 use Psr\Http\Message\ResponseInterface;

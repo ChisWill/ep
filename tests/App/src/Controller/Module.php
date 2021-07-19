@@ -23,12 +23,10 @@ final class Module extends WebModule
     public function before(ServerRequestInterface $request)
     {
         return true;
-        return $this->getService()->string('deny');
     }
 
     public function after(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $response->getBody()->write('<br>module after<br>');
         return $response;
     }
 }

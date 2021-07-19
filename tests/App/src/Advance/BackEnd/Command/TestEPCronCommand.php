@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ep\Tests\App\Advance\TestDir\BackAdmin\Command;
+namespace Ep\Tests\App\Advance\BackEnd\Command;
 
 use Ep\Console\Command;
 
-final class ADGTeCommand extends Command
+final class TestEPCronCommand extends Command
 {
     public function sayAction()
     {
@@ -17,9 +17,8 @@ final class ADGTeCommand extends Command
     {
         ob_start();
         $code = $this->getService()->call('init', ['name' => 'ChisWill']);
-        $od = ob_get_clean();
-        tt($od, 'over');
+        $echo = ob_get_clean();
 
-        return $this->success('call over, code: ' . $code);
+        return $this->success('call over, code: ' . $code . ', echo: ' . $echo);
     }
 }

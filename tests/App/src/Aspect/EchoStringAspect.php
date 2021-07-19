@@ -6,7 +6,7 @@ namespace Ep\Tests\App\Aspect;
 
 use Ep\Contract\AspectInterface;
 use Ep\Contract\HandlerInterface;
-use Ep\Web\ServerRequest;
+use Ep\Helper\Str;
 use Psr\Http\Message\ResponseInterface;
 
 class EchoStringAspect implements AspectInterface
@@ -24,7 +24,7 @@ class EchoStringAspect implements AspectInterface
     {
         /** @var ResponseInterface */
         $response = $handler->handle();
-        $response->getBody()->write('get:who:string,params:' . json_encode([$this->name, $this->age]) . '<br>');
+        $response->getBody()->write(sprintf('echo string: %s, params: %s<br>', Str::random(6), json_encode([$this->name, $this->age])));
         return $response;
     }
 }

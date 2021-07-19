@@ -18,6 +18,7 @@ use Yiisoft\Http\Method;
 use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Strings\StringHelper;
 use Psr\Http\Message\ServerRequestInterface;
+use Yiisoft\Db\Connection\Connection;
 
 abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
 {
@@ -58,15 +59,15 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
      * @return static
      * @throws NotFoundException
      */
-    public static function findModel($condition)
+    public static function findModel($condition, Connection $db = null)
     {
         if (empty($condition)) {
-            return new static();
+            return new static($db);
         } else {
             if (is_scalar($condition) && is_string(static::PK)) {
                 $condition = [static::PK => $condition];
             }
-            $model = static::find()->where($condition)->one();
+            $model = static::find($db)->where($condition)->one();
             if ($model === null) {
                 throw new NotFoundException("Data is not found.");
             }

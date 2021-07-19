@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App\Aspect;
 
-use Ep\Annotation\Inject;
 use Ep\Contract\AspectInterface;
-use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
 use Ep\Contract\HandlerInterface;
 
@@ -16,7 +14,7 @@ class ConsoleAspect implements AspectInterface
     {
         /** @var ConsoleResponseInterface */
         $response = $handler->handle();
-        $response->writeln('aspect after');
+        $response->writeln('Aspect after');
         return $response;
     }
 }

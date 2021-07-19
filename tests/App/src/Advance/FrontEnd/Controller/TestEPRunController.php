@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ep\Tests\App\Advance\TestDir\BackAdmin\Controller;
+namespace Ep\Tests\App\Advance\FrontEnd\Controller;
 
 use Ep\Tests\App\Component\Controller;
 
-final class AdTestController extends Controller
+final class TestEPRunController extends Controller
 {
     public function sayAction()
     {

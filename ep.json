@@ -6,7 +6,7 @@
     },
     "apps": {},
     "generate": {
-        "db": null,
+        "db": "sqlite",
         "model.path": "Model",
         "model.prefix": null
     },
