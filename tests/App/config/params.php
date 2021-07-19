@@ -3,5 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'domain' => 'ep.cc'
+    'domain' => 'ep.cc',
+    'db' => require('db.php')
 ];

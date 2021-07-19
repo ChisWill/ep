@@ -8,7 +8,6 @@
     "require": {
         "php": ">=7.4",
         "ext-json": "*",
-        "ext-mbstring": "*",
         "chiswill/ep-helper": "*",
         "doctrine/annotations": "^1.13",
         "httpsoft/http-message": "^1.0.5",
@@ -21,8 +20,7 @@
         "yiisoft/arrays": "^1.0",
         "yiisoft/assets": "^1.0",
         "yiisoft/cache-file": "dev-master",
-        "yiisoft/db-mysql": "dev-master",
-        "yiisoft/db-redis": "1.0.x-dev",
+        "yiisoft/db": "3.0.x-dev",
         "yiisoft/di": "^3.0",
         "yiisoft/files": "^1.0",
         "yiisoft/http": "^1.0",
@@ -38,6 +36,8 @@
         "phpbench/phpbench": "^1.0.0",
         "phpunit/phpunit": "^9.4",
         "vimeo/psalm": "^4.5",
+        "yiisoft/db-mysql": "3.0.x-dev",
+        "yiisoft/db-redis": "1.0.x-dev",
         "yiisoft/db-sqlite": "dev-master"
     },
     "autoload": {

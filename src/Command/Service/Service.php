@@ -10,6 +10,7 @@ use Ep\Console\Service as ConsoleService;
 use Ep\Kit\Util;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Connection\Connection;
+use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Factory\Exception\NotFoundException;
 use Yiisoft\Files\FileHelper;
 use Yiisoft\Files\PathMatcher\PathMatcher;
@@ -55,7 +56,7 @@ abstract class Service
         }
     }
 
-    protected ?Connection $db = null;
+    protected ?ConnectionInterface $db = null;
 
     protected function getDb(): Connection
     {

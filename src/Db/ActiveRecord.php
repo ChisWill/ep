@@ -12,7 +12,6 @@ use Ep\Helper\System;
 use Ep\Widget\FormTrait;
 use Yiisoft\ActiveRecord\ActiveQuery as BaseActiveQuery;
 use Yiisoft\ActiveRecord\ActiveRecord as BaseActiveRecord;
-use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Http\Method;
@@ -46,14 +45,14 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
      * 
      * @return static|null
      */
-    public static function findOne($pk, Connection $db = null)
+    public static function findOne($pk, ConnectionInterface $db = null)
     {
         return static::find($db)
             ->where([static::PK => $pk])
             ->one();
     }
 
-    public static function findAll(array $condition, Connection $db = null): array
+    public static function findAll(array $condition, ConnectionInterface $db = null): array
     {
         return static::find($db)
             ->where($condition)
@@ -66,7 +65,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
      * @return static
      * @throws NotFoundException
      */
-    public static function findModel($condition, Connection $db = null)
+    public static function findModel($condition, ConnectionInterface $db = null)
     {
         if (empty($condition)) {
             return new static($db);

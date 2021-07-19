@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
-use Ep\Web\Middleware\InterceptorMiddleware;
-use Ep\Web\Middleware\RouteMiddleware;
-use Yiisoft\Http\Method;
-use Yiisoft\Session\SessionMiddleware;
 use Closure;
 use InvalidArgumentException;
 
@@ -82,45 +78,9 @@ final class Config
      */
     public string $layoutDir = '_layouts';
     /**
-     * Web middlewares
-     */
-    public array $webMiddlewares = [
-        RouteMiddleware::class,
-        SessionMiddleware::class,
-        InterceptorMiddleware::class
-    ];
-    /**
      * Events
      */
     public array $events = [];
-    /**
-     * Mysql dsn
-     */
-    public string $mysqlDsn = '';
-    /**
-     * Mysql username
-     */
-    public string $mysqlUsername = '';
-    /**
-     * Mysql password
-     */
-    public string $mysqlPassword = '';
-    /**
-     * Redis Host
-     */
-    public string $redisHost = 'localhost';
-    /**
-     * Redis Port
-     */
-    public int $redisPort = 6379;
-    /**
-     * Redis Database
-     */
-    public int $redisDatabase = 0;
-    /**
-     * Redis Password
-     */
-    public ?string $redisPassword = null;
     /**
      * Application secretKey
      */
@@ -162,9 +122,6 @@ final class Config
             $this->$key = $val;
         }
         if ($this->debug) {
-            if (array_key_exists('defaultRoute', $config)) {
-                throw new InvalidArgumentException('The "defaultRoute" configuration can not be modified.');
-            }
             if ($this->rootPath === '') {
                 throw new InvalidArgumentException('The "rootPath" configuration is required.');
             }
@@ -180,16 +137,6 @@ final class Config
     public function __set(string $name, $value)
     {
         throw new InvalidArgumentException("The \"{$name}\" configuration is invalid.");
-    }
-
-    /**
-     * Default route rule
-     */
-    private array $defaultRoute = [Method::ALL, '{prefix:[\w/-]*?}{controller:/?[a-zA-Z][\w-]*|}{action:/?[a-zA-Z][\w-]*|}', '<prefix>/<controller>/<action>'];
-
-    public function getDefaultRoute(): array
-    {
-        return $this->defaultRoute;
     }
 
     public function getDi(): array

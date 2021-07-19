@@ -19,7 +19,7 @@ final class Route implements ConfigurableInterface
 {
     use ConfigurableTrait;
 
-    protected bool $defaultRoute = true;
+    protected bool $enableDefaultRoute = true;
     protected string $baseUrl = '';
     protected Closure $rule;
 
@@ -32,6 +32,13 @@ final class Route implements ConfigurableInterface
         $this->aliases = $aliases;
     }
 
+    private array $defaultRoute = [Method::ALL, '{prefix:[\w/-]*?}{controller:/?[a-zA-Z][\w-]*|}{action:/?[a-zA-Z][\w-]*|}', '<prefix>/<controller>/<action>'];
+
+    public function getDefaultRoute(): array
+    {
+        return $this->defaultRoute;
+    }
+
     /**
      * @throws NotFoundException
      */
@@ -42,8 +49,8 @@ final class Route implements ConfigurableInterface
                 if (isset($this->rule)) {
                     $route->addGroup($this->baseUrl, $this->rule);
                 }
-                if ($this->defaultRoute) {
-                    $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->config->getDefaultRoute()));
+                if ($this->enableDefaultRoute) {
+                    $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->defaultRoute));
                 }
             }, [
                 'cacheFile' => $this->aliases->get($this->config->runtimeDir . '/route.cache'),

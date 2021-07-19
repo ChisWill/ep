@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Ep\Web;
 
-use Ep\Base\Config;
 use Ep\Base\ErrorHandler;
 use Ep\Contract\NotFoundHandlerInterface;
+use Ep\Web\Middleware\InterceptorMiddleware;
+use Ep\Web\Middleware\RouteMiddleware;
 use Yiisoft\Http\Method;
+use Yiisoft\Session\SessionMiddleware;
 use Yiisoft\Yii\Web\SapiEmitter;
 use Yiisoft\Yii\Web\ServerRequestFactory;
 use Psr\Http\Message\ResponseInterface;
@@ -15,7 +17,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class Application
 {
-    private Config $config;
     private ServerRequestFactory $serverRequestFactory;
     private ErrorHandler $errorHandler;
     private RequestHandlerFactory $requestHandlerFactory;
@@ -23,14 +24,12 @@ final class Application
     private SapiEmitter $sapiEmitter;
 
     public function __construct(
-        Config $config,
         ServerRequestFactory $serverRequestFactory,
         ErrorHandler $errorHandler,
         RequestHandlerFactory $requestHandlerFactory,
         NotFoundHandlerInterface $notFoundHandler,
         SapiEmitter $sapiEmitter
     ) {
-        $this->config = $config;
         $this->serverRequestFactory = $serverRequestFactory;
         $this->errorHandler = $errorHandler;
         $this->requestHandlerFactory = $requestHandlerFactory;
@@ -38,11 +37,24 @@ final class Application
         $this->sapiEmitter = $sapiEmitter;
     }
 
+    private array $middlewares = [
+        RouteMiddleware::class,
+        SessionMiddleware::class,
+        InterceptorMiddleware::class
+    ];
+
+    public function withMiddlewares(array $middlewares): self
+    {
+        $new = clone $this;
+        $new->middlewares = $middlewares;
+        return $new;
+    }
+
     public function run(): void
     {
         $request = $this->createRequest();
 
-        $this->registerEvent($request);
+        $this->register($request);
 
         $this->emit($request, $this->handleRequest($request));
     }
@@ -52,7 +64,7 @@ final class Application
         return new ServerRequest($this->serverRequestFactory->createFromGlobals());
     }
 
-    public function registerEvent(ServerRequestInterface $request): void
+    public function register(ServerRequestInterface $request): void
     {
         $this->errorHandler->register($request);
     }
@@ -60,7 +72,7 @@ final class Application
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
     {
         return $this->requestHandlerFactory
-            ->wrap($this->config->webMiddlewares, $this->notFoundHandler)
+            ->wrap($this->middlewares, $this->notFoundHandler)
             ->handle($request);
     }
 

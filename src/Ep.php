@@ -7,7 +7,6 @@ use Ep\Contract\InjectorInterface;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Db\Connection\Connection;
-use Yiisoft\Db\Redis\Connection as RedisConnection;
 use Yiisoft\Di\Container as YiiContainer;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -48,11 +47,6 @@ final class Ep
     public static function getDb(?string $id = null): Connection
     {
         return self::$container->get($id ?: Connection::class);
-    }
-
-    public static function getRedis(?string $id = null): RedisConnection
-    {
-        return self::$container->get($id ?: RedisConnection::class);
     }
 
     public static function getCache(?string $id = null): CacheInterface

@@ -38,9 +38,6 @@ use Yiisoft\Assets\AssetPublisherInterface;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface as YiiCacheInterface;
 use Yiisoft\Cache\File\FileCache;
-use Yiisoft\Db\Connection\Connection;
-use Yiisoft\Db\Mysql\Connection as MysqlConnection;
-use Yiisoft\Db\Redis\Connection as RedisConnection;
 use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
 use Yiisoft\EventDispatcher\Provider\ListenerCollection;
 use Yiisoft\EventDispatcher\Provider\Provider;
@@ -126,19 +123,4 @@ return [
     ErrorRendererInterface::class => ErrorRenderer::class,
     // Default NotFoundHandler
     NotFoundHandlerInterface::class => NotFoundHandler::class,
-    // Default DB
-    Connection::class => [
-        'class' => MysqlConnection::class,
-        '__construct()' => [$config->mysqlDsn],
-        'setUsername()' => [$config->mysqlUsername],
-        'setPassword()' => [$config->mysqlPassword]
-    ],
-    // Default Redis
-    RedisConnection::class => [
-        'class' => RedisConnection::class,
-        'hostname()' => [$config->redisHost],
-        'database()' => [$config->redisDatabase],
-        'password()' => [$config->redisPassword],
-        'port()'     => [$config->redisPort]
-    ]
 ];

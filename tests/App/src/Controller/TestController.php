@@ -11,8 +11,6 @@ use Ep\Db\Query;
 use Ep\Helper\Str;
 use Ep\Helper\System;
 use Ep\Tests\App\Component\Controller;
-use Ep\Tests\App\Model\User;
-use Ep\Tests\App\Model\UserParent;
 use Ep\Tests\App\Service\TestService;
 use Ep\Tests\Support\Container\AngelWing;
 use Ep\Tests\Support\Container\Benz;
@@ -20,24 +18,19 @@ use Ep\Tests\Support\Container\BMW;
 use Ep\Tests\Support\Container\CarInterface;
 use Ep\Tests\Support\Container\DragoonEngine;
 use Ep\Tests\Support\Container\EngineInterface;
-use Ep\Tests\Support\Container\MegaBird;
 use Ep\Tests\Support\Container\WingInterface;
 use Ep\Tests\Support\Container\XEngine;
-use Ep\Tests\Support\Middleware\AddMiddleware;
 use Ep\Tests\Support\Middleware\CheckMiddleware;
 use Ep\Tests\Support\Middleware\FilterMiddleware;
-use Ep\Tests\Support\Middleware\InitMiddleware;
 use Ep\Tests\Support\Middleware\MultipleMiddleware;
 use Ep\Tests\Support\RequestHandler\ShowAttributeHandler;
-use Ep\Web\ErrorHandler;
-use Ep\Web\ErrorRenderer;
 use Ep\Web\RequestHandlerFactory;
 use Ep\Web\ServerRequest;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Redis\Connection;
+use Yiisoft\Db\Redis\Connection as RedisConnenct;
 use Yiisoft\Di\CompositeContainer;
 use Yiisoft\Di\Container;
 use Yiisoft\Strings\StringHelper;
@@ -49,9 +42,10 @@ use Ep\Tests\App\Aspect\EchoIntAspect;
 use Ep\Tests\App\Aspect\EchoStringAspect;
 use Ep\Tests\App\Aspect\LoggerAspect;
 use Ep\Tests\App\Middleware\TimeMiddleware;
+use Ep\Tests\App\Model\Student;
 use Ep\Tests\App\Service\DemoService;
-use Ep\Tests\Support\Container\Bird;
 use Psr\Http\Message\ResponseInterface;
+use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Injector\Injector;
 
 /**
@@ -75,6 +69,8 @@ class TestController extends Controller
 
     public string $title = 'Test';
 
+    private Connection $db;
+
     public function __construct()
     {
         $this->setMiddlewares([
@@ -82,6 +78,8 @@ class TestController extends Controller
             MultipleMiddleware::class,
             TimeMiddleware::class
         ]);
+
+        $this->db = Ep::getDb('sqlite');
     }
 
     public function before(ServerRequestInterface $request)
@@ -117,13 +115,16 @@ class TestController extends Controller
     public function reduceAction(ServerRequest $serverRequest)
     {
         $n1 = 0;
-        $r1 = User::find()->limit(2)->select(['id', 'username', 'age'])->reduce($n1, function ($data) {
-            $ages = array_column($data, 'age');
-            return array_sum($ages);
-        });
+        $r1 = Student::find($this->db)
+            ->limit(2)
+            ->select(['id', 'name', 'age'])
+            ->reduce($n1, function ($data) {
+                $ages = array_column($data, 'age');
+                return array_sum($ages);
+            });
 
         $n2 = 0;
-        $r2 = Query::find()->from('user')->limit(2)->reduce($n2, function ($data) {
+        $r2 = Query::find($this->db)->from('student')->limit(2)->reduce($n2, function ($data) {
             $ages = array_column($data, 'age');
             return array_sum($ages);
         });
@@ -199,10 +200,10 @@ class TestController extends Controller
 
     public function mapAction()
     {
-        $map = User::find()
-            ->joinWith('parent')
-            ->where('user.age > 100')
-            ->map('parent.id', 'user.age');
+        $map = Student::find($this->db)
+            ->joinWith('class')
+            ->where('student.age > 10')
+            ->map('class.id', 'student.age');
 
         return $this->json($map);
     }
@@ -230,9 +231,7 @@ class TestController extends Controller
 
     public function sqliteAction()
     {
-        $db = Ep::getDb('sqlite');
-
-        $result = Query::find($db)->from('user')->all();
+        $result = Query::find($this->db)->from('user')->all();
 
         return $this->json($result);
     }

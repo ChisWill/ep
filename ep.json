@@ -11,8 +11,8 @@
         "model.prefix": null
     },
     "migrate": {
-        "path": "Migration",
-        "db": "sqlite"
+        "db": "sqlite",
+        "path": "Migration"
     },
     "serve": {
         "address": "localhost",

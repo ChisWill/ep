@@ -132,7 +132,7 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
                 continue;
             }
             foreach ($values as $value) {
-                $output .= "$name: $value\n";
+                $output .= "{$name}: {$value}\n";
             }
         }
         $output .= "\n" . $request->getBody() . "\n\n";
@@ -152,32 +152,15 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
 
     public function argumentsToString(array $args): string
     {
-        $count = 0;
         $isAssoc = $args !== array_values($args);
 
         foreach ($args as $key => $value) {
-            $count++;
-            if ($count >= 5) {
-                if ($count > 5) {
-                    unset($args[$key]);
-                } else {
-                    $args[$key] = '...';
-                }
-                continue;
-            }
-
             if (is_object($value)) {
                 $args[$key] = '<span class="title">' . $this->htmlEncode(get_class($value)) . '</span>';
             } elseif (is_bool($value)) {
                 $args[$key] = '<span class="keyword">' . ($value ? 'true' : 'false') . '</span>';
             } elseif (is_string($value)) {
-                $fullValue = $this->htmlEncode($value);
-                if (mb_strlen($value, 'UTF-8') > 64) {
-                    $displayValue = $this->htmlEncode(mb_substr($value, 0, 64, 'UTF-8')) . '...';
-                    $args[$key] = "<span class=\"string\" title=\"$fullValue\">'$displayValue'</span>";
-                } else {
-                    $args[$key] = "<span class=\"string\">'$fullValue'</span>";
-                }
+                $args[$key] = '<span class="string">\'' . $this->htmlEncode($value) . '\'</span>';
             } elseif (is_array($value)) {
                 $args[$key] = '[' . $this->argumentsToString($value) . ']';
             } elseif ($value === null) {
@@ -189,9 +172,9 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
             }
 
             if (is_string($key)) {
-                $args[$key] = '<span class="string">\'' . $this->htmlEncode($key) . "'</span> => $args[$key]";
+                $args[$key] = '<span class="string">\'' . $this->htmlEncode($key) . "'</span> => {$args[$key]}";
             } elseif ($isAssoc) {
-                $args[$key] = "<span class=\"number\">$key</span> => $args[$key]";
+                $args[$key] = "<span class=\"number\">{$key}</span> => {$args[$key]}";
             }
         }
 
