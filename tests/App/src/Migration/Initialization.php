@@ -11,17 +11,22 @@ final class Initialization implements MigrateInterface
 {
     public static function getName(): string
     {
-        return 'Init DDL';
+        return 'Initialization';
     }
 
     public function up(MigrateBuilder $builder): void
     {
         $builder->execute(<<<'DDL'
 CREATE TABLE "school" (
-"id"  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-"name"  TEXT NOT NULL
+	 "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	 "name" TEXT NOT NULL
 );
 DDL);
+
+        $builder->batchInsert('school', ['id', 'name'], [
+            ['1', '托尔兹士官学院'],
+            ['2', '警察学院'],
+        ]);
     }
 
     public function down(MigrateBuilder $builder): void

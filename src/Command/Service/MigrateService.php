@@ -11,10 +11,10 @@ use Ep\Db\Query;
 use Ep\Db\Service as DbService;
 use Ep\Helper\Date;
 use Ep\Helper\File;
-use Psr\Container\ContainerInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Files\FileHelper;
 use Yiisoft\Files\PathMatcher\PathMatcher;
+use Psr\Container\ContainerInterface;
 use Closure;
 use Throwable;
 
@@ -68,15 +68,28 @@ final class MigrateService extends Service
                 $downSql .= sprintf('%s$builder->dropTable(\'%s\');%s', str_repeat(' ', 8), $tableName, "\n");
             }
         }
+        $insertData = [];
+        if ($this->options['data']) {
+            foreach ($tables as $tableName) {
+                $data = Query::find($this->getDb())->from($tableName)->all();
+                if (!$data) {
+                    continue;
+                }
+                $insertData[$tableName] = [
+                    'columns' => array_keys($data[0]),
+                    'rows' => $data
+                ];
+            }
+        }
 
-        $this->createFile('migrate/init', $this->initClassName, compact('name', 'upSql', 'downSql'));
+        $this->createFile('migrate/init', $this->initClassName, compact('name', 'upSql', 'downSql', 'insertData'));
     }
 
     public function list(): void
     {
         $this->createTable();
 
-        $list = array_map([$this, 'getClassNameByFile'], $this->findMigrations(true));
+        $list = array_map([$this, 'getClassNameByFile'], $this->findMigrations());
         $history = $this->getHistory();
 
         $total = count($list);
@@ -96,11 +109,9 @@ final class MigrateService extends Service
     }
 
     private int $step;
-    private bool $all;
 
     public function up(): void
     {
-        $this->all = $this->options['all'];
         $this->step = (int) ($this->options['step'] ?? 0);
 
         $this->migrate('up', function (array $instances): bool {
@@ -116,13 +127,12 @@ final class MigrateService extends Service
             }
             return $this->consoleService->confirm(sprintf('Apply the above migration%s?', $count > 1 ? 's' : ''), true);
         }, function (array $instances): void {
-            $rows = [];
-            $now = Date::fromUnix();
-            foreach ($instances as $instance) {
-                $rows[] = [$this->replaceFromClassName($instance), $now];
-            }
 
-            $this->builder->batchInsert($this->tableName, ['version', ActiveRecord::CREATED_AT], $rows);
+            $this->builder->batchInsert(
+                $this->tableName,
+                ['version', ActiveRecord::CREATED_AT],
+                array_map(fn ($instance): array => [$this->replaceFromClassName(get_class($instance)), Date::fromUnix()], $instances)
+            );
 
             $this->consoleService->writeln(sprintf('Commit count: %d.', count($instances)));
         });
@@ -130,8 +140,7 @@ final class MigrateService extends Service
 
     public function down(): void
     {
-        $this->all = $this->options['all'];
-        $this->step = $this->all ? 0 : (int) ($this->options['step'] ?? 1);
+        $this->step = $this->options['all'] ? 0 : (int) ($this->options['step'] ?? 1);
 
         $this->migrate('down', function (array $instances): bool {
             if (!$instances) {
@@ -146,7 +155,11 @@ final class MigrateService extends Service
             }
             return $this->consoleService->confirm(sprintf('Revert the above migration%s?', $count > 1 ? 's' : ''));
         }, function (array $instances): void {
-            $this->builder->delete($this->tableName, ['version' => array_map([$this, 'replaceFromClassName'], $instances)]);
+
+            $this->builder->delete(
+                $this->tableName,
+                ['version' => array_map(fn ($instance): string => $this->replaceFromClassName(get_class($instance)), $instances)]
+            );
 
             $this->consoleService->writeln(sprintf('Revert count: %d.', count($instances)));
         });
@@ -156,13 +169,9 @@ final class MigrateService extends Service
     {
         $this->createTable();
 
-        $files = $this->findMigrations($this->all);
+        $files = $this->findMigrations();
 
-        if ($this->all && $method === 'up') {
-            $history = [];
-        } else {
-            $history = $this->getHistory();
-        }
+        $history = $this->getHistory();
 
         switch ($method) {
             case 'up':
@@ -237,14 +246,10 @@ final class MigrateService extends Service
         );
     }
 
-    private function findMigrations(bool $all = false): array
+    private function findMigrations(): array
     {
-        $filter = (new PathMatcher())->only('**.php');
-        if (!$all) {
-            $filter = $filter->except('**/' . $this->initClassName . '.php');
-        }
         return FileHelper::findFiles($this->basePath, [
-            'filter' => $filter
+            'filter' => (new PathMatcher())->only('**.php')
         ]);
     }
 
@@ -285,20 +290,14 @@ final class MigrateService extends Service
         return $baseClassName . $suffix;
     }
 
-    /**
-     * @param string|object $input
-     */
-    private function replaceFromClassName($input): string
+    private function replaceFromClassName(string $className): string
     {
-        if (is_object($input)) {
-            $input = get_class($input);
-        }
-        return str_replace('\\', '-', $input);
+        return str_replace('\\', '-', $className);
     }
 
-    private function replaceToClassName(string $className): string
+    private function replaceToClassName(string $input): string
     {
-        return str_replace('-', '\\', $className);
+        return str_replace('-', '\\', $input);
     }
 
     private function createTable(): void

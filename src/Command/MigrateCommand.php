@@ -32,6 +32,7 @@ final class MigrateCommand extends Command
             ->addOption('app', 'a', InputOption::VALUE_REQUIRED, 'App name')
             ->addOption('db', null, InputOption::VALUE_REQUIRED, 'Db name')
             ->addOption('prefix', null, InputOption::VALUE_REQUIRED, 'Table prefix')
+            ->addOption('data', null, InputOption::VALUE_NONE, 'Whether initialize table data')
             ->setDescription('Initialize all tables');
 
         $this
@@ -47,7 +48,6 @@ final class MigrateCommand extends Command
             ->addOption('app', 'a', InputOption::VALUE_REQUIRED, 'App name')
             ->addOption('db', null, InputOption::VALUE_REQUIRED, 'Db name')
             ->addOption('step', null, InputOption::VALUE_REQUIRED, 'The number of migrations to apply')
-            ->addOption('all', null, InputOption::VALUE_NONE, 'Whether apply all migrations')
             ->setDescription('Execute all new migrations');
 
         $this
