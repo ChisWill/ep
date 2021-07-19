@@ -26,11 +26,10 @@ final class ErrorRenderer extends BaseErrorRenderer
         $context = [
             'category' => self::class
         ];
-        if ($request) {
-            $context['route'] = $request->getFirstArgument();
-            $context['arguments'] = $request->getArguments();
-            $context['options'] = $request->getOptions();
-        }
+
+        $context['route'] = $request->getFirstArgument();
+        $context['arguments'] = $request->getArguments();
+        $context['options'] = $request->getOptions();
 
         $this->logger->error($this->render($t, $request), $context);
     }

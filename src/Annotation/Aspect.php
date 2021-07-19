@@ -18,14 +18,14 @@ use Reflector;
  */
 final class Aspect implements AnnotationInterface
 {
-    private array $class;
+    private array $class = [];
 
     public function __construct(array $values)
     {
         $this->normalize($values);
     }
 
-    private function normalize(array $values)
+    private function normalize(array $values): void
     {
         if (isset($values['value'])) {
             $this->class[$values['value']] = [];

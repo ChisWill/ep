@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
-use Ep\Contract\ConfigurableInterface;
-use Ep\Contract\ConfigurableTrait;
 use Ep\Contract\NotFoundException;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
@@ -15,13 +13,9 @@ use Closure;
 
 use function FastRoute\cachedDispatcher;
 
-final class Route implements ConfigurableInterface
+final class Route
 {
-    use ConfigurableTrait;
-
-    protected bool $enableDefaultRoute = true;
-    protected string $baseUrl = '';
-    protected Closure $rule;
+    private const DEFAULT_ROUTE_RULE = [Method::ALL, '{prefix:[\w/-]*?}{controller:/?[a-zA-Z][\w-]*|}{action:/?[a-zA-Z][\w-]*|}', '<prefix>/<controller>/<action>'];
 
     private Config $config;
     private Aliases $aliases;
@@ -32,11 +26,31 @@ final class Route implements ConfigurableInterface
         $this->aliases = $aliases;
     }
 
-    private array $defaultRoute = [Method::ALL, '{prefix:[\w/-]*?}{controller:/?[a-zA-Z][\w-]*|}{action:/?[a-zA-Z][\w-]*|}', '<prefix>/<controller>/<action>'];
+    private string $baseUrl = '';
 
-    public function getDefaultRoute(): array
+    public function withBaseUrl(string $baseUrl): self
     {
-        return $this->defaultRoute;
+        $new = clone $this;
+        $new->baseUrl = $baseUrl;
+        return $new;
+    }
+
+    private bool $enableDefaultRoute = true;
+
+    public function withEnableDefaultRoute(bool $enableDefaultRoute): self
+    {
+        $new = clone $this;
+        $new->enableDefaultRoute = $enableDefaultRoute;
+        return $new;
+    }
+
+    private ?Closure $rule = null;
+
+    public function withRule(Closure $rule): self
+    {
+        $new = clone $this;
+        $new->rule = $rule;
+        return $new;
     }
 
     /**
@@ -46,11 +60,11 @@ final class Route implements ConfigurableInterface
     {
         return $this->solveRouteInfo(
             cachedDispatcher(function (RouteCollector $route): void {
-                if (isset($this->rule)) {
+                if ($this->rule) {
                     $route->addGroup($this->baseUrl, $this->rule);
                 }
                 if ($this->enableDefaultRoute) {
-                    $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->defaultRoute));
+                    $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...self::DEFAULT_ROUTE_RULE));
                 }
             }, [
                 'cacheFile' => $this->aliases->get($this->config->runtimeDir . '/route.cache'),

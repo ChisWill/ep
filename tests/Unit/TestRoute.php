@@ -12,67 +12,81 @@ use PHPUnit\Framework\TestCase;
 
 class TestRoute extends TestCase
 {
-    public function ruleProvider()
+    public function defaultRuleProvider()
     {
         return [
             [
-                'rule' => function (RouteCollector $route) {
-                    $rule = Ep::getDi()->get(Route::class)->getDefaultRoute();
-                    $route->addGroup(Ep::getConfig()->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$rule));
-                },
-                'cases' => [
-                    [
-                        'path' => '/',
-                        'handler' => '//',
-                        'params' => []
-                    ],
-                    [
-                        'path' => '/ctrl',
-                        'handler' => '/ctrl/',
-                        'params' => []
-                    ],
-                    [
-                        'path' => '/ctrl-suffix',
-                        'handler' => '/ctrl-suffix/',
-                        'params' => []
-                    ],
-                    [
-                        'path' => '/ctrl/act',
-                        'handler' => '/ctrl/act',
-                        'params' => []
-                    ],
-                    [
-                        'path' => '/ctrl-suffix/act-suf',
-                        'handler' => '/ctrl-suffix/act-suf',
-                        'params' => []
-                    ],
-                    [
-                        'path' => '/pre-s/ctrl-f/act-x',
-                        'handler' => 'pre-s/ctrl-f/act-x',
-                        'params' => []
-                    ],
-                    [
-                        'path' => '/pre/ctrl/act/',
-                        'handler' => 'pre/ctrl/act',
-                        'params' => []
-                    ],
-                    [
-                        'path' => '/pre/fix/ctrl/act',
-                        'handler' => 'pre/fix/ctrl/act',
-                        'params' => []
-                    ],
-                    [
-                        'path' => '/pre/fix/ctrl-suffix/act',
-                        'handler' => 'pre/fix/ctrl-suffix/act',
-                        'params' => []
-                    ],
-                    [
-                        'path' => '/pre-2/fix-n/ctrl-f/act-a',
-                        'handler' => 'pre-2/fix-n/ctrl-f/act-a',
-                        'params' => []
-                    ]
-                ]
+                'path' => '/',
+                'handler' => '//',
+                'params' => []
             ],
+            [
+                'path' => '/ctrl',
+                'handler' => '/ctrl/',
+                'params' => []
+            ],
+            [
+                'path' => '/ctrl-suffix',
+                'handler' => '/ctrl-suffix/',
+                'params' => []
+            ],
+            [
+                'path' => '/ctrl/act',
+                'handler' => '/ctrl/act',
+                'params' => []
+            ],
+            [
+                'path' => '/ctrl-suffix/act-suf',
+                'handler' => '/ctrl-suffix/act-suf',
+                'params' => []
+            ],
+            [
+                'path' => '/pre-s/ctrl-f/act-x',
+                'handler' => 'pre-s/ctrl-f/act-x',
+                'params' => []
+            ],
+            [
+                'path' => '/pre/ctrl/act/',
+                'handler' => 'pre/ctrl/act',
+                'params' => []
+            ],
+            [
+                'path' => '/pre/fix/ctrl/act',
+                'handler' => 'pre/fix/ctrl/act',
+                'params' => []
+            ],
+            [
+                'path' => '/pre/fix/ctrl-suffix/actUser',
+                'handler' => 'pre/fix/ctrl-suffix/actuser',
+                'params' => []
+            ],
+            [
+                'path' => '/pre-2/fix-n/ctrl-f/act-a',
+                'handler' => 'pre-2/fix-n/ctrl-f/act-a',
+                'params' => []
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider defaultRuleProvider
+     */
+    public function testDefaultRules($path, $handler, $params)
+    {
+        $route = Ep::getDi()->get(Route::class);
+        try {
+            [, $routeHandler, $routeParams] = $route
+                ->match($path);
+            $this->assertSame($handler, $routeHandler, $path . ' is wrong.');
+            $this->assertSame($params, $routeParams, $path . ' is wrong.');
+        } catch (NotFoundException $e) {
+            $this->assertSame($handler, false);
+        }
+    }
+
+    public function userRuleProvider()
+    {
+        return [
             [
                 'rule' => function (RouteCollector $route) {
                     $route->addGroup('/api', function (RouteCollector $r) {
@@ -133,19 +147,15 @@ class TestRoute extends TestCase
     }
 
     /**
-     * @dataProvider ruleProvider
+     * @dataProvider userRuleProvider
      */
-    public function testRules($rule, $cases)
+    public function testUserRules($rule, $cases)
     {
-        $route = Ep::getDi()->get(Route::class)->configure([
-            'enableDefaultRoute' => false
-        ]);
+        $route = Ep::getDi()->get(Route::class)->withEnableDefaultRoute(false);
         foreach ($cases as $row) {
             try {
                 [, $handler, $params] = $route
-                    ->clone([
-                        'rule' => $rule,
-                    ])
+                    ->withRule($rule)
                     ->match($row['path']);
                 $this->assertSame($row['handler'], $handler, $row['path'] . ' is wrong.');
                 $this->assertSame($row['params'], $params, $row['path'] . ' is wrong.');

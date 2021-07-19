@@ -72,7 +72,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withCookieParams(array $cookies): self
+    public function withCookieParams(array $cookies)
     {
         if ($cookies) {
             $new = clone $this;
@@ -93,7 +93,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withQueryParams(array $query): self
+    public function withQueryParams(array $query)
     {
         if ($query) {
             $new = clone $this;
@@ -114,7 +114,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withUploadedFiles(array $uploadedFiles): self
+    public function withUploadedFiles(array $uploadedFiles)
     {
         if ($uploadedFiles) {
             $new = clone $this;
@@ -135,7 +135,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withParsedBody($data): self
+    public function withParsedBody($data)
     {
         if ($data) {
             $new = clone $this;
@@ -164,7 +164,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withAttribute($name, $value): self
+    public function withAttribute($name, $value)
     {
         $new = clone $this;
         $new->request = $new->request->withAttribute($name, $value);
@@ -174,7 +174,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withoutAttribute($name): self
+    public function withoutAttribute($name)
     {
         $new = clone $this;
         $new->request = $new->request->withoutAttribute($name);
@@ -192,7 +192,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withRequestTarget($requestTarget): self
+    public function withRequestTarget($requestTarget)
     {
         $new = clone $this;
         $new->request = $new->request->withRequestTarget($requestTarget);
@@ -210,7 +210,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withMethod($method): self
+    public function withMethod($method)
     {
         $new = clone $this;
         $new->request = $new->request->withMethod($method);
@@ -228,7 +228,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withUri(UriInterface $uri, $preserveHost = false): self
+    public function withUri(UriInterface $uri, $preserveHost = false)
     {
         $new = clone $this;
         $new->request = $new->request->withUri($uri, $preserveHost);
@@ -246,7 +246,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withProtocolVersion($version): self
+    public function withProtocolVersion($version)
     {
         $new = clone $this;
         $new->request = $new->request->withProtocolVersion($version);
@@ -288,7 +288,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withHeader($name, $value): self
+    public function withHeader($name, $value)
     {
         $new = clone $this;
         $new->request = $new->request->withHeader($name, $value);
@@ -298,7 +298,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withAddedHeader($name, $value): self
+    public function withAddedHeader($name, $value)
     {
         $new = clone $this;
         $new->request = $new->request->withAddedHeader($name, $value);
@@ -308,7 +308,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withoutHeader($name): self
+    public function withoutHeader($name)
     {
         $new = clone $this;
         $new->request = $new->request->withoutHeader($name);
@@ -318,7 +318,7 @@ final class ServerRequest implements ServerRequestInterface
     /**
      * {@inheritDoc}
      */
-    public function withBody(StreamInterface $body): self
+    public function withBody(StreamInterface $body)
     {
         $new = clone $this;
         $new->request = $new->request->withBody($body);

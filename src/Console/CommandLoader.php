@@ -137,9 +137,7 @@ final class CommandLoader implements CommandLoaderInterface
     {
         if (!isset($this->commandNames[$name])) {
             [, $handler] = $this->route
-                ->configure([
-                    'rule' => $this->config->getRouteRule(),
-                ])
+                ->withRule($this->config->getRouteRule())
                 ->match('/' . $name);
 
             [, $class, $actionId] = $this->controllerLoader->parseHandler($handler);

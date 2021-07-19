@@ -9,7 +9,7 @@ interface InjectorInterface
     /**
      * @return mixed
      */
-    public function call(object $object, string $method, array $arguments = []);
+    public function call(object $instance, string $method, array $arguments = []);
 
     /**
      * @return mixed

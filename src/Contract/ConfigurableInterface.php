@@ -12,11 +12,11 @@ interface ConfigurableInterface
      * @return static
      * @throws LogicException
      */
-    public function configure(array $config);
+    public function configure(array $properties);
 
     /**
      * @return static
      * @throws LogicException
      */
-    public function clone(array $config);
+    public function clone(array $properties);
 }

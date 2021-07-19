@@ -11,7 +11,10 @@ abstract class Facade
 {
     private static array $instances = [];
 
-    public static function __callStatic($name, $arguments)
+    /**
+     * @return mixed
+     */
+    public static function __callStatic(string $name, array $arguments)
     {
         $instance = self::getInstance();
 

@@ -47,5 +47,6 @@ use Ep\Console\ArgvInput;
     $exitCode = Ep::getDi()
         ->get(Application::class)
         ->run($input);
+
     exit($exitCode);
 })();

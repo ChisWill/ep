@@ -76,14 +76,14 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
         $context = [
             'category' => self::class
         ];
-        if ($request) {
-            $context['host'] = $request->getUri()->getHost();
-            $context['path'] = $request->getRequestTarget();
-            $context['method'] = $request->getMethod();
-            if ($request->getMethod() === Method::POST) {
-                $context['post'] = $request->getParsedBody();
-            }
+
+        $context['host'] = $request->getUri()->getHost();
+        $context['path'] = $request->getRequestTarget();
+        $context['method'] = $request->getMethod();
+        if ($request->getMethod() === Method::POST) {
+            $context['post'] = $request->getParsedBody();
         }
+
         $this->logger->error(parent::render($t, $request), $context);
     }
 

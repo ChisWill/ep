@@ -61,7 +61,7 @@ final class Container implements ContainerInterface
     }
 
     /**
-     * @param string|array $id
+     * @param string|array $ids
      */
     public function clear($ids): void
     {

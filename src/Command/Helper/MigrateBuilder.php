@@ -49,6 +49,10 @@ final class MigrateBuilder
         $this->end($time);
     }
 
+    /**
+     * @param array|Query $insertColumns
+     * @param array|bool  $updateColumns
+     */
     public function upsert(string $table, $insertColumns, $updateColumns = true, array $params = []): void
     {
         $time = $this->begin("Upsert into {$table}");
@@ -56,6 +60,9 @@ final class MigrateBuilder
         $this->end($time);
     }
 
+    /**
+     * @param array|string $condition
+     */
     public function update(string $table, array $columns, $condition = '', array $params = []): void
     {
         $time = $this->begin("Update {$table}");
@@ -63,6 +70,9 @@ final class MigrateBuilder
         $this->end($time);
     }
 
+    /**
+     * @param array|string $condition
+     */
     public function delete(string $table, $condition = '', array $params = []): void
     {
         $time = $this->begin("Delete from {$table}");
@@ -184,6 +194,9 @@ final class MigrateBuilder
         $this->end($time);
     }
 
+    /**
+     * @param array|string $columns
+     */
     public function createIndex(string $name, string $table, $columns, bool $unique = false): void
     {
         $time = $this->begin('Create' . ($unique ? ' unique' : '') . " index {$name} on {$table} (" . implode(',', (array) $columns) . ')');

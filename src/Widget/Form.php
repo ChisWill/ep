@@ -15,9 +15,10 @@ abstract class Form implements ArrayAccess, DataSetInterface
 
     private array $data = [];
 
-    public static $rules = [];
-
-    public function __get($name)
+    /**
+     * @return mixed
+     */
+    public function __get(string $name)
     {
         return $this->data[$name] ?? null;
     }
