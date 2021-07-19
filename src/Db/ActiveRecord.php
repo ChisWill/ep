@@ -12,13 +12,13 @@ use Ep\Helper\System;
 use Ep\Widget\FormTrait;
 use Yiisoft\ActiveRecord\ActiveQuery as BaseActiveQuery;
 use Yiisoft\ActiveRecord\ActiveRecord as BaseActiveRecord;
+use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Http\Method;
 use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Strings\StringHelper;
 use Psr\Http\Message\ServerRequestInterface;
-use Yiisoft\Db\Connection\Connection;
 
 abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
 {
@@ -42,15 +42,22 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     }
 
     /**
-     * @param  mixed $pk
+     * @param  int|string $pk
      * 
      * @return static|null
      */
-    public static function findOne($pk)
+    public static function findOne($pk, Connection $db = null)
     {
-        return static::find()
+        return static::find($db)
             ->where([static::PK => $pk])
             ->one();
+    }
+
+    public static function findAll(array $condition, Connection $db = null): array
+    {
+        return static::find($db)
+            ->where($condition)
+            ->all();
     }
 
     /**
@@ -67,9 +74,11 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
             if (is_scalar($condition) && is_string(static::PK)) {
                 $condition = [static::PK => $condition];
             }
-            $model = static::find($db)->where($condition)->one();
+            $model = static::find($db)
+                ->where($condition)
+                ->one();
             if ($model === null) {
-                throw new NotFoundException("Data is not found.");
+                throw new NotFoundException('Data is not found.');
             }
             return $model;
         }
