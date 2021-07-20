@@ -46,11 +46,7 @@ final class Application extends SymfonyApplication
 
     public function registerErrorHandler(InputInterface $input): void
     {
-        $this->errorHandler
-            ->configure([
-                'errorRenderer' => $this->errorRenderer
-            ])
-            ->register($input);
+        $this->errorHandler->register($input, $this->errorRenderer);
     }
 
     /**

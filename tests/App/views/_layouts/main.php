@@ -32,6 +32,8 @@ $manager->register([
 <body>
     <header>
         <h3>头部</h3>
+        <h2>Controller: <?= $this->context->id ?></h2>
+        <h3>Action: <?= $this->context->actionId ?></h3>
     </header>
 
     <?= $content ?>

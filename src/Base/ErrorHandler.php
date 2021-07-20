@@ -5,16 +5,12 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep\Console\Command;
-use Ep\Contract\ConfigurableInterface;
-use Ep\Contract\ConfigurableTrait;
 use Ep\Contract\ErrorRendererInterface;
 use ErrorException;
 use Throwable;
 
-final class ErrorHandler implements ConfigurableInterface
+final class ErrorHandler
 {
-    use ConfigurableTrait;
-
     protected ErrorRendererInterface $errorRenderer;
 
     public function __construct(ErrorRendererInterface $errorRenderer)
@@ -25,9 +21,9 @@ final class ErrorHandler implements ConfigurableInterface
     /**
      * @param mixed $request
      */
-    public function register($request): void
+    public function register($request, ErrorRendererInterface $errorRenderer = null): void
     {
-        set_exception_handler(fn (Throwable $e) => $this->handleException($e, $request));
+        set_exception_handler(fn (Throwable $e) => $this->handleException($e, $request, $errorRenderer));
         set_error_handler([$this, 'handleError']);
         register_shutdown_function([$this, 'handleFatalError'], $request);
     }
@@ -35,13 +31,17 @@ final class ErrorHandler implements ConfigurableInterface
     /**
      * @param mixed $request
      */
-    public function handleException(Throwable $t, $request): void
+    public function handleException(Throwable $t, $request, ErrorRendererInterface $errorRenderer = null): void
     {
+        if ($errorRenderer === null) {
+            $errorRenderer = $this->errorRenderer;
+        }
+
         $this->unregister();
 
-        $this->errorRenderer->log($t, $request);
+        $errorRenderer->log($t, $request);
 
-        echo $this->errorRenderer->render($t, $request);
+        echo $errorRenderer->render($t, $request);
 
         exit(Command::FAIL);
     }

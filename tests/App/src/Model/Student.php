@@ -40,22 +40,22 @@ class Student extends ActiveRecord
     {
         return $this->userRules() + [
             'class_id' => [
-                (Number::rule())->integer(),
-                (Required::rule()),
+                Number::rule()->integer(),
+                Required::rule(),
             ],
             'name' => [
-                (HasLength::rule())->max(50),
-                (Required::rule()),
+                HasLength::rule()->max(50),
+                Required::rule(),
             ],
             'password' => [
-                (HasLength::rule())->max(100),
-                (Required::rule()),
+                HasLength::rule()->max(100),
+                Required::rule(),
             ],
             'age' => [
-                (Number::rule())->integer()->skipOnEmpty(true),
+                Number::rule()->integer()->skipOnEmpty(true),
             ],
             'sex' => [
-                (Number::rule())->integer()->skipOnEmpty(true),
+                Number::rule()->integer()->skipOnEmpty(true),
             ],
         ];
     }

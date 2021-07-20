@@ -25,7 +25,7 @@ class School extends ActiveRecord
     {
         return $this->userRules() + [
             'name' => [
-                (Required::rule()),
+                Required::rule(),
             ],
         ];
     }

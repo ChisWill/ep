@@ -21,10 +21,9 @@ final class GenerateService extends Service
     {
         parent::__construct($container);
 
-        $this->view = $view->configure([
-            'viewPath' => '@ep/views',
-            'prefix' => 'generate'
-        ]);
+        $this->view = $view
+            ->withViewPath('@ep/views')
+            ->withPrefix('generate');
     }
 
     public function render(string $path, array $params): string
@@ -202,7 +201,7 @@ final class GenerateService extends Service
             $rules[$field] = [];
             foreach ($items as $rule) {
                 $array = explode(':', $rule);
-                $string = sprintf('(%s::rule())', array_shift($array));
+                $string = sprintf('%s::rule()', array_shift($array));
                 foreach ($array as $method) {
                     $string .= '->' . $method;
                 }

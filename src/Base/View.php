@@ -4,20 +4,12 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
-use Ep\Contract\ConfigurableInterface;
-use Ep\Contract\ConfigurableTrait;
 use Ep\Contract\ContextInterface;
 use Yiisoft\Aliases\Aliases;
 
-class View implements ConfigurableInterface
+class View
 {
-    use ConfigurableTrait;
-
     public string $layout = 'main';
-
-    protected ?string $viewPath = null;
-    protected ?string $prefix = null;
-    protected ?ContextInterface $context = null;
 
     private Config $config;
     private Aliases $aliases;
@@ -26,6 +18,34 @@ class View implements ConfigurableInterface
     {
         $this->config = $config;
         $this->aliases = $aliases;
+    }
+
+    private ?string $viewPath = null;
+
+    public function withViewPath(string $viewPath): self
+    {
+        $new = clone $this;
+        $new->viewPath = $viewPath;
+        return $new;
+    }
+
+    protected ?ContextInterface $context = null;
+
+    public function withContext(ContextInterface $context): self
+    {
+        $new = clone $this;
+        $new->context = $context;
+        $new->prefix = $context->id;
+        return $new;
+    }
+
+    private ?string $prefix = null;
+
+    public function withPrefix(string $prefix): self
+    {
+        $new = clone $this;
+        $new->prefix = $prefix;
+        return $new;
     }
 
     public function render(string $path, array $params = []): string
