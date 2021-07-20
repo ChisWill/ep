@@ -250,8 +250,20 @@ class DemoController extends Controller
     {
         $cookie = new Cookie('testcookie', 'testcookie' . mt_rand());
         $cookie = $cookie->withMaxAge(new DateInterval('PT10S'))->withSecure(false);
+
+        $cookie2 = new Cookie('testcookie2', 'testcookie2' . mt_rand());
+        $cookie2 = $cookie2->withMaxAge(new DateInterval('PT20S'))->withSecure(false);
+
         $response = $this->string('ok');
-        return $cookie->addToResponse($response);
+        $response = $response->withAddedHeader('t1', 'v1');
+        $response = $response->withAddedHeader('t1', 'v2');
+        $response = $response->withAddedHeader('t1', 'v3');
+
+        $response = $response->withHeader('z1', 'v1');
+        $response = $response->withHeader('z1', 'v2');
+        $response = $response->withHeader('z1', 'v3');
+
+        return $cookie->addToResponse($cookie2->addToResponse($response));
     }
 
     public function sessionAction(SessionInterface $session)
