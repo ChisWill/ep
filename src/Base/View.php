@@ -29,7 +29,7 @@ class View
         return $new;
     }
 
-    protected ?ContextInterface $context = null;
+    private ?ContextInterface $context = null;
 
     public function withContext(ContextInterface $context): self
     {
@@ -98,10 +98,6 @@ class View
         return $this->aliases->get($this->getViewPath() . $view . $ext);
     }
 
-    /**
-     * @param string $file
-     * @param array  $params
-     */
     private function renderPHPFile(): string
     {
         ob_start();

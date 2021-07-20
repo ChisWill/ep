@@ -102,11 +102,11 @@ abstract class Command implements ControllerInterface
 
     public function setMiddlewares(array $middlewares): void
     {
-        throw new LogicException('Console command doesn\'t have middlewares yet.');
+        throw new LogicException('Command doesn\'t have middlewares yet.');
     }
 
     public function getMiddlewares(): array
     {
-        throw new LogicException('Console command doesn\'t have middlewares yet.');
+        throw new LogicException('Command doesn\'t have middlewares yet.');
     }
 }
