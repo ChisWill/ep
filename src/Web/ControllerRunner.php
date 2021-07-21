@@ -71,6 +71,6 @@ final class ControllerRunner extends BaseControllerRunner
      */
     public function getControllerSuffix(): string
     {
-        return $this->config->controllerDirAndSuffix;
+        return $this->config->controllerSuffix;
     }
 }

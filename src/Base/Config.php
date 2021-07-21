@@ -38,13 +38,13 @@ final class Config
      */
     public string $moduleName = 'Module';
     /**
-     * Web controller directory and suffix
+     * Web controller suffix
      */
-    public string $controllerDirAndSuffix = 'Controller';
+    public string $controllerSuffix = 'Controller';
     /**
-     * Console controller directory and suffix
+     * Console command suffix
      */
-    public string $commandDirAndSuffix = 'Command';
+    public string $commandSuffix = 'Command';
     /**
      * Database migration table name
      */

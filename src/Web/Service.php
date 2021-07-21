@@ -35,7 +35,7 @@ final class Service
         $response = $this->responseFactory
             ->createResponse(Status::OK)
             ->withHeader(Header::CONTENT_TYPE, 'application/json; charset=UTF-8');
-        $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE));
+        $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
         return $response;
     }
 

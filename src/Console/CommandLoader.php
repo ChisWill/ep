@@ -165,7 +165,7 @@ final class CommandLoader implements CommandLoaderInterface
 
     private function getCommandFiles(): array
     {
-        return $this->getFiles(str_replace('\\', '/', $this->util->getAppPath()), $this->config->commandDirAndSuffix);
+        return $this->getFiles(str_replace('\\', '/', $this->util->getAppPath()), $this->config->commandSuffix);
     }
 
     private function getFiles(string $directory, string $suffix): array
@@ -204,8 +204,8 @@ final class CommandLoader implements CommandLoaderInterface
         } else {
             $action = '/' . $action;
         }
-        $prefix = trim(Str::camelToId(Str::rtrim('/' . $subClassName, '/' . $this->config->commandDirAndSuffix, false), '-', true), '/');
-        $basename = Str::camelToId(basename($subClassName, $this->config->commandDirAndSuffix), '-', true);
+        $prefix = trim(Str::camelToId(Str::rtrim('/' . $subClassName, '/' . $this->config->commandSuffix, false), '-', true), '/');
+        $basename = Str::camelToId(basename($subClassName, $this->config->commandSuffix), '-', true);
         if ($prefix) {
             return sprintf('%s/%s%s', $prefix, $basename, $action);
         } else {
