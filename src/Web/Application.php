@@ -18,23 +18,26 @@ use Psr\Http\Message\ServerRequestInterface;
 final class Application
 {
     private ServerRequestFactory $serverRequestFactory;
-    private ErrorHandler $errorHandler;
     private RequestHandlerFactory $requestHandlerFactory;
-    private NotFoundHandlerInterface $notFoundHandler;
     private SapiEmitter $sapiEmitter;
+    private ErrorHandler $errorHandler;
+    private ErrorRenderer $errorRenderer;
+    private NotFoundHandlerInterface $notFoundHandler;
 
     public function __construct(
         ServerRequestFactory $serverRequestFactory,
-        ErrorHandler $errorHandler,
         RequestHandlerFactory $requestHandlerFactory,
-        NotFoundHandlerInterface $notFoundHandler,
-        SapiEmitter $sapiEmitter
+        SapiEmitter $sapiEmitter,
+        ErrorHandler $errorHandler,
+        ErrorRenderer $errorRenderer,
+        NotFoundHandlerInterface $notFoundHandler
     ) {
         $this->serverRequestFactory = $serverRequestFactory;
-        $this->errorHandler = $errorHandler;
         $this->requestHandlerFactory = $requestHandlerFactory;
-        $this->notFoundHandler = $notFoundHandler;
         $this->sapiEmitter = $sapiEmitter;
+        $this->errorHandler = $errorHandler;
+        $this->errorRenderer = $errorRenderer;
+        $this->notFoundHandler = $notFoundHandler;
     }
 
     private array $middlewares = [
@@ -66,7 +69,7 @@ final class Application
 
     public function register(ServerRequestInterface $request): void
     {
-        $this->errorHandler->register($request);
+        $this->errorHandler->register($request, $this->errorRenderer);
     }
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface

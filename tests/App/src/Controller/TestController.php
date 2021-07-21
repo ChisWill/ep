@@ -44,6 +44,7 @@ use Ep\Tests\App\Aspect\LoggerAspect;
 use Ep\Tests\App\Middleware\TimeMiddleware;
 use Ep\Tests\App\Model\Student;
 use Ep\Tests\App\Service\DemoService;
+use Ep\Web\ErrorRenderer;
 use Psr\Http\Message\ResponseInterface;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Injector\Injector;
@@ -238,7 +239,7 @@ class TestController extends Controller
 
     public function errorAction(ServerRequestInterface $request)
     {
-        $renderer = Ep::getDi()->get(ErrorRendererInterface::class);
+        $renderer = Ep::getDi()->get(ErrorRenderer::class);
 
         return $this->string($renderer->render(
             new RuntimeException(
