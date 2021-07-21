@@ -9,9 +9,7 @@ use Ep\Tests\Support\Middleware\AddMiddleware;
 use Ep\Tests\Support\Middleware\CheckMiddleware;
 use Ep\Tests\Support\Middleware\FilterMiddleware;
 use Ep\Tests\Support\Middleware\InitMiddleware;
-use Ep\Tests\Support\RequestHandler\Handler;
 use Ep\Tests\Support\RequestHandler\NotFoundHandler;
-use Ep\Tests\Support\RequestHandler\ShowAttributeHandler;
 use Ep\Web\RequestHandlerFactory;
 use HttpSoft\Message\ServerRequestFactory;
 use PhpBench\Benchmark\Metadata\Annotations\BeforeMethods;
@@ -24,7 +22,6 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Yiisoft\Middleware\Dispatcher\MiddlewareDispatcher;
 use Yiisoft\Middleware\Dispatcher\MiddlewareFactory;
-use Yiisoft\Middleware\Dispatcher\MiddlewareStack;
 
 /**
  * @Iterations(5)
@@ -91,7 +88,7 @@ class MiddlewareBench
 
     private function wrap(MiddlewareInterface $middleware, RequestHandlerInterface $handler): RequestHandlerInterface
     {
-        return new class($middleware, $handler) implements RequestHandlerInterface
+        return new class ($middleware, $handler) implements RequestHandlerInterface
         {
             private MiddlewareInterface $middleware;
             private RequestHandlerInterface $handler;

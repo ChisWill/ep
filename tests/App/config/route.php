@@ -8,7 +8,7 @@ use FastRoute\RouteCollector;
 use Yiisoft\Http\Method;
 
 return function (RouteCollector $route): void {
-    $route->get('/site', 'index/index');
+    $route->get('/site', 'state/ping');
     $route->addGroup('/try', function (RouteCollector $route) {
         $route->addRoute(Method::ALL, '/{action:[a-zA-Z][\w-]*}', 'test/<action>');
     });
