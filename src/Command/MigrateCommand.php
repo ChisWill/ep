@@ -62,7 +62,7 @@ final class MigrateCommand extends Command
 
     public function createAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->initialize($request->getOptions());
+        $this->service->load($request->getOptions());
 
         $this->service->create($request->getArgument('name'));
 
@@ -71,7 +71,7 @@ final class MigrateCommand extends Command
 
     public function initAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->initialize($request->getOptions());
+        $this->service->load($request->getOptions());
 
         $this->service->init();
 
@@ -80,7 +80,7 @@ final class MigrateCommand extends Command
 
     public function listAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->initialize($request->getOptions());
+        $this->service->load($request->getOptions());
 
         $this->service->list();
 
@@ -89,7 +89,7 @@ final class MigrateCommand extends Command
 
     public function upAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->initialize($request->getOptions());
+        $this->service->load($request->getOptions());
 
         $this->service->up();
 
@@ -98,7 +98,7 @@ final class MigrateCommand extends Command
 
     public function downAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->initialize($request->getOptions());
+        $this->service->load($request->getOptions());
 
         $this->service->down();
 

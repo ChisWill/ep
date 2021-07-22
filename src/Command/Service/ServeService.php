@@ -11,9 +11,9 @@ final class ServeService extends Service
     private string $docroot;
     private string $router;
 
-    public function initialize(array $options): void
+    public function load(array $options): void
     {
-        parent::initialize($options);
+        parent::load($options);
 
         $this->address = $options['address'] ?? $this->defaultOptions['address'] ?? 'localhost';
         $this->port = $options['port'] ?? $this->defaultOptions['port'] ?? '8080';
