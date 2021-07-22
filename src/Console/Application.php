@@ -14,17 +14,20 @@ final class Application extends SymfonyApplication
 {
     private InputInterface $input;
     private OutputInterface $output;
+    private Factory $factory;
     private ErrorHandler $errorHandler;
     private ErrorRenderer $errorRenderer;
 
     public function __construct(
         InputInterface $input,
         OutputInterface $output,
+        Factory $factory,
         ErrorHandler $errorHandler,
         ErrorRenderer $errorRenderer
     ) {
         $this->input = $input;
         $this->output = $output;
+        $this->factory = $factory;
         $this->errorHandler = $errorHandler;
         $this->errorRenderer = $errorRenderer;
 
@@ -34,19 +37,17 @@ final class Application extends SymfonyApplication
     /**
      * {@inheritDoc}
      */
-    public function run(?InputInterface $input = null, ?OutputInterface $output = null)
+    public function run(InputInterface $input = null, OutputInterface $output = null)
     {
         $input ??= $this->input;
         $output ??= $this->output;
 
-        $this->registerErrorHandler($input);
+        $this->errorHandler->register(
+            $this->factory->createRequest($input),
+            $this->errorRenderer
+        );
 
         return parent::run($input, $output);
-    }
-
-    private function registerErrorHandler(InputInterface $input): void
-    {
-        $this->errorHandler->register($input, $this->errorRenderer);
     }
 
     /**

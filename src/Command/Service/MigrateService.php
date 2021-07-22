@@ -37,9 +37,9 @@ final class MigrateService extends Service
     private string $basePath;
     private MigrateBuilder $builder;
 
-    public function initialize(array $options): void
+    public function load(array $options): void
     {
-        parent::initialize($options);
+        parent::load($options);
 
         $this->migratePath = $options['path'] ?? $this->defaultOptions['path'] ?? 'Migration';
         $this->basePath = $this->getAppPath() . '/' . trim($this->migratePath, '/');

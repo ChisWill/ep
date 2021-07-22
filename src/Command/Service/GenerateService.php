@@ -38,7 +38,7 @@ final class GenerateService extends Service
 
     public function initModel(array $options): void
     {
-        $this->initialize($options);
+        $this->load($options);
 
         $this->table = $options['table'];
         $this->path = $options['path'] ?? $this->defaultOptions['model.path'] ?? 'Model';

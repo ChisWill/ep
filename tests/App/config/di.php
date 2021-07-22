@@ -3,9 +3,11 @@
 declare(strict_types=1);
 
 use Ep\Base\Config;
+use Ep\Contract\ConsoleErrorRendererInterface;
 use Ep\Contract\InterceptorInterface;
 use Ep\Contract\WebErrorRendererInterface;
-use Ep\Tests\App\Component\ErrorRenderer;
+use Ep\Tests\App\Component\ConsoleRenderer;
+use Ep\Tests\App\Component\WebErrorRenderer;
 use Ep\Tests\App\Component\Interceptor;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
@@ -18,7 +20,8 @@ use Yiisoft\Log\Target;
 use Yiisoft\Log\Target\File\FileTarget;
 
 return static fn (Config $config): array => [
-    WebErrorRendererInterface::class => ErrorRenderer::class,
+    WebErrorRendererInterface::class => WebErrorRenderer::class,
+    ConsoleErrorRendererInterface::class => ConsoleRenderer::class,
     InterceptorInterface::class => Interceptor::class,
     // Log
     Target::class => static fn (Aliases $aliases): FileTarget => new FileTarget($aliases->get($config->runtimeDir . '/logs/' . date('Y-m-d') . '.log')),

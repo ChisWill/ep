@@ -26,19 +26,19 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
      */
     public string $id = 'error';
 
-    private Config $config;
     private ContainerInterface $container;
+    private Config $config;
     private LoggerInterface $logger;
     private Aliases $aliases;
 
     public function __construct(
-        Config $config,
         ContainerInterface $container,
+        Config $config,
         LoggerInterface $logger,
         Aliases $aliases
     ) {
-        $this->config = $config;
         $this->container = $container;
+        $this->config = $config;
         $this->logger = $logger;
         $this->aliases = $aliases;
     }
@@ -73,18 +73,24 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
      */
     public function log(Throwable $t, $request): void
     {
-        $context = [
-            'category' => self::class
-        ];
+        if ($this->container->has(WebErrorRendererInterface::class)) {
+            $this->container
+                ->get(WebErrorRendererInterface::class)
+                ->log($t, $request);
+        } else {
+            $context = [
+                'category' => get_class($t)
+            ];
 
-        $context['host'] = $request->getUri()->getHost();
-        $context['path'] = $request->getRequestTarget();
-        $context['method'] = $request->getMethod();
-        if ($request->getMethod() === Method::POST) {
-            $context['post'] = $request->getParsedBody();
+            $context['host'] = $request->getUri()->getHost();
+            $context['path'] = $request->getRequestTarget();
+            $context['method'] = $request->getMethod();
+            if ($request->getMethod() === Method::POST) {
+                $context['post'] = $request->getBody()->getContents() ?: $request->getParsedBody();
+            }
+
+            $this->logger->error(parent::render($t, $request), $context);
         }
-
-        $this->logger->error(parent::render($t, $request), $context);
     }
 
     public function renderPreviousException(Throwable $t): string

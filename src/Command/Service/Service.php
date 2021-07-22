@@ -37,7 +37,7 @@ abstract class Service
     protected array $options;
     protected string $userRootNamespace;
 
-    public function initialize(array $options): void
+    public function load(array $options): void
     {
         $this->options = $options;
         $this->userRootNamespace = $options['common']['userRootNamespace'];

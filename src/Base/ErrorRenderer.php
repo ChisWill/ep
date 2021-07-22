@@ -5,18 +5,10 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep\Contract\ErrorRendererInterface;
-use Psr\Log\LoggerInterface;
 use Throwable;
 
-class ErrorRenderer implements ErrorRendererInterface
+abstract class ErrorRenderer implements ErrorRendererInterface
 {
-    private LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
     private const ERRORS = [
         E_ERROR => 'PHP Fatal Error',
         E_WARNING => 'PHP Warning',
@@ -45,7 +37,7 @@ class ErrorRenderer implements ErrorRendererInterface
      */
     public function render(Throwable $t, $request): string
     {
-        return "Exception '" . get_class($t) . "' with message '{$t->getMessage()}' \n\nin "
+        return get_class($t) . " '{$t->getMessage()}' in "
             . $t->getFile() . ':' . $t->getLine() . "\n\n"
             . "Stack trace:\n" . $t->getTraceAsString() . "\n";
     }
@@ -53,8 +45,5 @@ class ErrorRenderer implements ErrorRendererInterface
     /**
      * @param mixed $request
      */
-    public function log(Throwable $t, $request): void
-    {
-        $this->logger->error($this->render($t, $request));
-    }
+    abstract public function log(Throwable $t, $request): void;
 }

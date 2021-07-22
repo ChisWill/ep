@@ -15,7 +15,11 @@ use function FastRoute\cachedDispatcher;
 
 final class Route
 {
-    private const DEFAULT_ROUTE_RULE = [Method::ALL, '{prefix:[\w/-]*?}{controller:/?[a-zA-Z][\w-]*|}{action:/?[a-zA-Z][\w-]*|}', '<prefix>/<controller>/<action>'];
+    private const DEFAULT_ROUTE_RULE = [
+        Method::ALL,
+        '{prefix:[\w/-]*?}{controller:/?[a-zA-Z][\w-]*|}{action:/?[a-zA-Z][\w-]*|}',
+        '<prefix>/<controller>/<action>'
+    ];
 
     private Config $config;
     private Aliases $aliases;

@@ -29,7 +29,7 @@ final class ServeCommand extends Command
 
     public function indexAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->initialize($request->getOptions());
+        $this->service->load($request->getOptions());
 
         $this->service->serve();
 
