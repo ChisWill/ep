@@ -106,7 +106,7 @@ final class CommandLoader implements CommandLoaderInterface
             /**
              * {@inheritdoc}
              */
-            protected function execute(InputInterface $input, OutputInterface $output)
+            protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 return $this->runner
                     ->runLoader(

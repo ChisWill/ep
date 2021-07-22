@@ -29,7 +29,7 @@ use Ep\Console\ArgvInput;
         $userConfig = require($options['config']),
         [
             'rootNamespace' => 'Ep',
-            'commandDirAndSuffix' => 'Command',
+            'commandSuffix' => 'Command',
             'actionSuffix' => 'Action',
             'defaultAction' => 'index'
         ]

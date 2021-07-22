@@ -5,32 +5,58 @@ declare(strict_types=1);
 namespace Ep\Console;
 
 use Ep\Base\ErrorRenderer as BaseErrorRenderer;
-use Symfony\Component\Console\Input\InputInterface;
+use Ep\Contract\ConsoleErrorRendererInterface;
+use Ep\Contract\ConsoleRequestInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
 final class ErrorRenderer extends BaseErrorRenderer
 {
+    private ContainerInterface $container;
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger)
-    {
+    public function __construct(
+        ContainerInterface $container,
+        LoggerInterface $logger
+    ) {
+        $this->container = $container;
         $this->logger = $logger;
     }
 
     /**
-     * @param InputInterface $request
+     * @param ConsoleRequestInterface $request
+     */
+    public function render(Throwable $t, $request): string
+    {
+        if ($this->container->has(ConsoleErrorRendererInterface::class)) {
+            return $this->container
+                ->get(ConsoleErrorRendererInterface::class)
+                ->render($t, $request);
+        } else {
+            return parent::render($t, $request);
+        }
+    }
+
+    /**
+     * @param ConsoleRequestInterface $request
      */
     public function log(Throwable $t, $request): void
     {
-        $context = [
-            'category' => self::class
-        ];
+        if ($this->container->has(ConsoleErrorRendererInterface::class)) {
+            $this->container
+                ->get(ConsoleErrorRendererInterface::class)
+                ->log($t, $request);
+        } else {
+            $context = [
+                'category' => get_class($t)
+            ];
 
-        $context['route'] = $request->getFirstArgument();
-        $context['arguments'] = $request->getArguments();
-        $context['options'] = $request->getOptions();
+            $context['route'] = $request->getRoute();
+            $context['arguments'] = $request->getArguments();
+            $context['options'] = $request->getOptions();
 
-        $this->logger->error($this->render($t, $request), $context);
+            $this->logger->error($this->render($t, $request), $context);
+        }
     }
 }

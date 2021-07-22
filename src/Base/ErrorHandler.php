@@ -11,37 +11,31 @@ use Throwable;
 
 final class ErrorHandler
 {
-    protected ErrorRendererInterface $errorRenderer;
+    private ErrorRendererInterface $errorRenderer;
 
-    public function __construct(ErrorRendererInterface $errorRenderer)
+    /**
+     * @param mixed $request
+     */
+    public function register($request, ErrorRendererInterface $errorRenderer): void
     {
-        $this->errorRenderer = $errorRenderer;
+        $new = clone $this;
+        $new->errorRenderer = $errorRenderer;
+
+        set_exception_handler(fn (Throwable $e) => $new->handleException($e, $request));
+        set_error_handler([$new, 'handleError']);
+        register_shutdown_function([$new, 'handleFatalError'], $request);
     }
 
     /**
      * @param mixed $request
      */
-    public function register($request, ErrorRendererInterface $errorRenderer = null): void
+    public function handleException(Throwable $t, $request): void
     {
-        set_exception_handler(fn (Throwable $e) => $this->handleException($e, $request, $errorRenderer));
-        set_error_handler([$this, 'handleError']);
-        register_shutdown_function([$this, 'handleFatalError'], $request);
-    }
-
-    /**
-     * @param mixed $request
-     */
-    public function handleException(Throwable $t, $request, ErrorRendererInterface $errorRenderer = null): void
-    {
-        if ($errorRenderer === null) {
-            $errorRenderer = $this->errorRenderer;
-        }
-
         $this->unregister();
 
-        $errorRenderer->log($t, $request);
+        $this->errorRenderer->log($t, $request);
 
-        echo $errorRenderer->render($t, $request);
+        echo $this->errorRenderer->render($t, $request);
 
         exit(Command::FAIL);
     }

@@ -10,4 +10,6 @@ use Throwable;
 interface WebErrorRendererInterface extends ContextInterface
 {
     public function render(Throwable $t, ServerRequestInterface $request): string;
+
+    public function log(Throwable $t, ServerRequestInterface $request): void;
 }

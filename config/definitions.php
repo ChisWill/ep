@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 use Ep\Base\Config;
 use Ep\Base\Container;
-use Ep\Base\ErrorRenderer;
 use Ep\Base\Injector;
 use Ep\Console\Application as ConsoleApplication;
 use Ep\Console\CommandLoader;
 use Ep\Console\EventDispatcher;
-use Ep\Contract\ErrorRendererInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Contract\NotFoundHandlerInterface;
 use Ep\Web\NotFoundHandler;
@@ -119,8 +117,6 @@ return [
     ListenerCollection::class => static fn (ListenerCollectionFactory $listenerCollectionFactory): ListenerCollection => $listenerCollectionFactory->create($config->events),
     ListenerProviderInterface::class => Provider::class,
     EventDispatcherInterface::class => Dispatcher::class,
-    // Default ErrorRenderer
-    ErrorRendererInterface::class => ErrorRenderer::class,
     // Default NotFoundHandler
     NotFoundHandlerInterface::class => NotFoundHandler::class,
 ];
