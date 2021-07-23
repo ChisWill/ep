@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Ep\Web;
 
+use Ep\Helper\Date;
+use Yiisoft\Http\ContentDispositionHeader;
 use Yiisoft\Http\Header;
 use Yiisoft\Http\Status;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use SplFileInfo;
 
 final class Service
 {
@@ -46,9 +49,39 @@ final class Service
             ->withHeader(Header::LOCATION, $url);
     }
 
-    public function status(int $statusCode): ResponseInterface
+    /**
+     * @param SplFileInfo|string $file
+     */
+    public function download($file, string $name = null): ResponseInterface
+    {
+        if (is_string($file)) {
+            $file = new SplFileInfo($file);
+        }
+
+        $response = $this->responseFactory
+            ->createResponse(Status::OK)
+            ->withHeader(Header::CACHE_CONTROL, 'no-cache')
+            ->withHeader(Header::ETAG, $this->getEtagValue(hash_file('sha256', $file->getPathname(), true)))
+            ->withHeader(Header::LAST_MODIFIED, Date::toGMT($file->getMTime()))
+            ->withHeader(Header::CONTENT_DISPOSITION, ContentDispositionHeader::attachment($name ?: $file->getFilename()));
+
+        $reader = $file->openFile('r');
+        $body = $response->getBody();
+        while (!$reader->eof()) {
+            $body->write($reader->fgets());
+        }
+
+        return $response;
+    }
+
+    public function status(int $statusCode = Status::OK): ResponseInterface
     {
         return $this->responseFactory
             ->createResponse($statusCode);
+    }
+
+    private function getEtagValue(string $etag, bool $weak = false): string
+    {
+        return ($weak === true ? 'W/' : '') . '"' . base64_encode($etag) . '"';
     }
 }

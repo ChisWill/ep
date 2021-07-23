@@ -88,6 +88,14 @@ abstract class Controller implements ControllerInterface
         return $this->getService()->redirect($url, $statusCode);
     }
 
+    /**
+     * @param SplFileInfo|string $file
+     */
+    protected function download($file, string $name = null): ResponseInterface
+    {
+        return $this->getService()->download($file, $name);
+    }
+
     protected function getViewClass(): string
     {
         return View::class;
