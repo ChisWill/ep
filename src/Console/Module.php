@@ -9,6 +9,7 @@ use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
 use Ep\Contract\FilterTrait;
 use Ep\Contract\ModuleInterface;
+use LogicException;
 
 abstract class Module implements ModuleInterface
 {
@@ -35,5 +36,15 @@ abstract class Module implements ModuleInterface
             $this->service = Ep::getDi()->get(Service::class);
         }
         return $this->service;
+    }
+
+    public function getMiddlewares(): array
+    {
+        throw new LogicException('Command doesn\'t have middlewares yet.');
+    }
+
+    public function setMiddlewares(array $middlewares): void
+    {
+        throw new LogicException('Command doesn\'t have middlewares yet.');
     }
 }
