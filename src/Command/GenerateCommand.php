@@ -33,19 +33,19 @@ final class GenerateCommand extends Command
     {
         foreach ($request->getArgument('table') as $table) {
             $request->setOption('table', $table);
-            $this->singleModel($request->getOptions());
+            $this->generateModel($request);
         }
         return $this->success();
     }
 
-    private function singleModel(array $options): void
+    private function generateModel(ConsoleRequestInterface $request): void
     {
-        $this->service->initModel($options);
+        $service = $this->service->load($request);
 
-        if ($this->service->hasModel()) {
-            $this->service->updateModel();
+        if ($service->hasModel()) {
+            $service->updateModel();
         } else {
-            $this->service->createModel();
+            $service->createModel();
         }
     }
 }

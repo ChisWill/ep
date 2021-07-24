@@ -12,6 +12,7 @@ use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\TableSchema;
 use Yiisoft\Strings\StringHelper;
 use Psr\Container\ContainerInterface;
+use InvalidArgumentException;
 
 final class GenerateService extends Service
 {
@@ -31,18 +32,30 @@ final class GenerateService extends Service
         return $this->view->renderPartial($path, $params);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure(): void
+    {
+        switch ($this->request->getRoute()) {
+            case 'generate/model':
+                $this->configureModel();
+                break;
+            default:
+                throw new InvalidArgumentException('Command "' . $this->request->getRoute() . '" is not defined.');
+        }
+    }
+
     private string $table;
     private string $path;
     private string $prefix;
     private TableSchema $tableSchema;
 
-    public function initModel(array $options): void
+    private function configureModel(): void
     {
-        $this->load($options);
-
-        $this->table = $options['table'];
-        $this->path = $options['path'] ?? $this->defaultOptions['model.path'] ?? 'Model';
-        $this->prefix = $options['prefix'] ?? $this->defaultOptions['model.prefix'] ?? '';
+        $this->table = $this->request->getOption('table');
+        $this->path = $this->request->getOption('path') ?? $this->defaultOptions['model.path'] ?? 'Model';
+        $this->prefix = $this->request->getOption('prefix') ?? $this->defaultOptions['model.prefix'] ?? '';
 
         $tableSchema = $this->getDb()->getTableSchema($this->table, true);
         if (!$tableSchema) {

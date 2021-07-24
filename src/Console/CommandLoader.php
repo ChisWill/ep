@@ -130,8 +130,8 @@ final class CommandLoader implements CommandLoaderInterface
     private array $commandNames = [];
 
     /**
-     * @throws NotFoundException
      * @throws LogicException
+     * @throws NotFoundException
      */
     private function parse(string $name): string
     {

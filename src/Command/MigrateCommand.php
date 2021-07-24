@@ -62,45 +62,45 @@ final class MigrateCommand extends Command
 
     public function createAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->load($request->getOptions());
-
-        $this->service->create($request->getArgument('name'));
+        $this->service
+            ->load($request)
+            ->create($request->getArgument('name'));
 
         return $this->success();
     }
 
     public function initAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->load($request->getOptions());
-
-        $this->service->init();
+        $this->service
+            ->load($request)
+            ->init();
 
         return $this->success();
     }
 
     public function listAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->load($request->getOptions());
-
-        $this->service->list();
+        $this->service
+            ->load($request)
+            ->list();
 
         return $this->success();
     }
 
     public function upAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->load($request->getOptions());
-
-        $this->service->up();
+        $this->service
+            ->load($request)
+            ->up();
 
         return $this->success();
     }
 
     public function downAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
-        $this->service->load($request->getOptions());
-
-        $this->service->down();
+        $this->service
+            ->load($request)
+            ->down();
 
         return $this->success();
     }

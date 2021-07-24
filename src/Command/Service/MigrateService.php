@@ -37,11 +37,12 @@ final class MigrateService extends Service
     private string $basePath;
     private MigrateBuilder $builder;
 
-    public function load(array $options): void
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure(): void
     {
-        parent::load($options);
-
-        $this->migratePath = $options['path'] ?? $this->defaultOptions['path'] ?? 'Migration';
+        $this->migratePath = $this->request->getOption('path') ?? $this->defaultOptions['path'] ?? 'Migration';
         $this->basePath = $this->getAppPath() . '/' . trim($this->migratePath, '/');
         $this->builder = new MigrateBuilder($this->getDb(), $this->consoleService);
     }
@@ -61,7 +62,7 @@ final class MigrateService extends Service
         $name = $this->initClassName;
         $upSql = '';
         $downSql = '';
-        $tables = $dbService->getTables($this->options['prefix'] ?? '');
+        $tables = $dbService->getTables($this->request->getOption('prefix') ?? '');
         foreach ($tables as $tableName) {
             if ($tableName !== $this->tableName) {
                 $upSql .= $dbService->getDDL($tableName) . ";\n";
@@ -69,7 +70,7 @@ final class MigrateService extends Service
             }
         }
         $insertData = [];
-        if ($this->options['data']) {
+        if ($this->request->getOption('data')) {
             foreach ($tables as $tableName) {
                 $data = Query::find($this->getDb())->from($tableName)->all();
                 if (!$data) {
@@ -112,7 +113,7 @@ final class MigrateService extends Service
 
     public function up(): void
     {
-        $this->step = (int) ($this->options['step'] ?? 0);
+        $this->step = (int) ($this->request->getOption('step') ?? 0);
 
         $this->migrate('up', function (array $instances): bool {
             if (!$instances) {
@@ -127,7 +128,6 @@ final class MigrateService extends Service
             }
             return $this->consoleService->confirm(sprintf('Apply the above migration%s?', $count > 1 ? 's' : ''), true);
         }, function (array $instances): void {
-
             $this->builder->batchInsert(
                 $this->tableName,
                 ['version', ActiveRecord::CREATED_AT],
@@ -140,7 +140,7 @@ final class MigrateService extends Service
 
     public function down(): void
     {
-        $this->step = $this->options['all'] ? 0 : (int) ($this->options['step'] ?? 1);
+        $this->step = $this->request->getOption('all') ? 0 : (int) ($this->request->getOption('step') ?? 1);
 
         $this->migrate('down', function (array $instances): bool {
             if (!$instances) {
@@ -155,7 +155,6 @@ final class MigrateService extends Service
             }
             return $this->consoleService->confirm(sprintf('Revert the above migration%s?', $count > 1 ? 's' : ''));
         }, function (array $instances): void {
-
             $this->builder->delete(
                 $this->tableName,
                 ['version' => array_map(fn ($instance): string => $this->replaceFromClassName(get_class($instance)), $instances)]

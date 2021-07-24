@@ -50,7 +50,9 @@ final class Service
 
     public function status(int $code): ConsoleResponseInterface
     {
-        return $this->factory->createResponse($this->output)->setCode($code);
+        return $this->factory
+            ->createResponse($this->output)
+            ->setCode($code);
     }
 
     public function write(string $message = '', int $options = 0): void
@@ -101,16 +103,18 @@ final class Service
 
     public function getHelper(string $name): HelperInterface
     {
-        return $this->application->getHelperSet()->get($name);
+        return $this->application
+            ->getHelperSet()
+            ->get($name);
     }
 
-    public function call(string $command, array $arguments = [], OutputInterface $output = null): int
+    public function call(string $command, array $arguments = []): int
     {
         return $this->application
             ->find($command)
             ->run(
                 new ArrayInput(compact('command') + $arguments),
-                $output ?? $this->output
+                $this->output
             );
     }
 }

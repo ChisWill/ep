@@ -7,6 +7,7 @@ namespace Ep\Command\Service;
 use Ep;
 use Ep\Base\Config;
 use Ep\Console\Service as ConsoleService;
+use Ep\Contract\ConsoleRequestInterface;
 use Ep\Kit\Util;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Connection\Connection;
@@ -34,25 +35,35 @@ abstract class Service
         $this->aliases = $container->get(Aliases::class);
     }
 
-    protected array $options;
-    protected string $userRootNamespace;
+    protected ConsoleRequestInterface $request;
 
-    public function load(array $options): void
+    /**
+     * @return static
+     */
+    final public function load(ConsoleRequestInterface $request)
     {
-        $this->options = $options;
-        $this->userRootNamespace = $options['common']['userRootNamespace'];
+        $new = clone $this;
+        $new->request = $request;
 
-        $this->initDefaultOptions();
+        $new->initDefaultOptions();
+
+        $new->configure();
+
+        return $new;
     }
 
+    protected string $userRootNamespace;
     protected array $defaultOptions;
 
     private function initDefaultOptions(): void
     {
-        if (!empty($this->options['app'])) {
-            $this->defaultOptions = $this->options['apps'][$this->options['app']][$this->getId()] ?? [];
+        $options = $this->request->getOptions();
+
+        $this->userRootNamespace = $options['common']['userRootNamespace'];
+        if (!empty($options['app'])) {
+            $this->defaultOptions = $options['apps'][$options['app']][$this->getId()] ?? [];
         } else {
-            $this->defaultOptions = $this->options[$this->getId()] ?? [];
+            $this->defaultOptions = $options[$this->getId()] ?? [];
         }
     }
 
@@ -61,7 +72,7 @@ abstract class Service
     protected function getDb(): Connection
     {
         if ($this->db === null) {
-            $db = $this->options['db'] ?? $this->defaultOptions['db'] ?? $this->options['common']['db'] ?? null;
+            $db = $this->request->getOption('db') ?? $this->defaultOptions['db'] ?? $this->request->getOption('common.db') ?? null;
             try {
                 $this->db = Ep::getDb($db);
             } catch (NotFoundException $e) {
@@ -103,4 +114,6 @@ abstract class Service
     {
         return lcfirst(basename(str_replace('\\', '/', static::class), 'Service'));
     }
+
+    abstract protected function configure(): void;
 }

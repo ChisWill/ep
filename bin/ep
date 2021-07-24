@@ -4,7 +4,7 @@
 declare(strict_types=1);
 
 use Ep\Console\Application;
-use Ep\Console\ArgvInput;
+use Ep\Console\Input;
 
 (static function (): void {
     $cwd = getcwd();
@@ -39,7 +39,7 @@ use Ep\Console\ArgvInput;
     $options['common'] ??= [];
     $options['common']['userRootNamespace'] = $userConfig['rootNamespace'] ?? 'App';
 
-    $input = new ArgvInput();
+    $input = Ep::getDi()->get(Input::class);
     foreach ($options as $name => $value) {
         $input->setOption($name, $value);
     }

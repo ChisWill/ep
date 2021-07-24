@@ -73,7 +73,10 @@ class DemoController extends Controller
         $newName = null;
         // $newName = '0!§ $&()=`´{}  []²³@€µ^°_+\' # - _ . , ; ü ä ö ß 9.jpg';
 
-        return $this->getService()->download($file, $newName);
+        return $this
+            ->getService()
+            ->withRequest($request)
+            ->download($file, $newName);
     }
 
     public function requestAction(ServerRequest $request)

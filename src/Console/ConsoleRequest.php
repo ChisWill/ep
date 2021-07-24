@@ -6,6 +6,7 @@ namespace Ep\Console;
 
 use Ep\Contract\ConsoleRequestInterface;
 use Symfony\Component\Console\Input\InputInterface;
+use Yiisoft\Arrays\ArrayHelper;
 
 final class ConsoleRequest implements ConsoleRequestInterface
 {
@@ -39,6 +40,9 @@ final class ConsoleRequest implements ConsoleRequestInterface
      */
     public function getArgument(string $name)
     {
+        if (strpos($name, '.') !== false) {
+            return ArrayHelper::getValueByPath($this->getArguments(), $name);
+        }
         return $this->arguments[$name] ?? $this->input->getArgument($name);
     }
 
@@ -83,6 +87,9 @@ final class ConsoleRequest implements ConsoleRequestInterface
      */
     public function getOption(string $name)
     {
+        if (strpos($name, '.') !== false) {
+            return ArrayHelper::getValueByPath($this->getOptions(), $name);
+        }
         return $this->options[$name] ?? $this->input->getOption($name);
     }
 

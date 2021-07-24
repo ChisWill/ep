@@ -28,9 +28,16 @@ final class ScanService extends Service
         $this->cache = $cache;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure(): void
+    {
+    }
+
     public function annotation(): void
     {
-        $classes = array_map([$this, 'getClassNameByFile'], $this->findClassFiles($this->getAppPath(), $this->options['ignore']));
+        $classes = array_map([$this, 'getClassNameByFile'], $this->findClassFiles($this->getAppPath(), $this->request->getOption('ignore')));
 
         $this->consoleService->progress(fn ($progressBar) => $this->cacheAnnotations($classes, $progressBar), count($classes));
 
