@@ -106,7 +106,7 @@ final class Service
         }
 
         foreach ($pairs as $name => $value) {
-            if ($value !== ($this->request->getHeader($name)[0] ?? null)) {
+            if (!in_array($value, $this->request->getHeader($name))) {
                 return false;
             }
         }

@@ -8,7 +8,7 @@
     "require": {
         "php": ">=7.4",
         "ext-json": "*",
-        "chiswill/ep-helper": "*",
+        "chiswill/ep-helper": "dev-master",
         "doctrine/annotations": "^1.13",
         "httpsoft/http-message": "^1.0.5",
         "nikic/fast-route": "^1.3",

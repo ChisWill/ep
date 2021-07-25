@@ -61,7 +61,7 @@ abstract class ControllerRunner
      * 
      * @return mixed
      */
-    private function runAll(?ModuleInterface $module, ControllerInterface $controller, string $action, $request, $response = null)
+    public function runAll(?ModuleInterface $module, ControllerInterface $controller, string $action, $request, $response = null)
     {
         if ($module instanceof ModuleInterface) {
             return $this->runModule($module, $controller, $action, $request, $response);
