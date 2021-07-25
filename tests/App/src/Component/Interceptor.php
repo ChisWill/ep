@@ -26,7 +26,7 @@ class Interceptor implements InterceptorInterface
     public function excludePath(): array
     {
         return [
-            ['/other', OtherFilter::class]
+            // ['/other', OtherFilter::class]
         ];
     }
 }

@@ -15,8 +15,8 @@ final class Module extends WebModule
     public function __construct()
     {
         $this->setMiddlewares([
+            AddMiddleware::class,
             FilterMiddleware::class,
-            AddMiddleware::class
         ]);
     }
 

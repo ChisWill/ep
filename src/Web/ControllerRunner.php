@@ -8,6 +8,7 @@ use Ep\Base\ControllerRunner as BaseControllerRunner;
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\ModuleInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Closure;
 
@@ -25,12 +26,11 @@ final class ControllerRunner extends BaseControllerRunner
     /**
      * @param  ServerRequestInterface $request
      * 
-     * @return mixed
+     * @return ResponseInterface
      */
     protected function runModule(ModuleInterface $module, ControllerInterface $controller, string $action, $request, $response = null)
     {
-        $middlewares = $module->getMiddlewares();
-        if ($middlewares) {
+        if ($middlewares = $module->getMiddlewares()) {
             return $this->requestHandlerFactory
                 ->wrap($middlewares, $this->requestHandlerFactory->create($this->wrapModule($module, $controller, $action)))
                 ->handle($request);
@@ -42,12 +42,11 @@ final class ControllerRunner extends BaseControllerRunner
     /**
      * @param  ServerRequestInterface $request
      * 
-     * @return mixed
+     * @return ResponseInterface
      */
     protected function runAction(ControllerInterface $controller, string $action, $request, $response = null)
     {
-        $middlewares = $controller->getMiddlewares();
-        if ($middlewares) {
+        if ($middlewares = $controller->getMiddlewares()) {
             return $this->requestHandlerFactory
                 ->wrap($middlewares, $this->requestHandlerFactory->create($this->wrapController($controller, $action)))
                 ->handle($request);

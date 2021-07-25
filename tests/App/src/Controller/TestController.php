@@ -75,9 +75,9 @@ class TestController extends Controller
     public function __construct()
     {
         $this->setMiddlewares([
-            FilterMiddleware::class,
             MultipleMiddleware::class,
-            TimeMiddleware::class
+            FilterMiddleware::class,
+            // TimeMiddleware::class
         ]);
 
         $this->db = Ep::getDb('sqlite');
@@ -165,8 +165,9 @@ class TestController extends Controller
         return Ep::getDi()
             ->get(RequestHandlerFactory::class)
             ->wrap([
+                MultipleMiddleware::class,
+                FilterMiddleware::class,
                 CheckMiddleware::class,
-                MultipleMiddleware::class
             ], $handler)
             ->handle($serverRequest);
     }

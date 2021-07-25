@@ -25,7 +25,7 @@ final class ServerRequest implements ServerRequestInterface
 
     public function isAjax(): bool
     {
-        return ($this->request->getServerParams()['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
+        return ($this->request->getServerParams()['HTTP_X_REQUESTED_WITH'] ?? null) === 'XMLHttpRequest';
     }
 
     public function getCurrentUrl(string $path = '', array $params = []): string

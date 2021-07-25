@@ -17,9 +17,9 @@ class OtherFilter implements FilterInterface
     public function __construct()
     {
         $this->setMiddlewares([
-            FilterMiddleware::class,
+            InitMiddleware::class,
             AddMiddleware::class,
-            InitMiddleware::class
+            FilterMiddleware::class,
         ]);
     }
 

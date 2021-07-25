@@ -32,10 +32,10 @@ use Yiisoft\Middleware\Dispatcher\MiddlewareFactory;
 class MiddlewareBench
 {
     private array $middlewareList = [
-        CheckMiddleware::class,
-        FilterMiddleware::class,
-        AddMiddleware::class,
         InitMiddleware::class,
+        AddMiddleware::class,
+        FilterMiddleware::class,
+        CheckMiddleware::class,
     ];
 
     private ServerRequestInterface $request;
@@ -88,7 +88,7 @@ class MiddlewareBench
 
     private function wrap(MiddlewareInterface $middleware, RequestHandlerInterface $handler): RequestHandlerInterface
     {
-        return new class ($middleware, $handler) implements RequestHandlerInterface
+        return new class($middleware, $handler) implements RequestHandlerInterface
         {
             private MiddlewareInterface $middleware;
             private RequestHandlerInterface $handler;

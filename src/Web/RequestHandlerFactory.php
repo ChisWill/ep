@@ -24,6 +24,7 @@ final class RequestHandlerFactory
 
     public function wrap(array $middlewares, RequestHandlerInterface $handler): RequestHandlerInterface
     {
+        krsort($middlewares);
         foreach ($this->buildMiddlewares($middlewares) as $middleware) {
             $handler = $this->wrapMiddleware($middleware, $handler);
         }

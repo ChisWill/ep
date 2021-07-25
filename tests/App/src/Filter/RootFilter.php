@@ -18,9 +18,9 @@ class RootFilter implements FilterInterface
     public function __construct()
     {
         $this->setMiddlewares([
-            FilterMiddleware::class,
+            InitMiddleware::class,
             MultipleMiddleware::class,
-            InitMiddleware::class
+            FilterMiddleware::class,
         ]);
     }
 

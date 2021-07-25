@@ -41,9 +41,9 @@ final class Application
     }
 
     private array $middlewares = [
-        RouteMiddleware::class,
+        InterceptorMiddleware::class,
         SessionMiddleware::class,
-        InterceptorMiddleware::class
+        RouteMiddleware::class
     ];
 
     public function withMiddlewares(array $middlewares): self

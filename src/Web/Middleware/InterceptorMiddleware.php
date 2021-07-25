@@ -25,8 +25,8 @@ final class InterceptorMiddleware implements MiddlewareInterface
     private array $excludePath = [];
 
     public function __construct(
-        Config $config,
         ContainerInterface $container,
+        Config $config,
         RequestHandlerFactory $requestHandlerFactory,
         Service $service,
         InterceptorInterface $interceptor = null
@@ -37,15 +37,15 @@ final class InterceptorMiddleware implements MiddlewareInterface
         $this->container = $container;
         $this->requestHandlerFactory = $requestHandlerFactory;
         $this->service = $service;
+
         $this->includePath = $interceptor->includePath();
         $this->excludePath = $interceptor->excludePath();
-        $baseUrl = $config->baseUrl;
 
         foreach ($this->includePath as [&$path, $class]) {
-            $path = $baseUrl . $path;
+            $path = $config->baseUrl . $path;
         }
         foreach ($this->excludePath as [&$path, $class]) {
-            $path = $baseUrl . $path;
+            $path = $config->baseUrl . $path;
         }
     }
 
@@ -73,9 +73,6 @@ final class InterceptorMiddleware implements MiddlewareInterface
         }
 
         if ($middlewares) {
-            krsort($middlewares);
-            $middlewares = array_unique($middlewares);
-            ksort($middlewares);
             $response = $this->requestHandlerFactory
                 ->wrap($middlewares, $handler)
                 ->handle($request);
@@ -101,7 +98,7 @@ final class InterceptorMiddleware implements MiddlewareInterface
         $result = $filter->before($request);
         if ($result === true || $result instanceof ResponseInterface) {
             $stack[] = $filter;
-            $middlewares = array_merge($filter->getMiddlewares(), $middlewares);
+            $middlewares = array_merge($middlewares, $filter->getMiddlewares());
             return $result;
         } else {
             return $this->service->status(Status::NOT_ACCEPTABLE);

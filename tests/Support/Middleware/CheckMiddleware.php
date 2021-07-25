@@ -20,7 +20,7 @@ class CheckMiddleware implements MiddlewareInterface
         $attributes = $request->getAttributes();
         try {
             $age = $attributes['age'] ?? 0;
-            if ($age >= 120) {
+            if ($age >= 100) {
                 throw new Exception('You are died.');
             } elseif ($age == 0) {
                 throw new Exception('You haven\'t been born yet.');
