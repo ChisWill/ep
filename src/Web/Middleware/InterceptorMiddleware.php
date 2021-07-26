@@ -21,7 +21,6 @@ final class InterceptorMiddleware implements MiddlewareInterface
     private ContainerInterface $container;
     private RequestHandlerFactory $requestHandlerFactory;
     private Service $service;
-    private ?InterceptorInterface $interceptor;
     private array $includePath = [];
     private array $excludePath = [];
 
@@ -32,7 +31,7 @@ final class InterceptorMiddleware implements MiddlewareInterface
         Service $service,
         InterceptorInterface $interceptor = null
     ) {
-        if (($this->interceptor = $interceptor) === null) {
+        if ($interceptor === null) {
             return;
         }
         $this->container = $container;
@@ -49,10 +48,6 @@ final class InterceptorMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if ($this->interceptor === null) {
-            return $handler->handle($request);
-        }
-
         $requestPath = $request->getUri()->getPath();
         $classList = [];
         foreach ($this->includePath as $path => $class) {
