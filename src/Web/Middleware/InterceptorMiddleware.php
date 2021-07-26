@@ -21,6 +21,7 @@ final class InterceptorMiddleware implements MiddlewareInterface
     private ContainerInterface $container;
     private RequestHandlerFactory $requestHandlerFactory;
     private Service $service;
+    private ?InterceptorInterface $interceptor;
     private array $includePath = [];
     private array $excludePath = [];
 
@@ -31,44 +32,53 @@ final class InterceptorMiddleware implements MiddlewareInterface
         Service $service,
         InterceptorInterface $interceptor = null
     ) {
-        if ($interceptor === null) {
+        if (($this->interceptor = $interceptor) === null) {
             return;
         }
         $this->container = $container;
         $this->requestHandlerFactory = $requestHandlerFactory;
         $this->service = $service;
 
-        $this->includePath = $interceptor->includePath();
-        $this->excludePath = $interceptor->excludePath();
-
-        foreach ($this->includePath as [&$path, $class]) {
-            $path = $config->baseUrl . $path;
+        foreach ($interceptor->includePath() as $path => $class) {
+            $this->includePath['/' . trim($config->baseUrl . $path, '/')] = (array) $class;
         }
-        foreach ($this->excludePath as [&$path, $class]) {
-            $path = $config->baseUrl . $path;
+        foreach ($interceptor->excludePath() as $path => $class) {
+            $this->excludePath['/' . trim($config->baseUrl . $path, '/')] = (array) $class;
         }
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $stack = [];
-        $middlewares = [];
-        $uri = $request->getUri()->getPath();
+        if ($this->interceptor === null) {
+            return $handler->handle($request);
+        }
 
-        foreach ($this->includePath as [$path, $class]) {
-            if (strpos($uri, $path) === 0) {
-                $result = $this->before($class, $request, $stack, $middlewares);
-                if ($result instanceof ResponseInterface) {
-                    return $result;
-                }
+        $requestPath = $request->getUri()->getPath();
+        $classList = [];
+        foreach ($this->includePath as $path => $class) {
+            if (strpos($requestPath, $path) === 0) {
+                $classList = array_merge($classList, $class);
             }
         }
-        foreach ($this->excludePath as [$path, $class]) {
-            if (strpos($uri, $path) !== 0) {
-                $result = $this->before($class, $request, $stack, $middlewares);
-                if ($result instanceof ResponseInterface) {
-                    return $result;
-                }
+        foreach ($this->excludePath as $path => $class) {
+            if (strpos($requestPath, $path) !== 0) {
+                $classList = array_merge($classList, $class);
+            }
+        }
+
+        $stack = [];
+        $middlewares = [];
+        foreach ($classList as $class) {
+            /** @var FilterInterface */
+            $filter = $this->container->get($class);
+            $result = $filter->before($request);
+            if ($result === true) {
+                $stack[] = $filter;
+                $middlewares = array_merge($middlewares, $filter->getMiddlewares());
+            } elseif ($result instanceof ResponseInterface) {
+                return $result;
+            } else {
+                return $this->service->status(Status::NOT_ACCEPTABLE);
             }
         }
 
@@ -86,22 +96,5 @@ final class InterceptorMiddleware implements MiddlewareInterface
         }
 
         return $response;
-    }
-
-    /**
-     * @return true|ResponseInterface
-     */
-    private function before(string $class, ServerRequestInterface $request, array &$stack, array &$middlewares)
-    {
-        /** @var FilterInterface */
-        $filter = $this->container->get($class);
-        $result = $filter->before($request);
-        if ($result === true || $result instanceof ResponseInterface) {
-            $stack[] = $filter;
-            $middlewares = array_merge($middlewares, $filter->getMiddlewares());
-            return $result;
-        } else {
-            return $this->service->status(Status::NOT_ACCEPTABLE);
-        }
     }
 }

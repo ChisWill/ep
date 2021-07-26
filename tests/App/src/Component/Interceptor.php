@@ -18,15 +18,15 @@ class Interceptor implements InterceptorInterface
     public function includePath(): array
     {
         return [
-            ['/', RootFilter::class],
-            // ['/test', DemoFilter::class],
+            '/' => RootFilter::class,
+            // '/test' => [DemoFilter::class],
         ];
     }
 
     public function excludePath(): array
     {
         return [
-            // ['/other', OtherFilter::class]
+            // '/other' => OtherFilter::class
         ];
     }
 }
