@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Console;
 
+use Ep\Contract\ConsoleFactoryInterface;
 use Ep\Contract\ConsoleResponseInterface;
 use Symfony\Component\Console\Helper\HelperInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -20,13 +21,13 @@ final class Service
     private Application $application;
     private InputInterface $input;
     private OutputInterface $output;
-    private Factory $factory;
+    private ConsoleFactoryInterface $factory;
 
     public function __construct(
         Application $application,
         InputInterface $input,
         OutputInterface $output,
-        Factory $factory
+        ConsoleFactoryInterface $factory
     ) {
         $this->application = $application;
         $this->input = $input;

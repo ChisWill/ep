@@ -8,6 +8,8 @@ use Ep\Base\Injector;
 use Ep\Console\Application as ConsoleApplication;
 use Ep\Console\CommandLoader;
 use Ep\Console\EventDispatcher;
+use Ep\Console\Factory;
+use Ep\Contract\ConsoleFactoryInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Contract\NotFoundHandlerInterface;
 use Ep\Web\NotFoundHandler;
@@ -76,6 +78,7 @@ return [
     // Annotation
     Reader::class => static fn (CacheItemPoolInterface $cache): Reader => $config->debug ? new AnnotationReader() : new PsrCachedReader(new AnnotationReader(), $cache, false),
     // Console
+    ConsoleFactoryInterface::class => Factory::class,
     ConsoleApplication::class => [
         'class' => ConsoleApplication::class,
         'setAutoExit()' => [false],

@@ -8,7 +8,6 @@ use Ep;
 use Ep\Annotation\Aspect;
 use Ep\Console\Command;
 use Ep\Console\CommandDefinition;
-use Ep\Console\ConsoleRequest;
 use Ep\Console\Service;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;

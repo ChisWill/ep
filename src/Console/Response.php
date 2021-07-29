@@ -7,7 +7,7 @@ namespace Ep\Console;
 use Ep\Contract\ConsoleResponseInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class ConsoleResponse implements ConsoleResponseInterface
+final class Response implements ConsoleResponseInterface
 {
     private OutputInterface $output;
 

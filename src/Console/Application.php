@@ -6,6 +6,7 @@ namespace Ep\Console;
 
 use Ep;
 use Ep\Base\ErrorHandler;
+use Ep\Contract\ConsoleFactoryInterface;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,14 +15,14 @@ final class Application extends SymfonyApplication
 {
     private InputInterface $input;
     private OutputInterface $output;
-    private Factory $factory;
+    private ConsoleFactoryInterface $factory;
     private ErrorHandler $errorHandler;
     private ErrorRenderer $errorRenderer;
 
     public function __construct(
         InputInterface $input,
         OutputInterface $output,
-        Factory $factory,
+        ConsoleFactoryInterface $factory,
         ErrorHandler $errorHandler,
         ErrorRenderer $errorRenderer
     ) {

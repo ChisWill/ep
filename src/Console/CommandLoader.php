@@ -7,6 +7,7 @@ namespace Ep\Console;
 use Ep\Base\Config;
 use Ep\Base\ControllerLoader;
 use Ep\Base\Route;
+use Ep\Contract\ConsoleFactoryInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Contract\NotFoundException;
 use Ep\Helper\Str;
@@ -26,7 +27,7 @@ final class CommandLoader implements CommandLoaderInterface
     private Config $config;
     private Route $route;
     private ControllerRunner $controllerRunner;
-    private Factory $factory;
+    private ConsoleFactoryInterface $factory;
     private Util $util;
     private ControllerLoader $controllerLoader;
 
@@ -34,7 +35,7 @@ final class CommandLoader implements CommandLoaderInterface
         Config $config,
         Route $route,
         ControllerRunner $controllerRunner,
-        Factory $factory,
+        ConsoleFactoryInterface $factory,
         InjectorInterface $injector,
         Util $util
     ) {
@@ -64,12 +65,12 @@ final class CommandLoader implements CommandLoaderInterface
         {
             private ControllerLoader $loader;
             private ControllerRunner $runner;
-            private Factory $factory;
+            private ConsoleFactoryInterface $factory;
 
             public function __construct(
                 ControllerLoader $loader,
                 ControllerRunner $runner,
-                Factory $factory,
+                ConsoleFactoryInterface $factory,
                 string $name,
                 string $alias
             ) {

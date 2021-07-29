@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Ep\Console;
 
+use Ep\Contract\ConsoleFactoryInterface;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class Factory
+final class Factory implements ConsoleFactoryInterface
 {
     private InputInterface $input;
     private OutputInterface $output;
@@ -22,11 +23,11 @@ final class Factory
 
     public function createRequest(InputInterface $input = null): ConsoleRequestInterface
     {
-        return new ConsoleRequest($input ?? $this->input);
+        return new Request($input ?? $this->input);
     }
 
     public function createResponse(OutputInterface $output = null): ConsoleResponseInterface
     {
-        return new ConsoleResponse($output ?? $this->output);
+        return new Response($output ?? $this->output);
     }
 }

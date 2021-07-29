@@ -8,7 +8,7 @@ use Ep\Contract\ConsoleRequestInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Yiisoft\Arrays\ArrayHelper;
 
-final class ConsoleRequest implements ConsoleRequestInterface
+final class Request implements ConsoleRequestInterface
 {
     private InputInterface $input;
 
