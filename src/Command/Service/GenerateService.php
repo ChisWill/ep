@@ -154,15 +154,10 @@ final class GenerateService extends Service
                 continue;
             }
 
-            if ($column->isAllowNull()) {
-                if (isset($fields[$field])) {
-                    $fields[$field] = array_map(fn ($rule): string => $rule . ':skipOnEmpty(true)', $fields[$field]);
-                }
-            } else {
+            if (!$column->isAllowNull()) {
                 $fields[$field][] = 'Required';
                 $types['Required'] = true;
             }
-
             switch ($column->getType()) {
                 case Schema::TYPE_TINYINT:
                 case Schema::TYPE_SMALLINT:
@@ -194,6 +189,9 @@ final class GenerateService extends Service
             if (StringHelper::endsWith($field, 'email')) {
                 $fields[$field][] = 'Email';
                 $types['Email'] = true;
+            }
+            if ($column->isAllowNull() && isset($fields[$field])) {
+                $fields[$field] = array_map(fn ($rule): string => $rule . ':skipOnEmpty(true)', $fields[$field]);
             }
         }
         switch (count($types)) {

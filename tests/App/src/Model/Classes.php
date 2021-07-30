@@ -30,12 +30,12 @@ class Classes extends ActiveRecord
     {
         return $this->userRules() + [
             'school_id' => [
-                Number::rule()->integer(),
                 Required::rule(),
+                Number::rule()->integer(),
             ],
             'name' => [
-                HasLength::rule()->max(50),
                 Required::rule(),
+                HasLength::rule()->max(50),
             ],
         ];
     }
