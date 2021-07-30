@@ -153,7 +153,6 @@ final class GenerateService extends Service
             if ($column->isPrimaryKey()) {
                 continue;
             }
-
             if (!$column->isAllowNull()) {
                 $fields[$field][] = 'Required';
                 $types['Required'] = true;
