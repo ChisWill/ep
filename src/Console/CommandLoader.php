@@ -180,17 +180,18 @@ final class CommandLoader implements CommandLoaderInterface
 
     private function getCommands(array $files): array
     {
-        foreach ($files as $subClassName) {
-            $map[$subClassName] = array_filter(
-                (new ReflectionClass($this->config->rootNamespace . '\\' . str_replace('/', '\\', $subClassName)))->getMethods(ReflectionMethod::IS_PUBLIC),
+        $map = [];
+        foreach ($files as $className) {
+            $map[$className] = array_filter(
+                (new ReflectionClass($this->config->rootNamespace . '\\' . str_replace('/', '\\', $className)))->getMethods(ReflectionMethod::IS_PUBLIC),
                 fn (ReflectionMethod $ref): bool => strpos($ref->getName(), $this->config->actionSuffix) !== false
             );
         }
         $commands = [];
-        foreach ($map as $subClassName => $actions) {
+        foreach ($map as $className => $actions) {
             foreach ($actions as $ref) {
                 $commands[] = $this->getCommandName(
-                    $subClassName,
+                    $className,
                     Str::camelToId(Str::rtrim($ref->getName(), $this->config->actionSuffix), '-', true)
                 );
             }
@@ -198,15 +199,15 @@ final class CommandLoader implements CommandLoaderInterface
         return $commands;
     }
 
-    private function getCommandName(string $subClassName, string $action): string
+    private function getCommandName(string $className, string $action): string
     {
         if ($action === $this->config->defaultAction) {
             $action = '';
         } else {
             $action = '/' . $action;
         }
-        $prefix = trim(Str::camelToId(Str::rtrim('/' . $subClassName, '/' . $this->config->commandSuffix, false), '-', true), '/');
-        $basename = Str::camelToId(basename($subClassName, $this->config->commandSuffix), '-', true);
+        $prefix = trim(Str::camelToId(Str::rtrim('/' . $className, '/' . $this->config->commandSuffix, false), '-', true), '/');
+        $basename = Str::camelToId(basename($className, $this->config->commandSuffix), '-', true);
         if ($prefix) {
             return sprintf('%s/%s%s', $prefix, $basename, $action);
         } else {
