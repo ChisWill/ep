@@ -1,6 +1,6 @@
 {
     "name": "chiswill/ep",
-    "description": "Elastic PHP Framework",
+    "description": "Elastic PHP",
     "type": "library",
     "license": "MIT",
     "minimum-stability": "dev",
