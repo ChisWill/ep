@@ -56,7 +56,7 @@ final class ErrorRenderer extends BaseErrorRenderer
             $context['arguments'] = $request->getArguments();
             $context['options'] = $request->getOptions();
 
-            $this->logger->error($this->render($t, $request), $context);
+            $this->logger->error(parent::render($t, $request), $context);
         }
     }
 }
