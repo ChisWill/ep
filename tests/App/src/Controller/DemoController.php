@@ -17,6 +17,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
+use Yiisoft\Auth\Method\QueryParameter;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
@@ -315,6 +316,28 @@ class DemoController extends Controller
         Logger::alert('i am reset');
 
         return $this->string($r);
+    }
+
+    public function loginAction(ServerRequestInterface $request, SessionInterface $session)
+    {
+        $p = $request->getQueryParams();
+        $username = $p['u'] ?? '';
+        $password = $p['p'] ?? '';
+        if (!$username || !$password) {
+            return $this->error('require params u or p');
+        }
+
+        $user = Query::find($this->db)->from('student')->where([
+            'name' => $username,
+            'password' => $password
+        ])->one();
+        if (!$user) {
+            return $this->error('missing user');
+        }
+
+        $session->set('id', $user['id']);
+
+        return $this->string('Logined');
     }
 
     public function testAction()

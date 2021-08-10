@@ -56,6 +56,8 @@ final class RequestHandlerFactory
         foreach ($middlewares as $definition) {
             if (is_string($definition)) {
                 yield $this->container->get($definition);
+            } elseif ($definition instanceof MiddlewareInterface) {
+                yield $definition;
             } elseif (is_callable($definition)) {
                 yield $this->wrapCallback($definition);
             }

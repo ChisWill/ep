@@ -33,6 +33,7 @@
         "yiisoft/yii-web": "^3.0@dev"
     },
     "require-dev": {
+        "chiswill/ep-auth": "dev-master",
         "phpbench/phpbench": "^1.0.0",
         "phpunit/phpunit": "^9.4",
         "vimeo/psalm": "^4.5",
