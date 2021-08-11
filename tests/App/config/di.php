@@ -31,7 +31,7 @@ return static fn (Config $config): array => [
     AuthRepository::class => static function (InjectorInterface $injector): AuthRepository {
         return $injector
             ->make(AuthRepository::class)
-            ->addMethod('frontend', $injector->make(HttpSession::class, [
+            ->setMethod('frontend', $injector->make(HttpSession::class, [
                 new UserRepository()
             ]))
             ->bindFailureHandler(HttpSession::class, AuthFailHandler::class);

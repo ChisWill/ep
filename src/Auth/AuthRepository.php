@@ -6,10 +6,6 @@ namespace Ep\Auth;
 
 use Ep\Contract\InjectorInterface;
 use Yiisoft\Auth\AuthenticationMethodInterface;
-use Yiisoft\Auth\Method\HttpBasic;
-use Yiisoft\Auth\Method\HttpBearer;
-use Yiisoft\Auth\Method\HttpHeader;
-use Yiisoft\Auth\Method\QueryParameter;
 use Yiisoft\Auth\Middleware\Authentication;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -29,20 +25,11 @@ final class AuthRepository
         $this->injector = $injector;
     }
 
-    private array $methods = [
-        HttpBasic::class,
-        HttpBearer::class,
-        HttpHeader::class,
-        QueryParameter::class
-    ];
-    private array $methodInstances = [];
+    private array $methods = [];
 
-    public function addMethod(string $method, AuthenticationMethodInterface $instance = null): self
+    public function setMethod(string $method, AuthenticationMethodInterface $instance = null): self
     {
-        if ($instance !== null) {
-            $this->methodInstances[$method] = $instance;
-        }
-        $this->methods[] = $method;
+        $this->methods[$method] = $instance;
         return $this;
     }
 
@@ -64,13 +51,13 @@ final class AuthRepository
     {
         $this->check($method);
 
-        if (!isset($this->methodInstances[$method])) {
-            $this->methodInstances[$method] = $this->container->get($method);
+        if (!isset($this->methods[$method])) {
+            $this->methods[$method] = $this->container->get($method);
         }
-        return $this->methodInstances[$method];
+        return $this->methods[$method];
     }
 
-    private array $middlewareInstances = [];
+    private array $middlewares = [];
 
     /**
      * @throws InvalidArgumentException
@@ -79,7 +66,7 @@ final class AuthRepository
     {
         $this->check($method);
 
-        if (!isset($this->middlewareInstances[$method])) {
+        if (!isset($this->middlewares[$method])) {
             $arguments = [
                 $this->findMethod($method)
             ];
@@ -89,15 +76,15 @@ final class AuthRepository
                 }
                 $arguments[] = $this->failureHandlers[$method];
             }
-            $this->middlewareInstances[$method] = $this->injector->make(Authentication::class, $arguments);
+            $this->middlewares[$method] = $this->injector->make(Authentication::class, $arguments);
         }
 
-        return $this->middlewareInstances[$method];
+        return $this->middlewares[$method];
     }
 
     private function check(string $method): void
     {
-        if (!in_array($method, $this->methods)) {
+        if (!array_key_exists($method, $this->methods)) {
             throw new InvalidArgumentException('Invalid authentication method.');
         }
     }

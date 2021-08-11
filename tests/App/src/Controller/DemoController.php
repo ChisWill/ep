@@ -6,6 +6,7 @@ namespace Ep\Tests\App\Controller;
 
 use DateInterval;
 use Ep;
+use Ep\Auth\AuthRepository;
 use Ep\Auth\Method\HttpSession;
 use Ep\Db\Query;
 use Ep\Tests\App\Component\Controller;
@@ -319,7 +320,7 @@ class DemoController extends Controller
         return $this->string($r);
     }
 
-    public function loginAction(ServerRequestInterface $request, SessionInterface $session, HttpSession $auth)
+    public function loginAction(ServerRequestInterface $request, SessionInterface $session, AuthRepository $auth)
     {
         $p = $request->getQueryParams();
         $username = $p['u'] ?? '';
@@ -336,7 +337,7 @@ class DemoController extends Controller
             return $this->error('missing user');
         }
 
-        $session->set($auth->getId(), $user['id']);
+        $session->set($auth->findMethod('frontend')->getId(), $user['id']);
 
         return $this->string('Logined');
     }
