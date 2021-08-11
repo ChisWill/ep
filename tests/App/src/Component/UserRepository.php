@@ -5,22 +5,16 @@ declare(strict_types=1);
 namespace Ep\Tests\App\Component;
 
 use Ep;
-use Ep\Db\Query;
+use Ep\Tests\App\Model\Student;
 use Yiisoft\Auth\IdentityInterface;
 use Yiisoft\Auth\IdentityRepositoryInterface;
 
-final class SessionRepository implements IdentityRepositoryInterface
+final class UserRepository implements IdentityRepositoryInterface
 {
     public function findIdentity(string $id): ?IdentityInterface
     {
-        $r = Query::find(Ep::getDb('sqlite'))
-            ->from('student')
+        return Student::find(Ep::getDb('sqlite'))
             ->where(['id' => $id])
             ->one();
-        if ($r) {
-            return new Identity($r);
-        } else {
-            return null;
-        }
     }
 }

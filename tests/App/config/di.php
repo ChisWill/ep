@@ -3,21 +3,19 @@
 declare(strict_types=1);
 
 use Ep\Auth\AuthRepository;
+use Ep\Auth\Method\HttpSession;
 use Ep\Base\Config;
-use Ep\Base\Injector;
 use Ep\Contract\ConsoleErrorRendererInterface;
+use Ep\Contract\InjectorInterface;
 use Ep\Contract\InterceptorInterface;
 use Ep\Contract\WebErrorRendererInterface;
 use Ep\Tests\App\Component\AuthFailHandler;
 use Ep\Tests\App\Component\ConsoleRenderer;
 use Ep\Tests\App\Component\WebErrorRenderer;
 use Ep\Tests\App\Component\Interceptor;
-use Ep\Tests\App\Component\SessionAuthMethod;
-use Ep\Tests\App\Component\SessionRepository;
-use Psr\Container\ContainerInterface;
+use Ep\Tests\App\Component\UserRepository;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
-use Yiisoft\Auth\IdentityRepositoryInterface;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Mysql\Connection as MysqlConnection;
 use Yiisoft\Db\Redis\Connection as RedisConnection;
@@ -30,12 +28,13 @@ return static fn (Config $config): array => [
     WebErrorRendererInterface::class => WebErrorRenderer::class,
     ConsoleErrorRendererInterface::class => ConsoleRenderer::class,
     InterceptorInterface::class => Interceptor::class,
-    IdentityRepositoryInterface::class => SessionRepository::class,
-    AuthRepository::class => static function (ContainerInterface $container, Injector $injector): AuthRepository {
-        return $injector->make(AuthRepository::class, [
-            'authMethods' => [SessionAuthMethod::class],
-            'failureHandlers' => [SessionAuthMethod::class => $container->get(AuthFailHandler::class)]
-        ]);
+    AuthRepository::class => static function (InjectorInterface $injector): AuthRepository {
+        return $injector
+            ->make(AuthRepository::class)
+            ->addMethod('frontend', $injector->make(HttpSession::class, [
+                new UserRepository()
+            ]))
+            ->bindFailureHandler(HttpSession::class, AuthFailHandler::class);
     },
     // Log
     Target::class => static fn (Aliases $aliases): FileTarget => new FileTarget($aliases->get($config->runtimeDir . '/logs/' . date('Y-m-d') . '.log')),

@@ -6,6 +6,7 @@ namespace Ep\Tests\App\Controller;
 
 use DateInterval;
 use Ep;
+use Ep\Auth\Method\HttpSession;
 use Ep\Db\Query;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Facade\Cache as FacadeCache;
@@ -318,7 +319,7 @@ class DemoController extends Controller
         return $this->string($r);
     }
 
-    public function loginAction(ServerRequestInterface $request, SessionInterface $session)
+    public function loginAction(ServerRequestInterface $request, SessionInterface $session, HttpSession $auth)
     {
         $p = $request->getQueryParams();
         $username = $p['u'] ?? '';
@@ -335,7 +336,7 @@ class DemoController extends Controller
             return $this->error('missing user');
         }
 
-        $session->set('id', $user['id']);
+        $session->set($auth->getId(), $user['id']);
 
         return $this->string('Logined');
     }

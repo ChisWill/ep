@@ -6,6 +6,7 @@ namespace Ep\Tests\App\Model;
 
 use Ep\Db\ActiveRecord;
 use Yiisoft\ActiveRecord\ActiveQuery;
+use Yiisoft\Auth\IdentityInterface;
 use Yiisoft\Validator\Result;
 use Yiisoft\Validator\Rule\{
     Callback,
@@ -27,7 +28,7 @@ use Yiisoft\Validator\ValidationContext;
  * @property int $sex
  * @property string $desc
  */
-class Student extends ActiveRecord
+class Student extends ActiveRecord implements IdentityInterface
 {
     public const PK = 'id';
 
@@ -86,5 +87,10 @@ class Student extends ActiveRecord
     public function getClass(): ActiveQuery
     {
         return $this->hasOne(Classes::class, ['id' => 'class_id']);
+    }
+
+    public function getId(): ?string
+    {
+        return (string) $this->id ?: null;
     }
 }
