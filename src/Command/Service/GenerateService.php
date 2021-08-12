@@ -93,9 +93,9 @@ final class GenerateService extends Service
         [$useRule, $useStatement] = $this->solveUseStatement($filename, $classes);
 
         $replace = [
+            $useRule => $useStatement,
             '~(/\*\*\s).+( \*/\sclass)~Us' => '$1' . $this->getModelProperty() . '$2',
             '~(const PK = ).+(;)~U' => '$1' . $this->getPrimaryKey() . '$2',
-            $useRule => $useStatement,
             '~(function rules\(\): array\s+\{\s+)return.*;\s(\s+\})~Us' => '$1' . $this->getModelRules($rules) . '$2'
         ];
         if (@file_put_contents($filename, preg_replace(array_keys($replace), array_values($replace), file_get_contents($filename), 1))) {
@@ -218,7 +218,6 @@ final class GenerateService extends Service
     private function solveUseStatement(string $filename, array $classes): array
     {
         $useRule = '~use\s+Yiisoft\\\Validator\\\Rule\\\([\s\S]+);~U';
-
         preg_match($useRule, file_get_contents($filename), $matches);
         if (isset($matches[1])) {
             $classes = array_unique(array_merge($classes, array_map(
