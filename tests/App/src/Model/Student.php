@@ -10,11 +10,11 @@ use Yiisoft\Auth\IdentityInterface;
 use Yiisoft\Validator\Result;
 use Yiisoft\Validator\Rule\{
     Callback,
-    Number,
-    Required,
     HasLength,
     InRange,
     MatchRegularExpression,
+    Number,
+    Required,
 };
 use Yiisoft\Validator\ValidationContext;
 

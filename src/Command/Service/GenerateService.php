@@ -70,14 +70,14 @@ final class GenerateService extends Service
         if (!file_exists($filePath)) {
             File::mkdir($filePath);
         }
-        [$use, $rules] = $this->getModelRuleData();
+        [$classes, $rules] = $this->getModelRuleData();
         if (@file_put_contents($this->getModelFileName(), $this->render('model', [
             'namespace' => $this->getNamespace(),
             'primaryKey' => $this->getPrimaryKey(),
             'tableName' => $this->getTableName(),
             'className' => $this->getModelClassName(),
             'property' => $this->getModelProperty(),
-            'use' => $this->getModelUseStatement($use),
+            'use' => $this->getUseStatement($classes),
             'rules' => $this->getModelRules($rules)
         ]))) {
             $this->consoleService->writeln(sprintf('The model file <info>%s.php</> has been created in <comment>%s</>', $this->getModelClassName(), $filePath));
@@ -89,10 +89,13 @@ final class GenerateService extends Service
     public function updateModel(): void
     {
         $filename = $this->getModelFileName();
-        [, $rules] = $this->getModelRuleData();
+        [$classes, $rules] = $this->getModelRuleData();
+        [$useRule, $useStatement] = $this->solveUseStatement($filename, $classes);
+
         $replace = [
             '~(/\*\*\s).+( \*/\sclass)~Us' => '$1' . $this->getModelProperty() . '$2',
             '~(const PK = ).+(;)~U' => '$1' . $this->getPrimaryKey() . '$2',
+            $useRule => $useStatement,
             '~(function rules\(\): array\s+\{\s+)return.*;\s(\s+\})~Us' => '$1' . $this->getModelRules($rules) . '$2'
         ];
         if (@file_put_contents($filename, preg_replace(array_keys($replace), array_values($replace), file_get_contents($filename), 1))) {
@@ -146,16 +149,15 @@ final class GenerateService extends Service
 
     private function getModelRuleData(): array
     {
+        $classes = [];
         $fields = [];
-        $types = [];
-        $ruleNs = 'Yiisoft\Validator\Rule\\';
         foreach ($this->getColumns() as $field => $column) {
             if ($column->isPrimaryKey()) {
                 continue;
             }
             if (!$column->isAllowNull()) {
                 $fields[$field][] = 'Required';
-                $types['Required'] = true;
+                $classes[] = 'Required';
             }
             switch ($column->getType()) {
                 case Schema::TYPE_TINYINT:
@@ -163,18 +165,18 @@ final class GenerateService extends Service
                 case Schema::TYPE_INTEGER:
                 case Schema::TYPE_BIGINT:
                     $fields[$field][] = 'Number:integer()';
-                    $types['Number'] = true;
+                    $classes[] = 'Number';
                     break;
                 case Schema::TYPE_BOOLEAN:
                     $fields[$field][] = 'Boolean';
-                    $types['Boolean'] = true;
+                    $classes[] = 'Boolean';
                     break;
                 case Schema::TYPE_FLOAT:
                 case Schema::TYPE_DOUBLE:
                 case Schema::TYPE_DECIMAL:
                 case Schema::TYPE_MONEY:
                     $fields[$field][] = 'Number';
-                    $types['Number'] = true;
+                    $classes[] = 'Number';
                     break;
                 case Schema::TYPE_CHAR:
                 case Schema::TYPE_STRING:
@@ -182,32 +184,21 @@ final class GenerateService extends Service
                         break;
                     }
                     $fields[$field][] = 'HasLength:max(' . $column->getSize() . ')';
-                    $types['HasLength'] = true;
+                    $classes[] = 'HasLength';
                     break;
             }
             if (StringHelper::endsWith($field, 'email')) {
                 $fields[$field][] = 'Email';
-                $types['Email'] = true;
+                $classes[] = 'Email';
             }
             if ($column->isAllowNull() && isset($fields[$field])) {
                 $fields[$field] = array_map(fn ($rule): string => $rule . ':skipOnEmpty(true)', $fields[$field]);
             }
         }
-        switch (count($types)) {
-            case 0:
-                $use = '';
-                break;
-            case 1:
-                $use = 'use ' . $ruleNs . key($types) . ";\n";
-                break;
-            default:
-                $use = 'use ' . $ruleNs . "{\n";
-                foreach ($types as $type => $v) {
-                    $use .= "    {$type},\n";
-                }
-                $use .= "};\n";
-                break;
-        }
+
+        $classes = array_unique($classes);
+        sort($classes);
+
         $rules = [];
         foreach ($fields as $field => $items) {
             $rules[$field] = [];
@@ -220,12 +211,56 @@ final class GenerateService extends Service
                 $rules[$field][] = $string;
             }
         }
-        return [$use, $rules];
+
+        return [$classes, $rules];
     }
 
-    private function getModelUseStatement(string $use): string
+    private function solveUseStatement(string $filename, array $classes): array
     {
-        return "use Ep\Db\ActiveRecord;\n" . $use;
+        $useRule = '~use\s+Yiisoft\\\Validator\\\Rule\\\([\s\S]+);~U';
+
+        preg_match($useRule, file_get_contents($filename), $matches);
+        if (isset($matches[1])) {
+            $classes = array_unique(array_merge($classes, array_map(
+                static fn (string $row): string => trim($row, ', '),
+                array_filter(
+                    explode("\n", $matches[1]),
+                    static fn (string $row): int => preg_match('~\w+~', $row)
+                )
+            )));
+            sort($classes);
+            $useStatement = $this->getUseStatement($classes, false);
+        } else {
+            $useRule = '~(use\s+[\w\\\]+\\\ActiveRecord[\s\w]*;)~U';
+            $useStatement = ($classes ? "$1\n" : '$1') . $this->getUseStatement($classes, false);
+        }
+
+        return [$useRule, $useStatement];
+    }
+
+    private function getUseStatement(array $classes, bool $isCreate = true): string
+    {
+        $base = $isCreate ? "\nuse Ep\Db\ActiveRecord;\n" : '';
+        $ruleNs = 'Yiisoft\Validator\Rule\\';
+        switch (count($classes)) {
+            case 0:
+                $use = '';
+                break;
+            case 1:
+                $use = 'use ' . $ruleNs . current($classes) . ";";
+                break;
+            default:
+                $use = 'use ' . $ruleNs . "{\n";
+                foreach ($classes as $class) {
+                    $use .= "    {$class},\n";
+                }
+                $use .= "};";
+                break;
+        }
+        if ($isCreate && $use) {
+            $use .= "\n";
+        }
+        return $base . $use;
     }
 
     private function getModelRules(array $rules): string
