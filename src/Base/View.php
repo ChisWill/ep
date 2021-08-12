@@ -9,8 +9,6 @@ use Yiisoft\Aliases\Aliases;
 
 class View
 {
-    public string $layout = 'main';
-
     private Config $config;
     private Aliases $aliases;
 
@@ -18,6 +16,15 @@ class View
     {
         $this->config = $config;
         $this->aliases = $aliases;
+    }
+
+    private string $layout = 'main';
+
+    public function withLayout(string $layout): self
+    {
+        $new = clone $this;
+        $new->layout = $layout;
+        return $new;
     }
 
     private ?string $viewPath = null;

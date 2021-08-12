@@ -90,7 +90,7 @@ final class GenerateService extends Service
     {
         $filename = $this->getModelFileName();
         [$classes, $rules] = $this->getModelRuleData();
-        [$useRule, $useStatement] = $this->solveUseStatement($filename, $classes);
+        [$useRule, $useStatement] = $this->getUseReplacement($filename, $classes);
 
         $replace = [
             $useRule => $useStatement,
@@ -215,11 +215,10 @@ final class GenerateService extends Service
         return [$classes, $rules];
     }
 
-    private function solveUseStatement(string $filename, array $classes): array
+    private function getUseReplacement(string $filename, array $classes): array
     {
         $useRule = '~use\s+Yiisoft\\\Validator\\\Rule\\\([\s\S]+);~U';
-        preg_match($useRule, file_get_contents($filename), $matches);
-        if (isset($matches[1])) {
+        if (preg_match($useRule, file_get_contents($filename), $matches)) {
             $classes = array_unique(array_merge($classes, array_map(
                 static fn (string $row): string => trim($row, ', '),
                 array_filter(
