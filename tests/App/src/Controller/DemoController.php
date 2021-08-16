@@ -336,8 +336,12 @@ class DemoController extends Controller
         if (!$user) {
             return $this->error('missing user');
         }
-
-        $session->set($auth->findMethod('frontend')->getId(), $user['id']);
+        $method = $auth->findMethod('frontend');
+        if ($method instanceof HttpSession) {
+            $session->set($method->getId(), $user['id']);
+        } else {
+            return $this->error('Wrong auth method');
+        }
 
         return $this->string('Logined');
     }
