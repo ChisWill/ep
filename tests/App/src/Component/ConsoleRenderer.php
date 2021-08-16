@@ -19,6 +19,13 @@ class ConsoleRenderer implements ConsoleErrorRendererInterface
 
     public function render(Throwable $t, ConsoleRequestInterface $request): string
     {
+        $this->log($t, $request);
+
+        return $this->renderContent($t, $request);
+    }
+
+    private function renderContent(Throwable $t, ConsoleRequestInterface $request): string
+    {
         return sprintf(
             "%s: %s, File: %s\n",
             get_class($t),
@@ -27,7 +34,7 @@ class ConsoleRenderer implements ConsoleErrorRendererInterface
         );
     }
 
-    public function log(Throwable $t, ConsoleRequestInterface $request): void
+    private function log(Throwable $t, ConsoleRequestInterface $request): void
     {
         $context = [
             'category' => get_class($t)
@@ -37,6 +44,6 @@ class ConsoleRenderer implements ConsoleErrorRendererInterface
         $context['arguments'] = $request->getArguments();
         $context['options'] = $request->getOptions();
 
-        $this->log->emergency($this->render($t, $request), $context);
+        $this->log->emergency($this->renderContent($t, $request), $context);
     }
 }

@@ -51,6 +51,8 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
     public function render(Throwable $t, $request): string
     {
         if ($this->config->debug) {
+            $this->log($t, $request);
+
             return $this
                 ->getView()
                 ->renderPartial('development', [
@@ -63,6 +65,8 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
                     ->get(WebErrorRendererInterface::class)
                     ->render($t, $request);
             } else {
+                $this->log($t, $request);
+
                 return $this->getView()->renderPartial('production');
             }
         }
@@ -71,26 +75,20 @@ final class ErrorRenderer extends BaseErrorRenderer implements ContextInterface
     /**
      * @param ServerRequestInterface $request
      */
-    public function log(Throwable $t, $request): void
+    private function log(Throwable $t, $request): void
     {
-        if ($this->container->has(WebErrorRendererInterface::class)) {
-            $this->container
-                ->get(WebErrorRendererInterface::class)
-                ->log($t, $request);
-        } else {
-            $context = [
-                'category' => get_class($t)
-            ];
+        $context = [
+            'category' => get_class($t)
+        ];
 
-            $context['host'] = $request->getUri()->getHost();
-            $context['path'] = $request->getRequestTarget();
-            $context['method'] = $request->getMethod();
-            if ($request->getMethod() === Method::POST) {
-                $context['post'] = $request->getBody()->getContents() ?: $request->getParsedBody();
-            }
-
-            $this->logger->error(parent::render($t, $request), $context);
+        $context['host'] = $request->getUri()->getHost();
+        $context['path'] = $request->getRequestTarget();
+        $context['method'] = $request->getMethod();
+        if ($request->getMethod() === Method::POST) {
+            $context['post'] = $request->getBody()->getContents() ?: $request->getParsedBody();
         }
+
+        $this->logger->error(parent::render($t, $request), $context);
     }
 
     public function renderPreviousException(Throwable $t): string

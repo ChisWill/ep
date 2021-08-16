@@ -34,6 +34,8 @@ final class ErrorRenderer extends BaseErrorRenderer
                 ->get(ConsoleErrorRendererInterface::class)
                 ->render($t, $request);
         } else {
+            $this->log($t, $request);
+
             return parent::render($t, $request);
         }
     }
@@ -41,22 +43,16 @@ final class ErrorRenderer extends BaseErrorRenderer
     /**
      * @param ConsoleRequestInterface $request
      */
-    public function log(Throwable $t, $request): void
+    private function log(Throwable $t, $request): void
     {
-        if ($this->container->has(ConsoleErrorRendererInterface::class)) {
-            $this->container
-                ->get(ConsoleErrorRendererInterface::class)
-                ->log($t, $request);
-        } else {
-            $context = [
-                'category' => get_class($t)
-            ];
+        $context = [
+            'category' => get_class($t)
+        ];
 
-            $context['route'] = $request->getRoute();
-            $context['arguments'] = $request->getArguments();
-            $context['options'] = $request->getOptions();
+        $context['route'] = $request->getRoute();
+        $context['arguments'] = $request->getArguments();
+        $context['options'] = $request->getOptions();
 
-            $this->logger->error(parent::render($t, $request), $context);
-        }
+        $this->logger->error(parent::render($t, $request), $context);
     }
 }

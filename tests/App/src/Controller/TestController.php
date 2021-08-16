@@ -6,7 +6,6 @@ namespace Ep\Tests\App\Controller;
 
 use Ep;
 use Ep\Annotation\Aspect;
-use Ep\Contract\ErrorRendererInterface;
 use Ep\Db\Query;
 use Ep\Helper\Str;
 use Ep\Helper\System;

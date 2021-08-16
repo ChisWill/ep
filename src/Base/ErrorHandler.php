@@ -33,8 +33,6 @@ final class ErrorHandler
     {
         $this->unregister();
 
-        $this->errorRenderer->log($t, $request);
-
         echo $this->errorRenderer->render($t, $request);
 
         exit(Command::FAIL);

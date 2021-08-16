@@ -24,10 +24,12 @@ class WebErrorRenderer implements WebErrorRendererInterface
 
     public function render(Throwable $t, ServerRequestInterface $request): string
     {
+        $this->log($t, $request);
+
         return $this->getView()->renderPartial('error', compact('t', 'request'));
     }
 
-    public function log(Throwable $t, ServerRequestInterface $request): void
+    private function log(Throwable $t, ServerRequestInterface $request): void
     {
         $this->log->critical($t->getMessage());
     }

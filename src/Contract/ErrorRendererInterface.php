@@ -9,6 +9,4 @@ use Throwable;
 interface ErrorRendererInterface
 {
     public function render(Throwable $t, $request): string;
-
-    public function log(Throwable $t, $request): void;
 }

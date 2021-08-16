@@ -7,7 +7,7 @@ namespace Ep\Base;
 use Ep\Contract\ErrorRendererInterface;
 use Throwable;
 
-abstract class ErrorRenderer implements ErrorRendererInterface
+class ErrorRenderer implements ErrorRendererInterface
 {
     private const ERRORS = [
         E_ERROR => 'PHP Fatal Error',
@@ -41,9 +41,4 @@ abstract class ErrorRenderer implements ErrorRendererInterface
             . $t->getFile() . ':' . $t->getLine() . "\n\n"
             . "Stack trace:\n" . $t->getTraceAsString() . "\n";
     }
-
-    /**
-     * @param mixed $request
-     */
-    abstract public function log(Throwable $t, $request): void;
 }
