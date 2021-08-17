@@ -44,8 +44,6 @@ use Yiisoft\EventDispatcher\Provider\Provider;
 use Yiisoft\Factory\Definition\Reference;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target;
-use Yiisoft\Log\Target\File\FileRotator;
-use Yiisoft\Log\Target\File\FileTarget;
 use Yiisoft\Profiler\Profiler;
 use Yiisoft\Profiler\ProfilerInterface;
 use Yiisoft\Session\Session;
@@ -105,7 +103,6 @@ return [
     // Response
     ResponseFactoryInterface::class => ResponseFactory::class,
     // Logger
-    Target::class => static fn (Aliases $aliases): Target => new FileTarget($aliases->get($config->runtimeDir . '/logs/app.log'), new FileRotator()),
     LoggerInterface::class => [
         'class' => Logger::class,
         '__construct()' => [[Reference::to(Target::class)]]
