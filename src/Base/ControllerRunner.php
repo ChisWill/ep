@@ -8,19 +8,24 @@ use Ep\Contract\ControllerInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Contract\ModuleInterface;
 use Ep\Contract\NotFoundException;
+use Ep\Event\AfterRequest;
+use Ep\Event\BeforeRequest;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 abstract class ControllerRunner
 {
     protected ContainerInterface $container;
     protected Config $config;
     protected InjectorInterface $injector;
+    protected EventDispatcherInterface $eventDispatcher;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->config = $container->get(Config::class);
         $this->injector = $container->get(InjectorInterface::class);
+        $this->eventDispatcher = $container->get(EventDispatcherInterface::class);
     }
 
     /**
@@ -63,10 +68,16 @@ abstract class ControllerRunner
      */
     public function runAll(?ModuleInterface $module, ControllerInterface $controller, string $action, $request, $response = null)
     {
-        if ($module instanceof ModuleInterface) {
-            return $this->runModule($module, $controller, $action, $request, $response);
-        } else {
-            return $this->runAction($controller, $action, $request, $response);
+        $this->eventDispatcher->dispatch(new BeforeRequest($request, $response));
+
+        try {
+            if ($module instanceof ModuleInterface) {
+                return $result = $this->runModule($module, $controller, $action, $request, $response);
+            } else {
+                return $result = $this->runAction($controller, $action, $request, $response);
+            }
+        } finally {
+            $this->eventDispatcher->dispatch(new AfterRequest($request, $result ?? null));
         }
     }
 

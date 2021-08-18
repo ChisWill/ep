@@ -174,25 +174,21 @@ class TestController extends Controller
     public function diAction()
     {
         $composite = new CompositeContainer();
-        $root1 = new Container([EngineInterface::class => XEngine::class]);
-        $root2 = new Container([EngineInterface::class => DragoonEngine::class]);
-        $root3 = new Container();
         $first = new Container([
             CarInterface::class => BMW::class,
             WingInterface::class => static fn (): AngelWing => new AngelWing(80),
-        ], [], [], $root1);
+        ], [], []);
         $second = new Container([
             CarInterface::class => Benz::class,
             WingInterface::class => AngelWing::class,
             'angelWing' => static fn (): AngelWing => new AngelWing(50),
-        ], [], [], $root2);
+        ], [], []);
         $third = new Container([
             WingInterface::class => AngelWing::class,
         ]);
         $composite->attach($first);
         $composite->attach($second);
         $composite->attach($third);
-
 
         return $this->json([
             'result' => $composite->get(AngelWing::class)

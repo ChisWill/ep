@@ -23,8 +23,8 @@ final class Annotate
 
     public function __construct(
         ContainerInterface $container,
-        Reader $reader,
         Config $config,
+        Reader $reader,
         CacheInterface $cache
     ) {
         $this->reader = $reader;
@@ -90,18 +90,18 @@ final class Annotate
             }
         }
 
-        $fn = fn () => $this->injector->invoke([$instance, $method], $arguments);
+        $callback = fn () => $this->injector->invoke([$instance, $method], $arguments);
         if (isset($reflectionMethod)) {
             $annotations = $this->reader->getMethodAnnotations($reflectionMethod);
             foreach ($annotations as $annotation) {
                 /** @var AnnotationInterface $annotation */
                 if ($annotation instanceof Aspect) {
-                    return $annotation->process($instance, new ReflectionFunction($fn), $arguments);
+                    return $annotation->process($instance, new ReflectionFunction($callback), $arguments);
                 } else {
                     $annotation->process($instance, $reflectionMethod, $arguments);
                 }
             }
         }
-        return $fn();
+        return $callback();
     }
 }

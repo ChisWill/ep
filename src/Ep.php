@@ -22,7 +22,10 @@ final class Ep
         $config = new Config($config);
 
         self::$container = (new YiiContainer(
-            $config->getDi() + require(dirname(__DIR__, 1) . '/config/definitions.php')
+            $config->getDi() + require(dirname(__DIR__, 1) . '/config/definitions.php'),
+            [],
+            [],
+            $config->debug
         ))
             ->get(ContainerInterface::class);
 
