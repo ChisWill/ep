@@ -141,7 +141,7 @@ final class Config
 
     public function getDi(): array
     {
-        return $this->di ? call_user_func($this->di, $this) : [];
+        return $this->di ? call_user_func($this->di, $this, $this->params) : [];
     }
 
     public function getRouteRule(): Closure

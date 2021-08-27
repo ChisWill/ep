@@ -47,18 +47,18 @@ final class Ep
         return self::$container->get(Config::class);
     }
 
-    public static function getDb(?string $id = null): Connection
+    public static function getDb(string $id = null): Connection
     {
-        return self::$container->get($id ?: Connection::class);
+        return self::$container->get($id ?? Connection::class);
     }
 
-    public static function getCache(?string $id = null): CacheInterface
+    public static function getCache(string $id = null): CacheInterface
     {
-        return self::$container->get($id ?: CacheInterface::class);
+        return self::$container->get($id ?? CacheInterface::class);
     }
 
-    public static function getLogger(?string $id = null): LoggerInterface
+    public static function getLogger(string $id = null): LoggerInterface
     {
-        return self::$container->get($id ?: LoggerInterface::class);
+        return self::$container->get($id ?? LoggerInterface::class);
     }
 }

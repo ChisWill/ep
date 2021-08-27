@@ -108,6 +108,7 @@ abstract class ControllerRunner
         if (!is_callable([$controller, $action])) {
             throw new NotFoundException(sprintf('%s::%s() is not found.', get_class($controller), $action));
         }
+
         $result = $controller->before($request, $response);
         if ($result === true) {
             return $controller->after($request, $this->injector->call($controller, $action, array_filter([$request, $response])));

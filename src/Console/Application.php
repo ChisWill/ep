@@ -58,6 +58,6 @@ final class Application extends SymfonyApplication
     {
         $parts = explode('/', $name, -1);
 
-        return ucfirst(implode('/', null === $limit ? $parts : array_slice($parts, 0, $limit)));
+        return ucfirst(implode('/', $limit === null ? $parts : array_slice($parts, 0, $limit)));
     }
 }

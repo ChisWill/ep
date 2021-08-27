@@ -24,7 +24,7 @@ use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target;
 use Yiisoft\Log\Target\File\FileTarget;
 
-return static fn (Config $config): array => [
+return static fn (Config $config, array $params): array => [
     WebErrorRendererInterface::class => WebErrorRenderer::class,
     ConsoleErrorRendererInterface::class => ConsoleRenderer::class,
     InterceptorInterface::class => Interceptor::class,
@@ -47,16 +47,16 @@ return static fn (Config $config): array => [
     // Redis
     RedisConnection::class => [
         'class' => RedisConnection::class,
-        'hostname()' => [$config->params['db']['redis']['hostname']],
-        'database()' => [$config->params['db']['redis']['database']],
-        'password()' => [$config->params['db']['redis']['password']],
-        'port()'     => [$config->params['db']['redis']['port']]
+        'hostname()' => [$params['db']['redis']['hostname']],
+        'database()' => [$params['db']['redis']['database']],
+        'password()' => [$params['db']['redis']['password']],
+        'port()'     => [$params['db']['redis']['port']]
     ],
     // Mysql
     Connection::class => [
         'class' => MysqlConnection::class,
-        '__construct()' => [$config->params['db']['mysql']['dsn']],
-        'setUsername()' => [$config->params['db']['mysql']['username']],
-        'setPassword()' => [$config->params['db']['mysql']['password']]
+        '__construct()' => [$params['db']['mysql']['dsn']],
+        'setUsername()' => [$params['db']['mysql']['username']],
+        'setPassword()' => [$params['db']['mysql']['password']]
     ]
 ];
