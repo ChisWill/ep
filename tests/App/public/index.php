@@ -6,12 +6,19 @@ use Ep\Web\Application;
 
 require(dirname(__DIR__, 3) . '/vendor/autoload.php');
 
-Ep::init(require(dirname(__DIR__) . '/config/main.php'));
+Ep::init(
+    file_exists(dirname(__DIR__) . '/config/main-local.php') ?
+        array_merge(
+            require(dirname(__DIR__) . '/config/main.php'),
+            require(dirname(__DIR__) . '/config/main-local.php')
+        ) :
+        require(dirname(__DIR__) . '/config/main.php'),
+);
 
-$s = microtime(true);
+$start = microtime(true);
 
 Ep::getDi()->get(Application::class)->run();
 
-$n = microtime(true);
+$end = microtime(true);
 
-Ep::getLogger()->info(($n - $s) * 1000 . 'ms');
+Ep::getLogger()->info(($end - $start) * 1000 . 'ms');
