@@ -27,6 +27,14 @@ final class BeforeRequest
     }
 
     /**
+     * @param mixed $request
+     */
+    public function setRequest($request): void
+    {
+        $this->request = $request;
+    }
+
+    /**
      * @return mixed
      */
     public function getRequest()

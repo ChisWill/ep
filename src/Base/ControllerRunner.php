@@ -68,7 +68,7 @@ abstract class ControllerRunner
      */
     public function runAll(?ModuleInterface $module, ControllerInterface $controller, string $action, $request, $response = null)
     {
-        $this->eventDispatcher->dispatch(new BeforeRequest($request, $response));
+        $request = $this->eventDispatcher->dispatch(new BeforeRequest($request, $response))->getRequest();
 
         try {
             if ($module instanceof ModuleInterface) {

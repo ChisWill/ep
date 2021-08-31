@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Ep\Event\AfterRequest;
 use Ep\Event\BeforeRequest;
+use Ep\Tests\App\Component\Event;
 use Ep\Tests\App\Controller\DemoController;
 
 return [
@@ -13,11 +14,9 @@ return [
         }
     ],
     BeforeRequest::class => [
-        function (BeforeRequest $beforeRequest) {
-        },
+        [Event::class, 'before']
     ],
     AfterRequest::class => [
-        function (AfterRequest $afterRequest) {
-        },
+        [Event::class, 'after']
     ]
 ];
