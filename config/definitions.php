@@ -33,6 +33,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as SymfonyEventDi
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Assets\AssetLoader;
 use Yiisoft\Assets\AssetLoaderInterface;
+use Yiisoft\Assets\AssetManager;
 use Yiisoft\Assets\AssetPublisher;
 use Yiisoft\Assets\AssetPublisherInterface;
 use Yiisoft\Cache\Cache;
@@ -93,6 +94,16 @@ return [
     // View
     AssetLoaderInterface::class => AssetLoader::class,
     AssetPublisherInterface::class => AssetPublisher::class,
+    AssetManager::class => [
+        'class' => AssetManager::class,
+        '__construct()' => [
+            Reference::to(Aliases::class),
+            Reference::to(AssetLoaderInterface::class)
+        ],
+        'withPublisher()' => [
+            Reference::to(AssetPublisherInterface::class)
+        ]
+    ],
     // Session
     SessionInterface::class => static fn (): SessionInterface => new Session(['cookie_secure' => 0]),
     // ServerRequest

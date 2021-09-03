@@ -1,2 +1,3 @@
-$(function () {
+$(function() {
+    console.log('main start');
 });

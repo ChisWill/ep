@@ -6,16 +6,17 @@ namespace Ep\Base;
 
 use Ep\Contract\ContextInterface;
 use Yiisoft\Aliases\Aliases;
+use Psr\Container\ContainerInterface;
 
 class View
 {
-    private Config $config;
-    private Aliases $aliases;
+    protected Config $config;
+    protected Aliases $aliases;
 
-    public function __construct(Config $config, Aliases $aliases)
+    public function __construct(ContainerInterface $container)
     {
-        $this->config = $config;
-        $this->aliases = $aliases;
+        $this->config = $container->get(Config::class);
+        $this->aliases = $container->get(Aliases::class);
     }
 
     private string $layout = 'main';
@@ -64,15 +65,15 @@ class View
 
     public function renderPartial(string $path, array $params = []): string
     {
-        return $this->renderPHPFile($this->findFilePath($this->normalizePath($path)), $params);
+        return $this->renderPHPFile($this->findFilePath($this->normalize($path)), $params);
     }
 
     public function renderFile(string $file): string
     {
-        return file_get_contents($this->findFilePath($this->normalizePath($file), ''));
+        return file_get_contents($this->findFilePath($this->normalize($file), ''));
     }
 
-    private function normalizePath(string $path): string
+    private function normalize(string $path): string
     {
         if ($this->prefix !== null && strpos($path, '/') !== 0) {
             $path = '/' . $this->prefix . '/' . $path;

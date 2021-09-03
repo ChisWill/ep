@@ -46,7 +46,9 @@ use Ep\Tests\App\Service\DemoService;
 use Ep\Web\ErrorRenderer;
 use Psr\Http\Message\ResponseInterface;
 use Yiisoft\Db\Connection\Connection;
+use Yiisoft\Html\Html;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Json\Json;
 
 /**
  * @ClassAnnotation
@@ -66,8 +68,6 @@ class TestController extends Controller
      * @Inject
      */
     private InjectorInterface $injector;
-
-    public string $title = 'Test';
 
     private Connection $db;
 
@@ -94,9 +94,11 @@ class TestController extends Controller
 
     public function indexAction(ServerRequestInterface $serverRequest)
     {
-        $message = 'test';
+        $view = $this->getView()->withLayout('test');
 
-        return $this->render('/index/index', compact('message'));
+        $message = 'hi';
+
+        return $this->string($view->render('/index/index', compact('message')));
     }
 
     public function injectAction()

@@ -8,6 +8,7 @@ use Ep\Annotation\Inject;
 use Ep\Base\Config;
 use Ep\Event\AfterRequest;
 use Ep\Event\BeforeRequest;
+use Ep\Web\Event\EndBody;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class Event
@@ -31,5 +32,11 @@ final class Event
         if (!$request instanceof ServerRequestInterface) {
             return;
         }
+    }
+
+    public function endBody(EndBody $endBody)
+    {
+        $view = $endBody->getView();
+        echo $view->renderPartial('/index/index', ['message' => 'end body event message']);
     }
 }

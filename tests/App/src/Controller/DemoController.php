@@ -29,8 +29,6 @@ use Yiisoft\Session\SessionInterface;
 
 class DemoController extends Controller
 {
-    public string $title = 'Demo';
-
     private Connection $db;
 
     public function __construct()

@@ -6,9 +6,18 @@
 
 use Ep\Tests\App\Asset\MainAsset;
 
-$this->register([
+$manager = $this->register([
     MainAsset::class
 ]);
+
+$this->registerMeta([
+    'a' => 1
+]);
+$this->registerLink([
+    'b' => 3,
+], $this::POSITION_END);
+$this->registerJs('console.log("js string");');
+$this->registerCss('h1 {color: blue} ');
 
 $this->beginPage();
 ?>
@@ -19,7 +28,7 @@ $this->beginPage();
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Demo - EP</title>
+    <title>Test - Ep</title>
     <?php $this->head() ?>
 </head>
 

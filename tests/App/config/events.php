@@ -6,6 +6,7 @@ use Ep\Event\AfterRequest;
 use Ep\Event\BeforeRequest;
 use Ep\Tests\App\Component\Event;
 use Ep\Tests\App\Controller\DemoController;
+use Ep\Web\Event\EndBody;
 
 return [
     DemoController::class => [
@@ -18,5 +19,8 @@ return [
     ],
     AfterRequest::class => [
         [Event::class, 'after']
+    ],
+    EndBody::class => [
+        [Event::class, 'endBody']
     ]
 ];

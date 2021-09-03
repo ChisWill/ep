@@ -13,6 +13,7 @@ use Ep\Base\View;
 trait ContextTrait
 {
     private ?View $view = null;
+    private array $views = [];
 
     public function getView(): View
     {
@@ -22,7 +23,12 @@ trait ContextTrait
                 ->withViewPath($this->getViewPath())
                 ->withContext($this);
         }
-        return $this->view;
+        if (isset($this->actionId)) {
+            $this->views[$this->actionId] ??= clone $this->view;
+            return $this->views[$this->actionId];
+        } else {
+            return $this->view;
+        }
     }
 
     protected function getViewClass(): string
