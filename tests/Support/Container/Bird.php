@@ -15,6 +15,16 @@ class Bird
         $this->wing = $wing;
     }
 
+    public function addSpeed(int $speed): void
+    {
+        $this->speed += $speed;
+    }
+
+    public function getWing(): WingInterface
+    {
+        return $this->wing;
+    }
+
     public function fly(): void
     {
         echo 'Now Speed:' . $this->wing->getSpeed();

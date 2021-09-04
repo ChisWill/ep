@@ -17,6 +17,21 @@ class MegaBird
         $this->engine = $engine;
     }
 
+    public function addSpeed(int $speed): void
+    {
+        $this->speed += $speed;
+    }
+
+    public function getWing(): WingInterface
+    {
+        return $this->wing;
+    }
+
+    public function getEngine(): EngineInterface
+    {
+        return $this->engine;
+    }
+
     public function fly(): void
     {
         echo 'Now Speed:' . $this->wing->getSpeed() * $this->engine->getPower();

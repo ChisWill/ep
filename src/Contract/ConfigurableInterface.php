@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Ep\Contract;
 
-use LogicException;
+use InvalidArgumentException;
 
 interface ConfigurableInterface
 {
     /**
      * @return static
-     * @throws LogicException
+     * @throws InvalidArgumentException
      */
     public function configure(array $properties);
 
     /**
      * @return static
-     * @throws LogicException
+     * @throws InvalidArgumentException
      */
     public function clone(array $properties);
 }

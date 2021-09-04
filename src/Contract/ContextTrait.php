@@ -13,22 +13,21 @@ use Ep\Base\View;
 trait ContextTrait
 {
     private ?View $view = null;
-    private array $views = [];
 
     public function getView(): View
     {
         if ($this->view === null) {
-            $this->view = Ep::getDi()
-                ->get($this->getViewClass())
-                ->withViewPath($this->getViewPath())
-                ->withContext($this);
+            $this->view = $this->createView();
         }
-        if (isset($this->actionId)) {
-            $this->views[$this->actionId] ??= clone $this->view;
-            return $this->views[$this->actionId];
-        } else {
-            return $this->view;
-        }
+        return $this->view;
+    }
+
+    private function createView(): View
+    {
+        return Ep::getInjector()
+            ->make($this->getViewClass())
+            ->withViewPath($this->getViewPath())
+            ->withContext($this);
     }
 
     protected function getViewClass(): string

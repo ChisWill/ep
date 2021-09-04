@@ -43,12 +43,18 @@ use Ep\Tests\App\Aspect\LoggerAspect;
 use Ep\Tests\App\Middleware\TimeMiddleware;
 use Ep\Tests\App\Model\Student;
 use Ep\Tests\App\Service\DemoService;
+use Ep\Tests\Support\Container\MegaBird;
 use Ep\Web\ErrorRenderer;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Yiisoft\Assets\AssetManager;
 use Yiisoft\Db\Connection\Connection;
+use Yiisoft\Definitions\Reference;
+use Yiisoft\Factory\Factory;
 use Yiisoft\Html\Html;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Json\Json;
+use Yiisoft\Session\SessionInterface;
 
 /**
  * @ClassAnnotation
@@ -99,6 +105,13 @@ class TestController extends Controller
         $message = 'hi';
 
         return $this->string($view->render('/index/index', compact('message')));
+    }
+
+    public function factoryAction(Factory $factory)
+    {
+        $a1 = $factory->create(SessionInterface::class);
+        $a2 = $factory->create(SessionInterface::class);
+        tt($a1 === $a2, $a1);
     }
 
     public function injectAction()
