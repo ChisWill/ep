@@ -29,7 +29,7 @@ final class View extends BaseView
     private const PLACEHOLDER_BODY_BEGIN = '<![CDATA[EP-BLOCK-BODY-BEGIN]]>';
     private const PLACEHOLDER_BODY_END = '<![CDATA[EP-BLOCK-BODY-END]]>';
 
-    protected AssetManager $assetManager;
+    private AssetManager $assetManager;
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
