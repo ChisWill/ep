@@ -12,5 +12,5 @@ return [
     'di' => require('di.php'),
     'route' => require('route.php'),
     'events' => require('events.php'),
-    'params' => file_exists(__DIR__ . '/params-local.php') ? array_merge(require('params.php'), require('params-local.php')) : require('params.php')
+    'params' => import('params')
 ];

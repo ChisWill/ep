@@ -16,10 +16,14 @@ final class Ep
 {
     public const VERSION = '1.0';
 
+    private function __construct()
+    {
+    }
+
     private static ContainerInterface $container;
     private static Factory $factory;
 
-    public static function init(array $config = []): void
+    public static function init(array $config = []): ContainerInterface
     {
         $config = new Config($config);
 
@@ -31,6 +35,8 @@ final class Ep
         self::$factory->setMultiple($definitions);
 
         AnnotationRegistry::registerLoader('class_exists');
+
+        return self::$container;
     }
 
     public static function getDi(): ContainerInterface

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
-use Ep\Console\Command;
 use Ep\Contract\ErrorRendererInterface;
 use ErrorException;
 use Throwable;
@@ -18,12 +17,11 @@ final class ErrorHandler
      */
     public function register($request, ErrorRendererInterface $errorRenderer): void
     {
-        $new = clone $this;
-        $new->errorRenderer = $errorRenderer;
+        $this->errorRenderer = $errorRenderer;
 
-        set_exception_handler(fn (Throwable $e) => $new->handleException($e, $request));
-        set_error_handler([$new, 'handleError']);
-        register_shutdown_function([$new, 'handleFatalError'], $request);
+        set_exception_handler(fn (Throwable $e) => $this->handleException($e, $request));
+        set_error_handler([$this, 'handleError']);
+        register_shutdown_function([$this, 'handleFatalError'], $request);
     }
 
     /**
@@ -35,7 +33,7 @@ final class ErrorHandler
 
         echo $this->errorRenderer->render($t, $request);
 
-        exit(Command::FAIL);
+        exit(1);
     }
 
     public function handleError(int $severity, string $message, string $file, int $line): void
