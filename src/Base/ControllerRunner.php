@@ -38,11 +38,10 @@ abstract class ControllerRunner
      */
     public function run($handler, $request, $response = null)
     {
-        return $this->runLoader(
-            $this->injector
-                ->make(ControllerLoader::class, [
-                    'suffix' => $this->getControllerSuffix()
-                ])
+        return $this->runResult(
+            $this->container
+                ->get(ControllerLoader::class)
+                ->withSuffix($this->getControllerSuffix())
                 ->parse($handler),
             $request,
             $response
@@ -55,9 +54,9 @@ abstract class ControllerRunner
      * 
      * @return mixed
      */
-    public function runLoader(ControllerLoader $loader, $request, $response = null)
+    public function runResult(ControllerLoaderResult $result, $request, $response = null)
     {
-        return $this->runAll($loader->getModule(), $loader->getController(), $loader->getAction(), $request, $response);
+        return $this->runAll($result->getModule(), $result->getController(), $result->getAction(), $request, $response);
     }
 
     /**

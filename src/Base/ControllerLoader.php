@@ -14,45 +14,48 @@ use LogicException;
 
 final class ControllerLoader
 {
-    private string $suffix;
     private ContainerInterface $container;
     private Config $config;
+    private string $suffix;
 
     public function __construct(
-        string $suffix,
         ContainerInterface $container,
         Config $config
     ) {
-        $this->suffix = $suffix;
         $this->container = $container;
         $this->config = $config;
+        $this->suffix = PHP_SAPI === 'cli' ? $config->commandSuffix : $config->controllerSuffix;
     }
 
-    private ?ModuleInterface $module;
-    private ControllerInterface $controller;
-    private string $action;
+    public function withSuffix(string $suffix): self
+    {
+        $new = clone $this;
+        $new->suffix = $suffix;
+        return $new;
+    }
 
     /**
      * @param  mixed $handler
      * 
+     * @throws InvalidArgumentException
+     * @throws LogicException
      * @throws NotFoundException
      */
-    public function parse($handler): self
+    public function parse($handler): ControllerLoaderResult
     {
-        $new = clone $this;
+        [$prefix, $class, $actionId] = $this->parseHandler($handler);
 
-        [$prefix, $class, $actionId] = $new->parseHandler($handler);
-
-        $new->module = $new->createModule($prefix);
-        $new->controller = $new->createController($class, $actionId);
-        $new->action = $new->createAction($actionId);
-
-        return $new;
+        return new ControllerLoaderResult(
+            $this->createModule($prefix),
+            $this->createController($class, $actionId),
+            $this->createAction($actionId)
+        );
     }
 
     /**
      * @param  string|array $handler
      * 
+     * @throws InvalidArgumentException
      * @throws LogicException
      */
     public function parseHandler($handler): array
@@ -65,21 +68,6 @@ final class ControllerLoader
             default:
                 throw new LogicException('The route handler is invalid.');
         }
-    }
-
-    public function getModule(): ?ModuleInterface
-    {
-        return $this->module;
-    }
-
-    public function getController(): ControllerInterface
-    {
-        return $this->controller;
-    }
-
-    public function getAction(): string
-    {
-        return $this->action;
     }
 
     private function createModule(string $prefix): ?ModuleInterface

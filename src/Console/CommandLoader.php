@@ -6,9 +6,9 @@ namespace Ep\Console;
 
 use Ep\Base\Config;
 use Ep\Base\ControllerLoader;
+use Ep\Base\ControllerLoaderResult;
 use Ep\Base\Route;
 use Ep\Contract\ConsoleFactoryInterface;
-use Ep\Contract\InjectorInterface;
 use Ep\Contract\NotFoundException;
 use Ep\Helper\Str;
 use Ep\Kit\Util;
@@ -26,28 +26,25 @@ final class CommandLoader implements CommandLoaderInterface
 {
     private Config $config;
     private Route $route;
+    private ControllerLoader $controllerLoader;
     private ControllerRunner $controllerRunner;
     private ConsoleFactoryInterface $factory;
     private Util $util;
-    private ControllerLoader $controllerLoader;
 
     public function __construct(
         Config $config,
         Route $route,
+        ControllerLoader $controllerLoader,
         ControllerRunner $controllerRunner,
         ConsoleFactoryInterface $factory,
-        InjectorInterface $injector,
         Util $util
     ) {
         $this->config = $config;
         $this->route = $route;
+        $this->controllerLoader = $controllerLoader->withSuffix($controllerRunner->getControllerSuffix());
         $this->controllerRunner = $controllerRunner;
         $this->factory = $factory;
         $this->util = $util;
-
-        $this->controllerLoader = $injector->make(ControllerLoader::class, [
-            'suffix' => $this->controllerRunner->getControllerSuffix()
-        ]);
     }
 
     /**
@@ -61,20 +58,20 @@ final class CommandLoader implements CommandLoaderInterface
     private function wrapCommand(string $name): SymfonyCommand
     {
         $commandName = $this->parse($name);
-        return new class ($this->controllerLoader->parse($commandName), $this->controllerRunner, $this->factory, $commandName, $name) extends SymfonyCommand
+        return new class($this->controllerLoader->parse($commandName), $this->controllerRunner, $this->factory, $commandName, $name) extends SymfonyCommand
         {
-            private ControllerLoader $loader;
+            private ControllerLoaderResult $result;
             private ControllerRunner $runner;
             private ConsoleFactoryInterface $factory;
 
             public function __construct(
-                ControllerLoader $loader,
+                ControllerLoaderResult $result,
                 ControllerRunner $runner,
                 ConsoleFactoryInterface $factory,
                 string $name,
                 string $alias
             ) {
-                $this->loader = $loader;
+                $this->result = $result;
                 $this->runner = $runner;
                 $this->factory = $factory;
 
@@ -91,7 +88,7 @@ final class CommandLoader implements CommandLoaderInterface
             protected function configure(): void
             {
                 /** @var Command */
-                $command = $this->loader->getController();
+                $command = $this->result->getController();
                 $definitions = $command->getDefinitions();
                 if (isset($definitions[$command->actionId])) {
                     $this
@@ -110,8 +107,8 @@ final class CommandLoader implements CommandLoaderInterface
             protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 return $this->runner
-                    ->runLoader(
-                        $this->loader,
+                    ->runResult(
+                        $this->result,
                         $this->factory->createRequest($input),
                         $this->factory->createResponse($output)
                     )
