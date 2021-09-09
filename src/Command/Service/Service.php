@@ -12,10 +12,10 @@ use Ep\Kit\Util;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Factory\Exception\NotFoundException;
 use Yiisoft\Files\FileHelper;
 use Yiisoft\Files\PathMatcher\PathMatcher;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use InvalidArgumentException;
 
 abstract class Service
@@ -75,7 +75,7 @@ abstract class Service
             $db = $this->request->getOption('db') ?? $this->defaultOptions['db'] ?? $this->request->getOption('common.db') ?? null;
             try {
                 $this->db = Ep::getDb($db);
-            } catch (NotFoundException $e) {
+            } catch (NotFoundExceptionInterface $e) {
                 $this->error(sprintf('The db "%s" is invalid.', $db));
             }
         }

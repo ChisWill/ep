@@ -51,18 +51,17 @@ final class ScanService extends Service
             if (!class_exists($class)) {
                 continue;
             }
+            // todo
             $reflectionClass = new ReflectionClass($class);
-            $properties = $reflectionClass->getProperties();
-            $methods = $reflectionClass->getMethods();
             if ($this->reader->getClassAnnotations($reflectionClass)) {
                 $data[$class][AnnotationInterface::TYPE_CLASS] = 1;
             }
-            foreach ($properties as $property) {
+            foreach ($reflectionClass->getProperties() as $property) {
                 if ($this->reader->getPropertyAnnotations($property)) {
                     $data[$class][AnnotationInterface::TYPE_PROPERTY][$property->getName()] = 1;
                 }
             }
-            foreach ($methods as $method) {
+            foreach ($reflectionClass->getMethods() as $method) {
                 if ($this->reader->getMethodAnnotations($method)) {
                     $data[$class][AnnotationInterface::TYPE_METHOD][$method->getName()] = 1;
                 }

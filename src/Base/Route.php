@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
+use Ep\Annotation\Route as AnnotationRoute;
 use Ep\Contract\NotFoundException;
+use Ep\Kit\Annotate;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use Yiisoft\Aliases\Aliases;
@@ -23,11 +25,16 @@ final class Route
 
     private Config $config;
     private Aliases $aliases;
+    private Annotate $annotate;
 
-    public function __construct(Config $config, Aliases $aliases)
-    {
+    public function __construct(
+        Config $config,
+        Aliases $aliases,
+        Annotate $annotate
+    ) {
         $this->config = $config;
         $this->aliases = $aliases;
+        $this->annotate = $annotate;
     }
 
     private string $baseUrl = '';
@@ -66,6 +73,9 @@ final class Route
             cachedDispatcher(function (RouteCollector $route): void {
                 if ($this->rule) {
                     $route->addGroup($this->baseUrl, $this->rule);
+                }
+                // todo
+                if ($routeCache = $this->annotate->getCache(AnnotationRoute::class)) {
                 }
                 if ($this->enableDefaultRoute) {
                     $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...self::DEFAULT_ROUTE_RULE));

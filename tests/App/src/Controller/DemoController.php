@@ -6,6 +6,7 @@ namespace Ep\Tests\App\Controller;
 
 use DateInterval;
 use Ep;
+use Ep\Annotation\Route;
 use Ep\Auth\AuthRepository;
 use Ep\Auth\Method\HttpSession;
 use Ep\Db\Query;
@@ -27,6 +28,9 @@ use Yiisoft\Db\Redis\Connection as RedisConnection;
 use Yiisoft\Http\Method;
 use Yiisoft\Session\SessionInterface;
 
+/**
+ * @Route("demo")
+ */
 class DemoController extends Controller
 {
     private Connection $db;

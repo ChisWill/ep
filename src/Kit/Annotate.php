@@ -104,4 +104,10 @@ final class Annotate
         }
         return $callback();
     }
+
+    public function getCache(string $id): array
+    {
+        // todo
+        return [];
+    }
 }
