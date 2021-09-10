@@ -7,6 +7,7 @@ namespace Ep\Command\Service;
 use Ep\Base\Constant;
 use Ep\Contract\AnnotationInterface;
 use Doctrine\Common\Annotations\Reader;
+use Ep\Annotation\Bootstrap;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Psr\Container\ContainerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -53,9 +54,16 @@ final class ScanService extends Service
             }
             // todo
             $reflectionClass = new ReflectionClass($class);
-            if ($this->reader->getClassAnnotations($reflectionClass)) {
+            $classAnootations = $this->reader->getClassAnnotations($reflectionClass);
+            foreach ($classAnootations as $annotation) {
+                if ($annotation instanceof Bootstrap) {
+                    $annotation->onScan();
+                }
+            }
+            if ($classAnootations) {
                 $data[$class][AnnotationInterface::TYPE_CLASS] = 1;
             }
+
             foreach ($reflectionClass->getProperties() as $property) {
                 if ($this->reader->getPropertyAnnotations($property)) {
                     $data[$class][AnnotationInterface::TYPE_PROPERTY][$property->getName()] = 1;

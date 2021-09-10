@@ -8,10 +8,16 @@ namespace Ep\Annotation;
  * @Annotation
  * @Target("CLASS")
  */
-final class Bootstrap
+abstract class Bootstrap
 {
+    private array $values;
+
     public function __construct(array $values)
     {
-        // todo
+        $this->values = $values;
     }
+
+    abstract public function onScan(): void;
+
+    abstract public function onStart(): void;
 }
