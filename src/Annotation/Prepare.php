@@ -8,7 +8,7 @@ namespace Ep\Annotation;
  * @Annotation
  * @Target("CLASS")
  */
-abstract class Bootstrap
+abstract class Prepare
 {
     private array $values;
 
@@ -17,5 +17,5 @@ abstract class Bootstrap
         $this->values = $values;
     }
 
-    abstract public function bootstrap(): void;
+    abstract public function prepare(): void;
 }

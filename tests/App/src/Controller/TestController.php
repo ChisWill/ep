@@ -34,6 +34,7 @@ use Yiisoft\Di\CompositeContainer;
 use Yiisoft\Di\Container;
 use Yiisoft\Strings\StringHelper;
 use Ep\Annotation\Inject;
+use Ep\Annotation\Route;
 use Ep\Base\Container as BaseContainer;
 use Ep\Contract\InjectorInterface;
 use Ep\Tests\App\Aspect\ClassAnnotation;
@@ -58,6 +59,7 @@ use Yiisoft\Session\SessionInterface;
 
 /**
  * @ClassAnnotation
+ * @Route("test")
  */
 class TestController extends Controller
 {

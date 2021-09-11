@@ -40,6 +40,9 @@ class DemoController extends Controller
         $this->db = Ep::getDb('sqlite');
     }
 
+    /**
+     * @Route("index")
+     */
     public function indexAction()
     {
         return $this->string('<h1>hello world</h1>');

@@ -57,7 +57,7 @@ final class ScanService extends Service
             $classAnootations = $this->reader->getClassAnnotations($reflectionClass);
             foreach ($classAnootations as $annotation) {
                 if ($annotation instanceof Bootstrap) {
-                    $annotation->onScan();
+                    // $annotation->onScan();
                 }
             }
             if ($classAnootations) {
