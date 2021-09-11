@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Db;
 
+use Ep\Helper\Arr;
 use Ep\Widget\Paginator;
 use Closure;
 
@@ -21,14 +22,15 @@ trait QueryTrait
 
     public function map(string $key, string $value): array
     {
-        if (strpos($key, '.') === false) {
-            $column = $key;
+        if ($select = $this->getSelect()) {
+            array_unshift($select, Arr::remove($select, $value, $value));
+            $this->select($select);
         } else {
-            $column = explode('.', $key)[1];
+            $this->select([$value, $key]);
         }
+
         return $this
-            ->select([$value, $key])
-            ->indexBy($column)
+            ->indexBy(strpos($key, '.') === false ? $key : explode('.', $key)[1])
             ->column();
     }
 
