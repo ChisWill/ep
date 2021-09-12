@@ -46,7 +46,11 @@ final class Ep
 
     private static function bootstrap(): void
     {
-        if (self::getConfig()->debug && self::getConfig()->rootNamespace !== 'Ep') {
+        if (self::getConfig()->rootNamespace === 'Ep') {
+            return;
+        }
+
+        if (self::getConfig()->debug) {
             self::scan();
         }
 

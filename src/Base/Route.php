@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
+use Ep\Contract\BootstrapInterface;
 use Ep\Contract\NotFoundException;
-use Ep\Result\RouteResult;
+use Ep\Helper\Str;
+use Doctrine\Common\Annotations\Annotation\Target;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use Yiisoft\Aliases\Aliases;
@@ -14,7 +16,7 @@ use Closure;
 
 use function FastRoute\cachedDispatcher;
 
-final class Route
+final class Route implements BootstrapInterface
 {
     private const DEFAULT_ROUTE_RULE = [
         Method::ALL,
@@ -24,16 +26,36 @@ final class Route
 
     private Config $config;
     private Aliases $aliases;
-    private RouteResult $routeResult;
 
     public function __construct(
         Config $config,
-        Aliases $aliases,
-        RouteResult $routeResult
+        Aliases $aliases
     ) {
         $this->config = $config;
         $this->aliases = $aliases;
-        $this->routeResult = $routeResult;
+    }
+
+    private array $annotationRules = [];
+
+    public function bootstrap(array $data = []): void
+    {
+        foreach ($data as $class => $value) {
+            if (!isset($value[Target::TARGET_METHOD])) {
+                continue;
+            }
+
+            if (isset($value[Target::TARGET_CLASS])) {
+                $path = rtrim($value[Target::TARGET_CLASS]['value'], '/') . '/';
+                $method = $value[Target::TARGET_CLASS]['method'] ?? Method::GET;
+            } else {
+                $path = '/';
+                $method = Method::GET;
+            }
+
+            foreach ($value[Target::TARGET_METHOD] as $item) {
+                $this->annotationRules[$item['method'] ?? $method]['/' . trim($path . trim($item['value'], '/'), '/')] = [$class, Str::rtrim($item['target'], $this->config->actionSuffix)];
+            }
+        }
     }
 
     private string $baseUrl = '';
@@ -74,7 +96,7 @@ final class Route
                     $route->addGroup($this->baseUrl, $this->rule);
                 }
 
-                $route->addGroup($this->baseUrl, $this->routeResult->getRouteRule());
+                $route->addGroup($this->baseUrl, $this->getAnnotationRule());
 
                 if ($this->enableDefaultRoute) {
                     $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...self::DEFAULT_ROUTE_RULE));
@@ -117,5 +139,16 @@ final class Route
             $handler = strtr($handler, $captureParams);
         }
         return [true, $handler, $params];
+    }
+
+    private function getAnnotationRule(): Closure
+    {
+        return function (RouteCollector $route): void {
+            foreach ($this->annotationRules as $method => $value) {
+                foreach ($value as $path => $handler) {
+                    $route->addRoute($method, $path, $handler);
+                }
+            }
+        };
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Annotation;
 
-use Ep\Result\RouteResult;
+use Ep\Base\Route as BaseRoute;
 
 /**
  * @Annotation
@@ -29,7 +29,7 @@ final class Route extends Configure
     public static function handlers(): array
     {
         return [
-            RouteResult::class
+            BaseRoute::class
         ];
     }
 }
