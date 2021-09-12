@@ -6,6 +6,7 @@ namespace Ep\Tests\App\Controller;
 
 use DateInterval;
 use Ep;
+use Ep\Annotation\Configure;
 use Ep\Annotation\Route;
 use Ep\Auth\AuthRepository;
 use Ep\Auth\Method\HttpSession;
@@ -29,7 +30,7 @@ use Yiisoft\Http\Method;
 use Yiisoft\Session\SessionInterface;
 
 /**
- * @Route("test")
+ * @Configure
  */
 class DemoController extends Controller
 {

@@ -58,7 +58,7 @@ final class CommandLoader implements CommandLoaderInterface
     private function wrapCommand(string $name): SymfonyCommand
     {
         $commandName = $this->parse($name);
-        return new class($this->controllerLoader->parse($commandName), $this->controllerRunner, $this->factory, $commandName, $name) extends SymfonyCommand
+        return new class ($this->controllerLoader->parse($commandName), $this->controllerRunner, $this->factory, $commandName, $name) extends SymfonyCommand
         {
             private ControllerLoaderResult $result;
             private ControllerRunner $runner;

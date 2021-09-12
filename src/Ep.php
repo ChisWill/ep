@@ -57,7 +57,9 @@ final class Ep
         }
 
         foreach (self::getCache()->get(Constant::CACHE_ANNOTATION_CONFIGURE_DATA) ?: [] as $class => $data) {
-            self::$container->get(call_user_func([$class, 'bootstrapClass']))->bootstrap($data);
+            foreach (call_user_func([$class, 'handlers']) as $handler) {
+                self::$container->get($handler)->bootstrap($data);
+            }
         }
     }
 

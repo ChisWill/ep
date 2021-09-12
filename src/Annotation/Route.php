@@ -26,8 +26,10 @@ final class Route extends Configure
         }
     }
 
-    public static function bootstrapClass(): string
+    public static function handlers(): array
     {
-        return RouteResult::class;
+        return [
+            RouteResult::class
+        ];
     }
 }

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Ep\Annotation;
 
+use Ep;
+
 /**
  * @Annotation
  * @Target("ALL")
  */
-abstract class Configure
+class Configure
 {
     private array $values;
 
@@ -27,5 +29,8 @@ abstract class Configure
         return $values;
     }
 
-    abstract public static function bootstrapClass(): string;
+    public static function handlers(): array
+    {
+        return Ep::getConfig()->configureHandlers;
+    }
 }
