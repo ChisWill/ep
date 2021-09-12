@@ -59,7 +59,7 @@ use Yiisoft\Session\SessionInterface;
 
 /**
  * @ClassAnnotation
- * @Route("test")
+ * @Route(value="t")
  */
 class TestController extends Controller
 {
@@ -100,6 +100,9 @@ class TestController extends Controller
         return $response;
     }
 
+    /**
+     * @Route("index")
+     */
     public function indexAction(ServerRequestInterface $serverRequest)
     {
         $view = $this->getView()->withLayout('test');

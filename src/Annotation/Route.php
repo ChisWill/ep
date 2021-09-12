@@ -4,33 +4,30 @@ declare(strict_types=1);
 
 namespace Ep\Annotation;
 
-use FastRoute\RouteCollector;
-use Closure;
+use Ep\Result\RouteResult;
 
 /**
  * @Annotation
  * @Target({"CLASS", "METHOD"})
  */
-final class Route extends Prepare
+final class Route extends Configure
 {
-    private array $routes = [];
-
-    public function __construct(array $values)
+    protected function normalize(array $values): array
     {
-        // todo
-        // tt($values);
+        $value = $values['value'] ?? '';
+        if (is_array($value)) {
+            return [
+                'value' => array_shift($value),
+                'method' => array_shift($value) ?? null
+            ];
+        } else {
+            $method = $values['method'] ?? null;
+            return compact('value', 'method');
+        }
     }
 
-    public function prepare(): void
+    public static function bootstrapClass(): string
     {
-    }
-
-    public function getRouteRule(): Closure
-    {
-        return function (RouteCollector $route) {
-            foreach ($this->routes as $path => $handler) {
-                $route->addRoute(['GET', 'POST'], $path, $handler);
-            }
-        };
+        return RouteResult::class;
     }
 }

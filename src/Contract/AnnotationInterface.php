@@ -8,10 +8,6 @@ use Reflector;
 
 interface AnnotationInterface
 {
-    public const TYPE_PROPERTY = 'property';
-    public const TYPE_METHOD = 'method';
-    public const TYPE_CLASS = 'class';
-
     /**
      * @return mixed
      */

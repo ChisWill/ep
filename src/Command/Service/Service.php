@@ -12,8 +12,6 @@ use Ep\Kit\Util;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Files\FileHelper;
-use Yiisoft\Files\PathMatcher\PathMatcher;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use InvalidArgumentException;
@@ -46,7 +44,6 @@ abstract class Service
         $new->request = $request;
 
         $new->initDefaultOptions();
-
         $new->configure();
 
         return $new;
@@ -82,6 +79,11 @@ abstract class Service
         return $this->db;
     }
 
+    protected function getClassList(array $exceptPatterns = [])
+    {
+        return $this->util->getClassList($this->userRootNamespace, $exceptPatterns);
+    }
+
     /**
      * @throws InvalidArgumentException
      */
@@ -92,14 +94,7 @@ abstract class Service
 
     protected function getClassNameByFile(string $file): string
     {
-        return str_replace([$this->getAppPath(), '.php', '/'], [$this->userRootNamespace, '', '\\'], $file);
-    }
-
-    protected function findClassFiles(string $path, array $exceptPatterns = []): array
-    {
-        return FileHelper::findFiles($path, [
-            'filter' => (new PathMatcher())->only('**.php')->except(...$exceptPatterns)
-        ]);
+        return $this->util->getClassNameByFile($this->userRootNamespace, $file);
     }
 
     /**

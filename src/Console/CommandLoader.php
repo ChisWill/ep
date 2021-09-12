@@ -6,12 +6,12 @@ namespace Ep\Console;
 
 use Ep\Base\Config;
 use Ep\Base\ControllerLoader;
-use Ep\Base\ControllerLoaderResult;
 use Ep\Base\Route;
 use Ep\Contract\ConsoleFactoryInterface;
 use Ep\Contract\NotFoundException;
 use Ep\Helper\Str;
 use Ep\Kit\Util;
+use Ep\Result\ControllerLoaderResult;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Input\InputInterface;

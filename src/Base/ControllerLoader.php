@@ -8,6 +8,7 @@ use Ep\Contract\ControllerInterface;
 use Ep\Contract\ModuleInterface;
 use Ep\Contract\NotFoundException;
 use Ep\Helper\Str;
+use Ep\Result\ControllerLoaderResult;
 use Psr\Container\ContainerInterface;
 use InvalidArgumentException;
 use LogicException;

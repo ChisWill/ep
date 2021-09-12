@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
-use Ep\Annotation\Route as Annotation;
 use Ep\Contract\NotFoundException;
+use Ep\Result\RouteResult;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use Yiisoft\Aliases\Aliases;
@@ -24,16 +24,16 @@ final class Route
 
     private Config $config;
     private Aliases $aliases;
-    private Annotation $annotation;
+    private RouteResult $routeResult;
 
     public function __construct(
         Config $config,
         Aliases $aliases,
-        Annotation $annotation
+        RouteResult $routeResult
     ) {
         $this->config = $config;
         $this->aliases = $aliases;
-        $this->annotation = $annotation;
+        $this->routeResult = $routeResult;
     }
 
     private string $baseUrl = '';
@@ -74,7 +74,7 @@ final class Route
                     $route->addGroup($this->baseUrl, $this->rule);
                 }
 
-                $route->addGroup($this->baseUrl, $this->annotation->getRouteRule());
+                $route->addGroup($this->baseUrl, $this->routeResult->getRouteRule());
 
                 if ($this->enableDefaultRoute) {
                     $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...self::DEFAULT_ROUTE_RULE));

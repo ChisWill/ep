@@ -29,7 +29,7 @@ use Yiisoft\Http\Method;
 use Yiisoft\Session\SessionInterface;
 
 /**
- * @Route("demo")
+ * @Route("test")
  */
 class DemoController extends Controller
 {
@@ -41,13 +41,16 @@ class DemoController extends Controller
     }
 
     /**
-     * @Route("index")
+     * @Route("index", method="GET")
      */
     public function indexAction()
     {
         return $this->string('<h1>hello world</h1>');
     }
 
+    /**
+     * @Route("json")
+     */
     public function jsonAction(ServerRequestInterface $request)
     {
         if ($request->getMethod() === Method::POST) {

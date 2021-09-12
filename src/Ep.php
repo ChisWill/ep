@@ -3,14 +3,17 @@
 declare(strict_types=1);
 
 use Ep\Base\Config;
+use Ep\Base\Constant;
 use Ep\Contract\InjectorInterface;
+use Ep\Kit\Annotate;
+use Ep\Kit\Util;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Di\Container as YiiContainer;
 use Yiisoft\Factory\Factory;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 
 final class Ep
 {
@@ -36,7 +39,26 @@ final class Ep
 
         AnnotationRegistry::registerLoader('class_exists');
 
+        self::bootstrap();
+
         return self::$container;
+    }
+
+    private static function bootstrap(): void
+    {
+        if (self::getConfig()->debug) {
+            self::$container
+                ->get(Annotate::class)
+                ->cache(
+                    self::$container
+                        ->get(Util::class)
+                        ->getClassList(self::getConfig()->rootNamespace)
+                );
+        }
+
+        foreach (self::getCache()->get(Constant::CACHE_ANNOTATION_CONFIGURE_DATA) ?: [] as $class => $data) {
+            self::$container->get(call_user_func([$class, 'bootstrapClass']))->bootstrap($data);
+        }
     }
 
     public static function getDi(): ContainerInterface

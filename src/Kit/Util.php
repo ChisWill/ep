@@ -6,6 +6,8 @@ namespace Ep\Kit;
 
 use Ep\Base\Config;
 use Yiisoft\Aliases\Aliases;
+use Yiisoft\Files\FileHelper;
+use Yiisoft\Files\PathMatcher\PathMatcher;
 use InvalidArgumentException;
 
 final class Util
@@ -17,6 +19,15 @@ final class Util
     {
         $this->config = $config;
         $this->aliases = $aliases;
+    }
+
+    public function getClassList(string $rootNamespace, array $exceptPatterns = []): array
+    {
+        $result = [];
+        foreach ($this->findClassFiles($this->getAppPath($rootNamespace), $exceptPatterns) as $file) {
+            $result[] = $this->getClassNameByFile($rootNamespace, $file);
+        }
+        return $result;
     }
 
     private array $appPath = [];
@@ -52,5 +63,17 @@ final class Util
         }
 
         return $this->appPath[$rootNamespace];
+    }
+
+    public function getClassNameByFile(string $rootNamespace, string $file): string
+    {
+        return str_replace([$this->getAppPath($rootNamespace), '.php', '/'], [$rootNamespace, '', '\\'], $file);
+    }
+
+    public function findClassFiles(string $path, array $exceptPatterns = []): array
+    {
+        return FileHelper::findFiles($path, [
+            'filter' => (new PathMatcher())->only('**.php')->except(...$exceptPatterns)
+        ]);
     }
 }

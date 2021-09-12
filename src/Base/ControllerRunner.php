@@ -10,6 +10,7 @@ use Ep\Contract\ModuleInterface;
 use Ep\Contract\NotFoundException;
 use Ep\Event\AfterRequest;
 use Ep\Event\BeforeRequest;
+use Ep\Result\ControllerLoaderResult;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
