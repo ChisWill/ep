@@ -46,14 +46,8 @@ final class Ep
 
     private static function bootstrap(): void
     {
-        if (self::getConfig()->debug) {
-            self::$container
-                ->get(Annotate::class)
-                ->cache(
-                    self::$container
-                        ->get(Util::class)
-                        ->getClassList(self::getConfig()->rootNamespace)
-                );
+        if (self::getConfig()->debug && self::getConfig()->rootNamespace !== 'Ep') {
+            self::scan();
         }
 
         foreach (self::getCache()->get(Constant::CACHE_ANNOTATION_CONFIGURE_DATA) ?: [] as $class => $data) {
@@ -61,6 +55,17 @@ final class Ep
                 self::$container->get($handler)->bootstrap($data);
             }
         }
+    }
+
+    public static function scan(): void
+    {
+        self::$container
+            ->get(Annotate::class)
+            ->cache(
+                self::$container
+                    ->get(Util::class)
+                    ->getClassList(self::getConfig()->rootNamespace)
+            );
     }
 
     public static function getDi(): ContainerInterface
