@@ -19,16 +19,16 @@ final class ScanCommand extends Command
         $this->service = $service;
 
         $this
-            ->createDefinition('annotation')
+            ->createDefinition('index')
             ->addOption('ignore', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'The pattern to ignore files')
             ->setDescription('Scan root path to generate annotation cache');
     }
 
-    public function annotationAction(ConsoleRequestInterface $request): ConsoleResponseInterface
+    public function indexAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
         $this->service
             ->load($request)
-            ->annotation();
+            ->scan();
 
         return $this->success();
     }

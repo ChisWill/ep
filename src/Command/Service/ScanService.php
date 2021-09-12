@@ -27,9 +27,9 @@ final class ScanService extends Service
     {
     }
 
-    public function annotation(): void
+    public function scan(): void
     {
-        $classList = $this->getClassList($this->request->getOption('ignore'));
+        $classList = $this->util->getClassList($this->userRootNamespace, $this->request->getOption('ignore'));
 
         $this->consoleService->progress(fn ($progressBar) => $this->annotate->cache($classList, static fn () => $progressBar->advance()), count($classList));
 

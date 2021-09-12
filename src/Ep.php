@@ -29,28 +29,26 @@ final class Ep
     public static function init(array $config = []): ContainerInterface
     {
         $config = new Config($config);
-
         $definitions = $config->getDi() + require(dirname(__DIR__, 1) . '/config/definitions.php');
 
         self::$container = (new YiiContainer($definitions, [], [], $config->debug))->get(ContainerInterface::class);
-
         self::$factory = self::$container->get(Factory::class);
         self::$factory->setMultiple($definitions);
 
         AnnotationRegistry::registerLoader('class_exists');
 
-        self::bootstrap();
+        self::bootstrap($config);
 
         return self::$container;
     }
 
-    private static function bootstrap(): void
+    private static function bootstrap(Config $config): void
     {
-        if (self::getConfig()->rootNamespace === 'Ep') {
+        if ($config->rootNamespace === 'Ep') {
             return;
         }
 
-        if (self::getConfig()->debug) {
+        if ($config->debug) {
             self::scan();
         }
 

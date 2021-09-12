@@ -79,11 +79,6 @@ abstract class Service
         return $this->db;
     }
 
-    protected function getClassList(array $exceptPatterns = [])
-    {
-        return $this->util->getClassList($this->userRootNamespace, $exceptPatterns);
-    }
-
     /**
      * @throws InvalidArgumentException
      */
