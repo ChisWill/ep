@@ -11,14 +11,12 @@ use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\FilterTrait;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use LogicException;
 
 abstract class Command implements ControllerInterface
 {
     use ContextTrait, FilterTrait, ConfigurableTrait;
-
-    public const OK = 0;
-    public const FAIL = 1;
 
     /**
      * {@inheritDoc}
@@ -74,7 +72,7 @@ abstract class Command implements ControllerInterface
         if ($message) {
             $this->getService()->writeln($message);
         }
-        return $this->getService()->status(Command::OK);
+        return $this->getService()->status(SymfonyCommand::SUCCESS);
     }
 
     protected function error(string $message = ''): ConsoleResponseInterface
@@ -82,7 +80,7 @@ abstract class Command implements ControllerInterface
         if ($message) {
             $this->getService()->writeln($message);
         }
-        return $this->getService()->status(Command::FAIL);
+        return $this->getService()->status(SymfonyCommand::FAILURE);
     }
 
     protected function write(string $message = '', int $options = 0): void

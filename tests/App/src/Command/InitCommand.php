@@ -4,19 +4,13 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App\Command;
 
-use Ep;
 use Ep\Annotation\Aspect;
 use Ep\Console\Command;
-use Ep\Console\CommandDefinition;
 use Ep\Console\Service;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
-use Ep\Tests\App\Aspect\ConsoleAspect;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
 class InitCommand extends Command

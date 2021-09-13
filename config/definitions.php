@@ -82,10 +82,7 @@ return [
         'class' => ConsoleApplication::class,
         'setAutoExit()' => [false],
         'setCommandLoader()' => [Reference::to(CommandLoaderInterface::class)],
-        'setDispatcher()' => [Reference::to(SymfonyEventDispatcherInterface::class)],
-        'setHelperSet()' => [
-            new HelperSet([new QuestionHelper()])
-        ]
+        'setDispatcher()' => [Reference::to(SymfonyEventDispatcherInterface::class)]
     ],
     CommandLoaderInterface::class => CommandLoader::class,
     SymfonyEventDispatcherInterface::class => EventDispatcher::class,

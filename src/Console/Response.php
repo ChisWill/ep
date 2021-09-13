@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\Console;
 
 use Ep\Contract\ConsoleResponseInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class Response implements ConsoleResponseInterface
@@ -16,7 +17,7 @@ final class Response implements ConsoleResponseInterface
         $this->output = $output;
     }
 
-    private int $code = Command::OK;
+    private int $code = Command::SUCCESS;
 
     public function setCode(int $code): ConsoleResponseInterface
     {
