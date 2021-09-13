@@ -61,7 +61,7 @@
         }
     },
     "scripts": {
-        "post-update-cmd": "php ./bin/ep scan/annotation"
+        "post-update-cmd": "php ./bin/ep scan"
     },
     "bin": [
         "bin/ep"

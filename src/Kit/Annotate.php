@@ -127,7 +127,15 @@ final class Annotate
                             break;
                     }
                 } else {
-                    $injectData[$class][$type] = true;
+                    switch ($type) {
+                        case Target::TARGET_CLASS:
+                            $injectData[$class][$type] = true;
+                            break;
+                        case Target::TARGET_PROPERTY:
+                        case Target::TARGET_METHOD:
+                            $injectData[$class][$type][$name] = true;
+                            break;
+                    }
                 }
             }
         };
