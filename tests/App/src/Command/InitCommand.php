@@ -9,6 +9,7 @@ use Ep\Console\Command;
 use Ep\Console\Service;
 use Ep\Contract\ConsoleRequestInterface;
 use Ep\Contract\ConsoleResponseInterface;
+use Ep\Tests\App\Aspect\ConsoleAspect;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputOption;

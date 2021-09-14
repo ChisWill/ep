@@ -8,6 +8,11 @@ use Ep\Console\Command;
 
 final class TestEPCronCommand extends Command
 {
+    public function indexAction()
+    {
+        return $this->success('index');
+    }
+
     public function sayAction()
     {
         return $this->success('hi');

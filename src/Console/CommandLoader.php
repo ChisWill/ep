@@ -198,7 +198,7 @@ final class CommandLoader implements CommandLoaderInterface
 
     private function getCommandName(string $className, string $action): string
     {
-        if ($action === $this->config->defaultAction) {
+        if ($action === $this->config->defaultAction && substr_count($className, '/') === 1) {
             $action = '';
         } else {
             $action = '/' . $action;
