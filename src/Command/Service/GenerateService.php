@@ -185,11 +185,11 @@ final class GenerateService extends Service
                     }
                     $fields[$field][] = 'HasLength:max(' . $column->getSize() . ')';
                     $classes[] = 'HasLength';
+                    if (StringHelper::endsWith($field, 'email')) {
+                        $fields[$field][] = 'Email';
+                        $classes[] = 'Email';
+                    }
                     break;
-            }
-            if (StringHelper::endsWith($field, 'email')) {
-                $fields[$field][] = 'Email';
-                $classes[] = 'Email';
             }
             if ($column->isAllowNull() && isset($fields[$field])) {
                 $fields[$field] = array_map(fn ($rule): string => $rule . ':skipOnEmpty(true)', $fields[$field]);
