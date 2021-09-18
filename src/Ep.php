@@ -48,10 +48,6 @@ final class Ep
             return;
         }
 
-        if ($config->debug) {
-            self::scan();
-        }
-
         foreach (self::getCache()->get(Constant::CACHE_ANNOTATION_CONFIGURE_DATA) ?: [] as $class => $data) {
             foreach (call_user_func([$class, 'handlers']) as $handler) {
                 self::$container->get($handler)->bootstrap($data);
@@ -66,7 +62,11 @@ final class Ep
             ->cache(
                 self::$container
                     ->get(Util::class)
-                    ->getClassList(self::getConfig()->rootNamespace)
+                    ->getClassList(
+                        self::$container
+                            ->get(Config::class)
+                            ->rootNamespace
+                    )
             );
     }
 

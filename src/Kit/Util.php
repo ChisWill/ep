@@ -42,27 +42,32 @@ final class Util
             if ($rootNamespace === 'Ep') {
                 $this->appPath[$rootNamespace] = $this->aliases->get('@ep/src');
             } else {
-                $vendorPath = dirname($this->aliases->get($this->config->vendorPath));
-                $composerPath = $vendorPath . '/composer.json';
-                if (!file_exists($composerPath)) {
-                    throw new InvalidArgumentException('Unable to find composer.json in your project root.');
-                }
-                $content = json_decode(file_get_contents($composerPath), true);
-                $autoload = ($content['autoload']['psr-4'] ?? []) + ($content['autoload-dev']['psr-4'] ?? []);
-                foreach ($autoload as $ns => $path) {
-                    if ($ns === $rootNamespace . '\\') {
-                        $appPath = $path;
-                        break;
-                    }
-                }
-                if (!isset($appPath)) {
-                    throw new InvalidArgumentException('You should set the "autoload[psr-4]" configuration in your composer.json first.');
-                }
-                $this->appPath[$rootNamespace] = str_replace('\\', '/', $vendorPath . '/' . $appPath);
+                $this->appPath[$rootNamespace] = $this->getAppPathByComposer($rootNamespace);
             }
         }
 
         return $this->appPath[$rootNamespace];
+    }
+
+    private function getAppPathByComposer(string $rootNamespace): string
+    {
+        $vendorPath = dirname($this->aliases->get($this->config->vendorPath));
+        $composerPath = $vendorPath . '/composer.json';
+        if (!file_exists($composerPath)) {
+            throw new InvalidArgumentException('Unable to find composer.json in your project root.');
+        }
+        $content = json_decode(file_get_contents($composerPath), true);
+        $autoload = ($content['autoload']['psr-4'] ?? []) + ($content['autoload-dev']['psr-4'] ?? []);
+        foreach ($autoload as $ns => $path) {
+            if ($ns === $rootNamespace . '\\') {
+                $psrPath = $path;
+                break;
+            }
+        }
+        if (!isset($psrPath)) {
+            throw new InvalidArgumentException('You should set the "autoload[psr-4]" configuration in your composer.json first.');
+        }
+        return str_replace('\\', '/', $vendorPath . '/' . $psrPath);
     }
 
     public function getClassNameByFile(string $rootNamespace, string $file): string
