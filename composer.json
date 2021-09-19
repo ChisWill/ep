@@ -23,6 +23,7 @@
         "yiisoft/cache-file": "^1.0",
         "yiisoft/db": "dev-master",
         "yiisoft/di": "dev-master",
+        "yiisoft/yii-event": "^1.0",
         "yiisoft/files": "^1.0",
         "yiisoft/html": "^2.0",
         "yiisoft/http": "^1.0",
