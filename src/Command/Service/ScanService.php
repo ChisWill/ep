@@ -29,7 +29,10 @@ final class ScanService extends Service
 
     public function scan(): void
     {
-        $classList = $this->util->getClassList($this->userRootNamespace, $this->request->getOption('ignore'));
+        $classList = [];
+        foreach (array_merge([$this->userRootNamespace], $this->request->getOption('ns')) as $rootNamespace) {
+            $classList = array_merge($classList, $this->util->getClassList($rootNamespace, $this->request->getOption('ignore')));
+        }
 
         $this->consoleService->progress(fn ($progressBar) => $this->annotate->cache($classList, static fn () => $progressBar->advance()), count($classList));
 

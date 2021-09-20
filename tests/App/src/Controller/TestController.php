@@ -196,15 +196,15 @@ class TestController extends Controller
     {
         $container = Ep::getDi();
 
-        // $bird = $container->get(Bird::class);
-        // $megaBird = $container->get(MegaBird::class);
+        $bird = $container->get(Bird::class);
+        $megaBird = $container->get(MegaBird::class);
         $child = $container->get(Child::class);
 
         return $this->json(
             [
+                $bird->introduce(),
+                $megaBird->introduce(),
                 $child->do()
-                // $bird->introduce(),
-                // $megaBird->introduce()
             ]
         );
     }

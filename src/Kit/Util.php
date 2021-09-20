@@ -8,6 +8,7 @@ use Ep\Base\Config;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Files\FileHelper;
 use Yiisoft\Files\PathMatcher\PathMatcher;
+use Composer\Autoload\ClassLoader;
 use InvalidArgumentException;
 
 final class Util
@@ -51,23 +52,19 @@ final class Util
 
     private function getAppPathByComposer(string $rootNamespace): string
     {
-        $vendorPath = dirname($this->aliases->get($this->config->vendorPath));
-        $composerPath = $vendorPath . '/composer.json';
-        if (!file_exists($composerPath)) {
-            throw new InvalidArgumentException('Unable to find composer.json in your project root.');
-        }
-        $content = json_decode(file_get_contents($composerPath), true);
-        $autoload = ($content['autoload']['psr-4'] ?? []) + ($content['autoload-dev']['psr-4'] ?? []);
-        foreach ($autoload as $ns => $path) {
-            if ($ns === $rootNamespace . '\\') {
-                $psrPath = $path;
+        $rootNamespace = trim($rootNamespace, '\\') . '\\';
+        /** @var ClassLoader */
+        $classLoader = require($this->aliases->get($this->config->vendorPath) . '/autoload.php');
+        foreach ($classLoader->getPrefixesPsr4() as $prefix => $paths) {
+            if (strpos($rootNamespace, $prefix) === 0) {
+                $path = rtrim(str_replace('\\', '/',  realpath(current($paths)) . str_replace($prefix, DIRECTORY_SEPARATOR, $rootNamespace)), '/');
                 break;
             }
         }
-        if (!isset($psrPath)) {
+        if (!isset($path)) {
             throw new InvalidArgumentException('You should set the "autoload[psr-4]" configuration in your composer.json first.');
         }
-        return str_replace('\\', '/', $vendorPath . '/' . $psrPath);
+        return $path;
     }
 
     public function getClassNameByFile(string $rootNamespace, string $file): string

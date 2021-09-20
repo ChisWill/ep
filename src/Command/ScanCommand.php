@@ -20,6 +20,7 @@ final class ScanCommand extends Command
 
         $this
             ->createDefinition('index')
+            ->addOption('ns', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'The extra namespace to scan')
             ->addOption('ignore', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'The pattern to ignore files')
             ->setDescription('Scan root path to generate annotation cache');
     }
