@@ -64,16 +64,7 @@ final class Annotate
     {
         $reflectionClass = $this->class($instance) ?? new ReflectionClass($instance);
 
-        if ($this->cacheData === null) {
-            $properties = $reflectionClass->getProperties();
-        } else {
-            $properties = [];
-            foreach ($this->cacheData[get_class($instance)][Target::TARGET_PROPERTY] ?? [] as $name => $v) {
-                $properties[] = $reflectionClass->getProperty($name);
-            }
-        }
-
-        foreach ($properties as $property) {
+        foreach ($this->getProperties($reflectionClass) as $property) {
             $annotations = $this->reader->getPropertyAnnotations($property);
             foreach ($annotations as $annotation) {
                 if ($annotation instanceof AnnotationInterface) {
@@ -164,5 +155,21 @@ final class Annotate
 
         $this->cache->set(Constant::CACHE_ANNOTATION_INJECT_DATA, $injectData, 86400 * 365 * 100);
         $this->cache->set(Constant::CACHE_ANNOTATION_CONFIGURE_DATA, $configureData, 86400 * 365 * 100);
+    }
+
+    private function getProperties(ReflectionClass $reflectionClass): array
+    {
+        $parentClass = $reflectionClass->getParentClass();
+        $properties = $parentClass === false ? [] : $this->getProperties($parentClass);
+
+        if ($this->cacheData === null) {
+            $properties = array_merge($properties, $reflectionClass->getProperties());
+        } else {
+            foreach ($this->cacheData[$reflectionClass->getName()][Target::TARGET_PROPERTY] ?? [] as $name => $v) {
+                $properties[] = $reflectionClass->getProperty($name);
+            }
+        }
+
+        return $properties;
     }
 }

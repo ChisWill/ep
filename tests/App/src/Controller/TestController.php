@@ -37,6 +37,7 @@ use Ep\Tests\App\Aspect\EchoStringAspect;
 use Ep\Tests\App\Aspect\LoggerAspect;
 use Ep\Tests\App\Middleware\TimeMiddleware;
 use Ep\Tests\App\Model\Student;
+use Ep\Tests\App\Objects\Human\Child;
 use Ep\Tests\App\Service\DemoService;
 use Ep\Tests\Support\Object\Animal\Bird;
 use Ep\Tests\Support\Object\Animal\MegaBird;
@@ -195,13 +196,15 @@ class TestController extends Controller
     {
         $container = Ep::getDi();
 
-        $bird = $container->get(Bird::class);
-        $megaBird = $container->get(MegaBird::class);
+        // $bird = $container->get(Bird::class);
+        // $megaBird = $container->get(MegaBird::class);
+        $child = $container->get(Child::class);
 
         return $this->json(
             [
-                $bird->introduce(),
-                $megaBird->introduce()
+                $child->do()
+                // $bird->introduce(),
+                // $megaBird->introduce()
             ]
         );
     }
