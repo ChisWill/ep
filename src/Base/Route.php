@@ -46,14 +46,17 @@ final class Route implements BootstrapInterface
 
             if (isset($value[Target::TARGET_CLASS])) {
                 $path = rtrim($value[Target::TARGET_CLASS]['value'], '/') . '/';
-                $method = $value[Target::TARGET_CLASS]['method'] ?? Method::GET;
+                $method = (array) ($value[Target::TARGET_CLASS]['method'] ?? Method::GET);
             } else {
                 $path = '/';
-                $method = Method::GET;
+                $method = [Method::GET];
             }
 
             foreach ($value[Target::TARGET_METHOD] as $item) {
-                $this->annotationRules[$item['method'] ?? $method]['/' . trim($path . trim($item['value'], '/'), '/')] = [$class, Str::rtrim($item['target'], $this->config->actionSuffix)];
+                $this->annotationRules['/' . trim($path . trim($item['value'], '/'), '/')] = [
+                    (array) ($item['method'] ?? $method),
+                    [$class, Str::rtrim($item['target'], $this->config->actionSuffix)]
+                ];
             }
         }
     }
@@ -144,10 +147,8 @@ final class Route implements BootstrapInterface
     private function getAnnotationRule(): Closure
     {
         return function (RouteCollector $route): void {
-            foreach ($this->annotationRules as $method => $value) {
-                foreach ($value as $path => $handler) {
-                    $route->addRoute($method, $path, $handler);
-                }
+            foreach ($this->annotationRules as $path => [$method, $handler]) {
+                $route->addRoute($method, $path, $handler);
             }
         };
     }

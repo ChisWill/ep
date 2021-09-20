@@ -42,9 +42,11 @@ final class Ep
         return self::$container;
     }
 
+    private static bool $isBootstrap = false;
+
     private static function bootstrap(Config $config): void
     {
-        if ($config->rootNamespace === 'Ep') {
+        if ($config->rootNamespace === 'Ep' || self::$isBootstrap) {
             return;
         }
 
@@ -53,6 +55,8 @@ final class Ep
                 self::$container->get($handler)->bootstrap($data);
             }
         }
+
+        self::$isBootstrap = true;
     }
 
     public static function scan(): void

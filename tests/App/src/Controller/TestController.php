@@ -102,7 +102,7 @@ class TestController extends Controller
     }
 
     /**
-     * @Route("index")
+     * @Route("index", {"GET","POST"})
      */
     public function indexAction(ServerRequestInterface $serverRequest)
     {
