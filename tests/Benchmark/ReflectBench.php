@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Tests\Benchmark;
 
-use Ep\Tests\Support\Container\XEngine;
+use Ep\Tests\Support\Object\Engine\NuclearEngine;
 use PhpBench\Benchmark\Metadata\Annotations\BeforeMethods;
 use PhpBench\Benchmark\Metadata\Annotations\Groups;
 use PhpBench\Benchmark\Metadata\Annotations\Iterations;
@@ -25,14 +25,13 @@ class ReflectBench
 
     public function before()
     {
-        $this->class = new XEngine();
+        $this->class = new NuclearEngine();
     }
 
     public function benchOther()
     {
         for ($i = 0; $i < self::COUNT; $i++) {
-            // new XEngine();
-            $ref = new ReflectionClass(XEngine::class);
+            $ref = new ReflectionClass(NuclearEngine::class);
         }
     }
 

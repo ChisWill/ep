@@ -14,6 +14,10 @@ use Ep\Tests\App\Component\ConsoleRenderer;
 use Ep\Tests\App\Component\WebErrorRenderer;
 use Ep\Tests\App\Component\Interceptor;
 use Ep\Tests\App\Component\UserRepository;
+use Ep\Tests\Support\Object\Engine\EngineInterface;
+use Ep\Tests\Support\Object\Engine\SteamEngine;
+use Ep\Tests\Support\Object\Wing\AngelWing;
+use Ep\Tests\Support\Object\Wing\WingInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Connection\Connection;
@@ -58,5 +62,9 @@ return static fn (Config $config, array $params): array => [
         '__construct()' => [$params['db']['mysql']['dsn']],
         'setUsername()' => [$params['db']['mysql']['username']],
         'setPassword()' => [$params['db']['mysql']['password']]
-    ]
+    ],
+
+    // Others
+    WingInterface::class => AngelWing::class,
+    EngineInterface::class => SteamEngine::class
 ];

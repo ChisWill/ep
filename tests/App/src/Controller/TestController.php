@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App\Controller;
 
+use Doctrine\Common\Annotations\Reader;
 use Ep;
 use Ep\Annotation\Aspect;
 use Ep\Db\Query;
@@ -11,14 +12,6 @@ use Ep\Helper\Str;
 use Ep\Helper\System;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Service\TestService;
-use Ep\Tests\Support\Container\AngelWing;
-use Ep\Tests\Support\Container\Benz;
-use Ep\Tests\Support\Container\BMW;
-use Ep\Tests\Support\Container\CarInterface;
-use Ep\Tests\Support\Container\DragoonEngine;
-use Ep\Tests\Support\Container\EngineInterface;
-use Ep\Tests\Support\Container\WingInterface;
-use Ep\Tests\Support\Container\XEngine;
 use Ep\Tests\Support\Middleware\CheckMiddleware;
 use Ep\Tests\Support\Middleware\FilterMiddleware;
 use Ep\Tests\Support\Middleware\MultipleMiddleware;
@@ -35,6 +28,7 @@ use Yiisoft\Di\Container;
 use Yiisoft\Strings\StringHelper;
 use Ep\Annotation\Inject;
 use Ep\Annotation\Route;
+use Ep\Base\Config;
 use Ep\Base\Container as BaseContainer;
 use Ep\Contract\InjectorInterface;
 use Ep\Tests\App\Aspect\ClassAnnotation;
@@ -44,10 +38,16 @@ use Ep\Tests\App\Aspect\LoggerAspect;
 use Ep\Tests\App\Middleware\TimeMiddleware;
 use Ep\Tests\App\Model\Student;
 use Ep\Tests\App\Service\DemoService;
-use Ep\Tests\Support\Container\MegaBird;
+use Ep\Tests\Support\Object\Animal\Bird;
+use Ep\Tests\Support\Object\Animal\MegaBird;
+use Ep\Tests\Support\Object\Engine\EngineInterface;
+use Ep\Tests\Support\Object\Engine\SteamEngine;
+use Ep\Tests\Support\Object\Wing\AngelWing;
+use Ep\Tests\Support\Object\Wing\WingInterface;
 use Ep\Web\ErrorRenderer;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Assets\AssetManager;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Definitions\Reference;
@@ -193,26 +193,17 @@ class TestController extends Controller
 
     public function diAction()
     {
-        $composite = new CompositeContainer();
-        $first = new Container([
-            CarInterface::class => BMW::class,
-            WingInterface::class => static fn (): AngelWing => new AngelWing(80),
-        ], [], []);
-        $second = new Container([
-            CarInterface::class => Benz::class,
-            WingInterface::class => AngelWing::class,
-            'angelWing' => static fn (): AngelWing => new AngelWing(50),
-        ], [], []);
-        $third = new Container([
-            WingInterface::class => AngelWing::class,
-        ]);
-        $composite->attach($first);
-        $composite->attach($second);
-        $composite->attach($third);
+        $container = Ep::getDi();
 
-        return $this->json([
-            'result' => $composite->get(AngelWing::class)
-        ]);
+        $bird = $container->get(Bird::class);
+        $megaBird = $container->get(MegaBird::class);
+
+        return $this->json(
+            [
+                $bird->introduce(),
+                $megaBird->introduce()
+            ]
+        );
     }
 
     public function mapAction()
