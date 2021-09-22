@@ -19,15 +19,21 @@ final class Ep
 {
     public const VERSION = '1.0';
 
+    private static ContainerInterface $container;
+    private static Factory $factory;
+
     private function __construct()
     {
     }
 
-    private static ContainerInterface $container;
-    private static Factory $factory;
+    private static bool $init = false;
 
     public static function init(array $config = []): ContainerInterface
     {
+        if (self::$init) {
+            return self::$container;
+        }
+
         $config = new Config($config);
         $definitions = $config->getDi() + require(dirname(__DIR__, 1) . '/config/definitions.php');
 
@@ -37,26 +43,23 @@ final class Ep
 
         AnnotationRegistry::registerLoader('class_exists');
 
-        self::bootstrap($config);
+        if ($config->rootNamespace !== 'Ep') {
+            self::bootstrap();
+        }
+
+        self::$init = true;
 
         return self::$container;
     }
 
-    private static bool $isBootstrap = false;
 
-    private static function bootstrap(Config $config): void
+    private static function bootstrap(): void
     {
-        if ($config->rootNamespace === 'Ep' || self::$isBootstrap) {
-            return;
-        }
-
         foreach (self::getCache()->get(Constant::CACHE_ANNOTATION_CONFIGURE_DATA) ?: [] as $class => $data) {
             foreach (call_user_func([$class, 'handlers']) as $handler) {
                 self::$container->get($handler)->bootstrap($data);
             }
         }
-
-        self::$isBootstrap = true;
     }
 
     public static function scan(): void

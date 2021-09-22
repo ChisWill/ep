@@ -23,7 +23,7 @@ final class Inject implements AnnotationInterface
     }
 
     /**
-     * @param  ReflectionProperty $reflector
+     * @param ReflectionProperty $reflector
      */
     public function process(object $instance, Reflector $reflector, array $arguments = []): void
     {
@@ -31,9 +31,9 @@ final class Inject implements AnnotationInterface
 
         $className = $reflector->getType()->getName();
 
-        foreach ($arguments as $argv) {
-            if (is_object($argv) && is_subclass_of($argv, $className, false)) {
-                $target = $argv;
+        foreach ($arguments as $value) {
+            if (is_object($value) && is_subclass_of($value, $className, false)) {
+                $target = $value;
                 break;
             }
         }
