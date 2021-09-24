@@ -62,7 +62,7 @@
         }
     },
     "scripts": {
-        "post-update-cmd": "php ./bin/ep scan --ns='Ep\\Tests\\Support'"
+        "post-update-cmd": "php ./bin/ep scan --ns=Ep/Tests/Support"
     },
     "bin": [
         "bin/ep"

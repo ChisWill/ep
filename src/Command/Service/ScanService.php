@@ -30,7 +30,7 @@ final class ScanService extends Service
     public function scan(): void
     {
         $classList = [];
-        foreach (array_merge([$this->userRootNamespace], $this->request->getOption('ns')) as $rootNamespace) {
+        foreach (array_merge([$this->userRootNamespace], str_replace('/', '\\', $this->request->getOption('ns'))) as $rootNamespace) {
             $classList = array_merge($classList, $this->util->getClassList($rootNamespace, $this->request->getOption('ignore')));
         }
 
