@@ -6,6 +6,7 @@ namespace Ep\Db;
 
 use Ep;
 use Ep\Helper\Batch;
+use Ep\Widget\Paginator;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\Query as BaseQuery;
@@ -110,5 +111,10 @@ class Query extends BaseQuery
         }
 
         return Batch::reduce($this->getBatchProducer($primaryKey, $startId), ...$callbacks);
+    }
+
+    public function nextPage(int $startId, int $pageSize = 10, string $primaryKey = 'id'): array
+    {
+        return (new Paginator($this))->next($startId, $pageSize, $primaryKey);
     }
 }

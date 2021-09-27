@@ -18,9 +18,9 @@ final class Paginator
         $this->query = $query;
     }
 
-    public function all(int $page = 1, int $pageSize = 15): array
+    public function all(int $page = 1, int $pageSize = 10): array
     {
-        $this->filter($page, $pageSize);
+        $this->normalize($page, $pageSize);
 
         $totalCount = (int) $this->query->count();
 
@@ -33,9 +33,9 @@ final class Paginator
         ];
     }
 
-    public function data(int $page = 1, int $pageSize = 15): array
+    public function data(int $page = 1, int $pageSize = 10): array
     {
-        $this->filter($page, $pageSize);
+        $this->normalize($page, $pageSize);
 
         return $this->query
             ->offset(($page - 1) * $pageSize)
@@ -43,9 +43,28 @@ final class Paginator
             ->all();
     }
 
-    private function filter(int &$page, int &$pageSize): void
+    public function next(int $startId, int $pageSize = 10, string $primaryKey = 'id'): array
     {
-        $page = $page < 1 ? 1 : $page;
-        $pageSize = $pageSize  < 1 ? 1 : $pageSize;
+        $this->normalize($startId, $pageSize);
+
+        $data = $this->query
+            ->andWhere(['>', $primaryKey, $startId])
+            ->limit($pageSize)
+            ->all();
+
+        if ($data) {
+            $nextId = end($data)[$primaryKey];
+        } else {
+            $nextId = $startId;
+        }
+
+        return compact('nextId', 'data');
+    }
+
+    private function normalize(int &...$values): void
+    {
+        foreach ($values as &$value) {
+            $value = $value < 1 ? 1 : $value;
+        }
     }
 }

@@ -15,7 +15,7 @@ trait QueryTrait
         return new Paginator($this);
     }
 
-    public function paginate(int $page, int $pageSize = 15): array
+    public function paginate(int $page, int $pageSize = 10): array
     {
         return (new Paginator($this))->data($page, $pageSize);
     }

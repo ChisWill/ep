@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\Db;
 
 use Ep\Helper\Batch;
+use Ep\Widget\Paginator;
 use Yiisoft\ActiveRecord\ActiveQuery as BaseActiveQuery;
 use Yiisoft\Db\Expression\Expression;
 use LogicException;
@@ -35,14 +36,28 @@ class ActiveQuery extends BaseActiveQuery
      */
     public function reduce(int &$startId, callable ...$callbacks): array
     {
-        $primaryKey = $this->getARClass()::PK;
-        if (is_array($primaryKey)) {
-            throw new LogicException('Don\'t support composite primary key.');
-        }
         if (count($callbacks) === 0) {
             throw new LogicException('It must be at least one callback.');
         }
 
-        return Batch::reduce($this->getBatchProducer($primaryKey, $startId), ...$callbacks);
+        return Batch::reduce($this->getBatchProducer($this->getPrimaryKey(), $startId), ...$callbacks);
+    }
+
+    public function nextPage(int $startId, int $pageSize = 10): array
+    {
+        return (new Paginator($this))->next($startId, $pageSize, $this->getPrimaryKey());
+    }
+
+    /**
+     * @throws LogicException
+     */
+    private function getPrimaryKey(): string
+    {
+        $primaryKey = $this->getARClass()::PK;
+        if (is_array($primaryKey)) {
+            throw new LogicException('Don\'t support composite primary key.');
+        }
+
+        return $primaryKey;
     }
 }

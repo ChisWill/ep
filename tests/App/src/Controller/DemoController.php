@@ -310,7 +310,9 @@ class DemoController extends Controller
 
         return $this->json([
             'count' => $count,
-            'all' => $query->getPaginator()->all($page, 3),
+            'next' => $query->nextPage($page, 3),
+            'data' => $query->getPaginator()->data($page, 3),
+            'all' => $query->getPaginator()->all($page, 3)
         ]);
     }
 
