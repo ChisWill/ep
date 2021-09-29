@@ -15,6 +15,7 @@
         "symfony/cache": "^5.3",
         "symfony/console": "^5.2",
         "symfony/event-dispatcher-contracts": "^2.4",
+        "vlucas/phpdotenv": "^5.3",
         "yiisoft/active-record": "dev-master",
         "yiisoft/aliases": "^2.0",
         "yiisoft/arrays": "^1.0",
@@ -23,7 +24,6 @@
         "yiisoft/cache-file": "^1.0",
         "yiisoft/db": "dev-master",
         "yiisoft/di": "dev-master",
-        "yiisoft/yii-event": "^1.0",
         "yiisoft/files": "^1.0",
         "yiisoft/html": "^2.0",
         "yiisoft/http": "^1.0",
@@ -33,10 +33,11 @@
         "yiisoft/session": "^1.0",
         "yiisoft/strings": "^2.0",
         "yiisoft/validator": "^3.0",
+        "yiisoft/yii-event": "^1.0",
         "yiisoft/yii-web": "dev-master"
     },
     "require-dev": {
-        "phpbench/phpbench": "^1.0.0",
+        "phpbench/phpbench": "^1.0",
         "phpunit/phpunit": "^9.4",
         "vimeo/psalm": "^4.5",
         "yiisoft/db-mysql": "dev-master",
@@ -44,9 +45,13 @@
         "yiisoft/db-sqlite": "dev-master",
         "yiisoft/log-target-file": "dev-master"
     },
+    "suggest": {
+        "ext-openssl": "Allows to encrypt and decrypt"
+    },
     "autoload": {
         "files": [
-            "src/Ep.php"
+            "src/Ep.php",
+            "src/functions.php"
         ],
         "psr-4": {
             "Ep\\": "src"

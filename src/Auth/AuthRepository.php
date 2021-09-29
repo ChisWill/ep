@@ -49,7 +49,7 @@ final class AuthRepository
      */
     public function findMethod(string $method): AuthenticationMethodInterface
     {
-        $this->check($method);
+        $this->validate($method);
 
         if (!isset($this->methods[$method])) {
             $this->methods[$method] = $this->container->get($method);
@@ -64,7 +64,7 @@ final class AuthRepository
      */
     public function findMiddleware(string $method): MiddlewareInterface
     {
-        $this->check($method);
+        $this->validate($method);
 
         if (!isset($this->middlewares[$method])) {
             $arguments = [
@@ -82,7 +82,7 @@ final class AuthRepository
         return $this->middlewares[$method];
     }
 
-    private function check(string $method): void
+    private function validate(string $method): void
     {
         if (!array_key_exists($method, $this->methods)) {
             throw new InvalidArgumentException('Invalid authentication method.');

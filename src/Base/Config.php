@@ -14,10 +14,6 @@ final class Config
      */
     public string $rootNamespace = 'App';
     /**
-     * Application root path
-     */
-    public string $rootPath = '';
-    /**
      * Path aliases
      */
     public array $aliases = [];
@@ -90,6 +86,10 @@ final class Config
      */
     public string $secretKey = '';
     /**
+     * The algorithm cipher
+     */
+    public string $algoCipher = 'AES-128-CBC';
+    /**
      * Params
      */
     public array $params = [];
@@ -125,13 +125,9 @@ final class Config
         foreach ($config as $key => $val) {
             $this->$key = $val;
         }
-        if ($this->debug) {
-            if ($this->rootPath === '') {
-                throw new InvalidArgumentException('The "rootPath" configuration is required.');
-            }
-            if ($this->secretKey === '') {
-                throw new InvalidArgumentException('The "secretKey" configuration is required.');
-            }
+
+        if ($this->secretKey === '') {
+            throw new InvalidArgumentException('The "secretKey" configuration is required.');
         }
     }
 

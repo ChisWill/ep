@@ -7,24 +7,30 @@ namespace Ep\Command\Service;
 use Ep\Base\View;
 use Ep\Helper\File;
 use Ep\Helper\Str;
+use Ep\Kit\Crypt;
 use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\TableSchema;
 use Yiisoft\Strings\StringHelper;
 use Psr\Container\ContainerInterface;
-use InvalidArgumentException;
+use LogicException;
 
 final class GenerateService extends Service
 {
     private View $view;
+    private Crypt $crypt;
 
-    public function __construct(ContainerInterface $container, View $view)
-    {
+    public function __construct(
+        ContainerInterface $container,
+        View $view,
+        Crypt $crypt
+    ) {
         parent::__construct($container);
 
         $this->view = $view
             ->withViewPath('@ep/views')
             ->withPrefix('generate');
+        $this->crypt = $crypt;
     }
 
     public function render(string $path, array $params): string
@@ -41,8 +47,6 @@ final class GenerateService extends Service
             case 'generate/model':
                 $this->configureModel();
                 break;
-            default:
-                throw new InvalidArgumentException('Command "' . $this->request->getRoute() . '" is not defined.');
         }
     }
 
@@ -62,6 +66,13 @@ final class GenerateService extends Service
             $this->error(sprintf('The table "%s" is not exists.', $this->table));
         }
         $this->tableSchema = $tableSchema;
+    }
+
+    public function createKey(): void
+    {
+        $this->setEnvFile(base64_encode($this->crypt->generateKey()));
+
+        $this->consoleService->writeln('<info>Generate secret key successfully.</>');
     }
 
     public function createModel(): void
@@ -108,6 +119,28 @@ final class GenerateService extends Service
     public function hasModel(): bool
     {
         return file_exists($this->getModelFileName());
+    }
+
+    private function setEnvFile(string $key): void
+    {
+        $file = $this->util->getRootPath('.env');
+        if (!file_exists($file)) {
+            throw new LogicException('The environment file ".env" is not exists.');
+        }
+
+        $count = 0;
+        $data = preg_replace(
+            '/^SECRET_KEY=.*/m',
+            'SECRET_KEY=' . $key,
+            file_get_contents($file),
+            1,
+            $count
+        );
+        if ($count === 0) {
+            throw new LogicException('The configure "SECRET_KEY" is not exists.');
+        }
+
+        file_put_contents($file, $data);
     }
 
     private function getNamespace(): string

@@ -22,6 +22,16 @@ final class Util
         $this->aliases = $aliases;
     }
 
+    public function getRootPath(string $path = ''): string
+    {
+        return $this->aliases->get('@root') . ($path ? DIRECTORY_SEPARATOR . $path : '');
+    }
+
+    public function getVendorPath(string $path = ''): string
+    {
+        return $this->aliases->get('@vendor') . ($path ? DIRECTORY_SEPARATOR . $path : '');
+    }
+
     public function getClassList(string $rootNamespace, array $exceptPatterns = []): array
     {
         $result = [];
@@ -46,7 +56,6 @@ final class Util
                 $this->appPath[$rootNamespace] = $this->getAppPathByComposer($rootNamespace);
             }
         }
-
         return $this->appPath[$rootNamespace];
     }
 
@@ -54,7 +63,7 @@ final class Util
     {
         $rootNamespace = trim($rootNamespace, '\\') . '\\';
         /** @var ClassLoader */
-        $classLoader = require($this->aliases->get($this->config->vendorPath) . '/autoload.php');
+        $classLoader = require($this->getVendorPath('autoload.php'));
         foreach ($classLoader->getPrefixesPsr4() as $prefix => $paths) {
             if (strpos($rootNamespace, $prefix) === 0) {
                 $path = rtrim(str_replace('\\', '/',  realpath(current($paths)) . str_replace($prefix, DIRECTORY_SEPARATOR, $rootNamespace)), '/');

@@ -16,35 +16,28 @@ use Ep\Console\Input;
         fwrite(STDERR, $message);
         exit(1);
     }
-    require($options['bootstrap']);
+
+    require($options['bootstrap'] ?? 'vendor/autoload.php');
     unset($options['bootstrap']);
 
-    if (!file_exists($options['config'])) {
-        $message = "Unable to find config file in {$options['config']}" . PHP_EOL;
-        fwrite(STDERR, $message);
-        exit(1);
-    }
+    $container = Ep::init(realpath($options['rootPath'] ?? './'));
+    unset($options['rootPath']);
 
-    Ep::init(array_merge(
-        $userConfig = require($options['config']),
-        [
-            'rootNamespace' => 'Ep',
-            'commandSuffix' => 'Command',
-            'actionSuffix' => 'Action',
-            'defaultAction' => 'index'
-        ]
-    ));
-    unset($options['config']);
-
+    $config = Ep::getConfig();
     $options['common'] ??= [];
-    $options['common']['userRootNamespace'] = $userConfig['rootNamespace'] ?? 'App';
+    $options['common']['userRootNamespace'] = $config->rootNamespace;
 
-    $input = Ep::getDi()->get(Input::class);
+    $config->rootNamespace = 'Ep';
+    $config->commandSuffix = 'Command';
+    $config->actionSuffix = 'Action';
+    $config->defaultAction = 'index';
+
+    $input = $container->get(Input::class);
     foreach ($options as $name => $value) {
         $input->setOption($name, $value);
     }
 
-    $exitCode = Ep::getDi()
+    $exitCode = $container
         ->get(Application::class)
         ->run($input);
 

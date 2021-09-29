@@ -263,7 +263,7 @@ final class MigrateService extends Service
         $params['className'] = $className;
         $params['namespace'] = $namespace;
 
-        if (@file_put_contents($this->basePath . '/' . $className . '.php', $this->generateService->render($view, $params))) {
+        if (@file_put_contents(sprintf('%s/%s.php', $this->basePath, $className), $this->generateService->render($view, $params))) {
             $this->consoleService->writeln(sprintf('New migration file <info>%s.php</> has been created in <comment>%s</>', $className, $this->basePath));
             return true;
         } else {

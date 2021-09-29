@@ -76,7 +76,7 @@ class View
     private function normalize(string $path): string
     {
         if ($this->prefix !== null && strpos($path, '/') !== 0) {
-            $path = '/' . $this->prefix . '/' . $path;
+            $path = sprintf('/%s/%s', $this->prefix, $path);
         }
         return $path;
     }
@@ -93,9 +93,9 @@ class View
     {
         if (strpos($layout, '/') !== 0) {
             if ($this->prefix === null || ($pos = strrpos($this->prefix, '/')) === false) {
-                $layout = '/' . $this->config->layoutDir . '/' . $layout;
+                $layout = sprintf('/%s/%s', $this->config->layoutDir, $layout);
             } else {
-                $layout = '/' . substr($this->prefix, 0, $pos) . '/' . $this->config->layoutDir . '/' . $layout;
+                $layout = sprintf('/%s/%s/%s', substr($this->prefix, 0, $pos), $this->config->layoutDir, $layout);
             }
         }
         return $this->renderPHPFile($this->findFilePath($layout), $params);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Ep\Base\Config;
 use Ep\Base\Constant;
+use Ep\Base\Env;
 use Ep\Contract\InjectorInterface;
 use Ep\Kit\Annotate;
 use Ep\Kit\Util;
@@ -19,6 +20,7 @@ final class Ep
 {
     public const VERSION = '1.0';
 
+    private static Env $env;
     private static ContainerInterface $container;
     private static Factory $factory;
 
@@ -28,14 +30,17 @@ final class Ep
 
     private static bool $init = false;
 
-    public static function init(array $config = []): ContainerInterface
+    public static function init(string $rootPath, string $configFile = 'config/main.php'): ContainerInterface
     {
         if (self::$init) {
             return self::$container;
         }
+        self::$init = true;
 
-        $config = new Config($config);
-        $definitions = $config->getDi() + require(dirname(__DIR__, 1) . '/config/definitions.php');
+        self::$env = new Env($rootPath);
+
+        $config = new Config(require($rootPath . '/' . $configFile));
+        $definitions = $config->getDi() + require(dirname(__DIR__) . '/config/definitions.php');
 
         self::$container = (new YiiContainer($definitions, [], [], $config->debug))->get(ContainerInterface::class);
         self::$factory = self::$container->get(Factory::class);
@@ -47,11 +52,8 @@ final class Ep
             self::bootstrap();
         }
 
-        self::$init = true;
-
         return self::$container;
     }
-
 
     private static function bootstrap(): void
     {
@@ -62,19 +64,9 @@ final class Ep
         }
     }
 
-    public static function scan(): void
+    public static function getEnv(): Env
     {
-        self::$container
-            ->get(Annotate::class)
-            ->cache(
-                self::$container
-                    ->get(Util::class)
-                    ->getClassList(
-                        self::$container
-                            ->get(Config::class)
-                            ->rootNamespace
-                    )
-            );
+        return self::$env;
     }
 
     public static function getDi(): ContainerInterface
@@ -110,5 +102,20 @@ final class Ep
     public static function getLogger(string $id = null): LoggerInterface
     {
         return self::$container->get($id ?? LoggerInterface::class);
+    }
+
+    public static function scan(): void
+    {
+        self::$container
+            ->get(Annotate::class)
+            ->cache(
+                self::$container
+                    ->get(Util::class)
+                    ->getClassList(
+                        self::$container
+                            ->get(Config::class)
+                            ->rootNamespace
+                    )
+            );
     }
 }

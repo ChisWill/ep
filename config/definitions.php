@@ -60,7 +60,10 @@ use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
-/** @var Config $config */
+/**
+ * @var Config $config 
+ * @var string $rootPath
+ */
 
 return [
     // Base
@@ -68,9 +71,9 @@ return [
     InjectorInterface::class => Injector::class,
     Config::class => $config,
     Aliases::class => new Aliases([
-        '@root' => $config->rootPath,
+        '@root' => $rootPath,
         '@vendor' => $config->vendorPath,
-        '@ep' => dirname(__DIR__, 1)
+        '@ep' => dirname(__DIR__)
     ] + $config->aliases),
     // Annotation
     Reader::class => static fn (CacheItemPoolInterface $cache): Reader => $config->debug ? new AnnotationReader() : new PsrCachedReader(new AnnotationReader(), $cache, false),

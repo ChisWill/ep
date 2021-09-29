@@ -4,4 +4,4 @@ declare(strict_types=1);
 
 require(dirname(__DIR__, 3) . '/vendor/autoload.php');
 
-Ep::init(import('main'));
+Ep::init(dirname(__DIR__));

@@ -8,7 +8,7 @@ require(dirname(__DIR__, 3) . '/vendor/autoload.php');
 
 $start = microtime(true);
 
-Ep::init(import('main'))->get(Application::class)->run();
+Ep::init(dirname(__DIR__))->get(Application::class)->run();
 
 $end = microtime(true);
 

@@ -29,6 +29,15 @@ final class GenerateCommand extends Command
             ->setDescription('Generate model');
     }
 
+    public function keyAction(ConsoleRequestInterface $request): ConsoleResponseInterface
+    {
+        $this->service
+            ->load($request)
+            ->createKey();
+
+        return $this->success();
+    }
+
     public function modelAction(ConsoleRequestInterface $request): ConsoleResponseInterface
     {
         foreach ($request->getArgument('table') as $table) {

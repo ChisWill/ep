@@ -11,6 +11,8 @@ use Ep\Annotation\Route;
 use Ep\Auth\AuthRepository;
 use Ep\Auth\Method\HttpSession;
 use Ep\Db\Query;
+use Ep\Helper\Str;
+use Ep\Kit\Crypt;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Facade\Cache as FacadeCache;
 use Ep\Tests\App\Facade\Logger;
@@ -204,6 +206,15 @@ class DemoController extends Controller
         $result['get'] = $r;
 
         return $this->json($result);
+    }
+
+    public function cryptAction(Crypt $crypt)
+    {
+        $text = Str::random();
+        $pwd = $crypt->encrypt($text);
+        $parse = $crypt->decrypt($pwd);
+
+        return $this->json(compact('text', 'pwd', 'parse'));
     }
 
     public function validateAction()
