@@ -10,13 +10,20 @@ use Dotenv\Repository\RepositoryInterface;
 
 final class Env
 {
+    private string $rootPath;
     private RepositoryInterface $repository;
 
-    public function __construct(string $basePath)
+    public function __construct(string $rootPath)
     {
+        $this->rootPath = $rootPath;
         $this->repository = $this->getRepository();
 
-        Dotenv::create($this->repository, $basePath)->safeLoad();
+        Dotenv::create($this->repository, $rootPath)->safeLoad();
+    }
+
+    public function getRootPath(): string
+    {
+        return $this->rootPath;
     }
 
     /**

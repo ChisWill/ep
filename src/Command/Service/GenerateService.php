@@ -123,7 +123,7 @@ final class GenerateService extends Service
 
     private function setEnvFile(string $key): void
     {
-        $file = $this->util->getRootPath('.env');
+        $file = $this->util->rootPath('.env');
         if (!file_exists($file)) {
             throw new LogicException('The environment file ".env" is not exists.');
         }

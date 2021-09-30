@@ -61,18 +61,17 @@ use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
-/** @var string $rootPath */
-
+$env = Ep::getEnv();
 $config = Ep::getConfig();
 
 return [
     // Base
     ContainerInterface::class => Container::class,
     InjectorInterface::class => Injector::class,
-    Env::class => Ep::getEnv(),
+    Env::class => $env,
     Config::class => $config,
     Aliases::class => new Aliases([
-        '@root' => $rootPath,
+        '@root' => $env->getRootPath(),
         '@vendor' => $config->vendorPath,
         '@ep' => dirname(__DIR__)
     ] + $config->aliases),

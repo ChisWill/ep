@@ -40,6 +40,7 @@ final class Ep
 
         self::$env = new Env($rootPath);
         self::$config = new Config(require($rootPath . '/' . $configFile));
+
         $definitions = self::$config->getDi() + require(dirname(__DIR__) . '/config/definitions.php');
 
         self::$container = (new YiiContainer($definitions, [], [], self::$config->debug))->get(ContainerInterface::class);
@@ -111,11 +112,7 @@ final class Ep
             ->cache(
                 self::$container
                     ->get(Util::class)
-                    ->getClassList(
-                        self::$container
-                            ->get(Config::class)
-                            ->rootNamespace
-                    )
+                    ->getClassList(self::$config->rootNamespace)
             );
     }
 }
