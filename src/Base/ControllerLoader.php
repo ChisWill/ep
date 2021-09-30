@@ -77,7 +77,7 @@ final class ControllerLoader
         if (strpos($prefix, '\\\\') !== false) {
             $prefix = explode('\\\\', trim($prefix, '\\'))[0];
         }
-        $class = $this->config->rootNamespace . '\\' . ($prefix ? $prefix . '\\' : '') . $this->suffix . '\\' . $this->config->moduleName;
+        $class = sprintf('%s\\%s%s\\%s', $this->config->rootNamespace, $prefix ? $prefix . '\\' : '', $this->suffix, $this->config->moduleName);
         if (class_exists($class)) {
             return $this->container->get($class);
         } else {

@@ -21,6 +21,7 @@ final class Ep
     public const VERSION = '1.0';
 
     private static Env $env;
+    private static Config $config;
     private static ContainerInterface $container;
     private static Factory $factory;
 
@@ -38,17 +39,16 @@ final class Ep
         self::$init = true;
 
         self::$env = new Env($rootPath);
+        self::$config = new Config(require($rootPath . '/' . $configFile));
+        $definitions = self::$config->getDi() + require(dirname(__DIR__) . '/config/definitions.php');
 
-        $config = new Config(require($rootPath . '/' . $configFile));
-        $definitions = $config->getDi() + require(dirname(__DIR__) . '/config/definitions.php');
-
-        self::$container = (new YiiContainer($definitions, [], [], $config->debug))->get(ContainerInterface::class);
+        self::$container = (new YiiContainer($definitions, [], [], self::$config->debug))->get(ContainerInterface::class);
         self::$factory = self::$container->get(Factory::class);
         self::$factory->setMultiple($definitions);
 
         AnnotationRegistry::registerLoader('class_exists');
 
-        if ($config->rootNamespace !== 'Ep') {
+        if (self::$config->rootNamespace !== 'Ep') {
             self::bootstrap();
         }
 
@@ -69,6 +69,11 @@ final class Ep
         return self::$env;
     }
 
+    public static function getConfig(): Config
+    {
+        return self::$config;
+    }
+
     public static function getDi(): ContainerInterface
     {
         return self::$container;
@@ -82,11 +87,6 @@ final class Ep
     public static function getInjector(): InjectorInterface
     {
         return self::$container->get(InjectorInterface::class);
-    }
-
-    public static function getConfig(): Config
-    {
-        return self::$container->get(Config::class);
     }
 
     public static function getDb(string $id = null): Connection

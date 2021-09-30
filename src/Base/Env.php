@@ -19,13 +19,6 @@ final class Env
         Dotenv::create($this->repository, $basePath)->safeLoad();
     }
 
-    private function getRepository(): RepositoryInterface
-    {
-        return RepositoryBuilder::createWithDefaultAdapters()
-            ->immutable()
-            ->make();
-    }
-
     /**
      * @param  mixed $default
      * 
@@ -45,5 +38,12 @@ final class Env
             default:
                 return $value;
         }
+    }
+
+    private function getRepository(): RepositoryInterface
+    {
+        return RepositoryBuilder::createWithDefaultAdapters()
+            ->immutable()
+            ->make();
     }
 }

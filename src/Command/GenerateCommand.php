@@ -19,6 +19,8 @@ final class GenerateCommand extends Command
     {
         $this->service = $service;
 
+        $this->createDefinition('key')->setDescription('Generate secret key');
+
         $this
             ->createDefinition('model')
             ->addArgument('table', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Table name')

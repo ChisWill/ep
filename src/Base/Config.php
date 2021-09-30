@@ -98,7 +98,7 @@ final class Config
      * 
      * use Ep\Base\Config;
      * 
-     * return static fn (Config $config): array => [
+     * return static fn (Ep\Base\Config $config, array $params): array => [
      *     FooInterface::class => Foo::class
      * ];
      * 
@@ -124,10 +124,6 @@ final class Config
     {
         foreach ($config as $key => $val) {
             $this->$key = $val;
-        }
-
-        if ($this->secretKey === '') {
-            throw new InvalidArgumentException('The "secretKey" configuration is required.');
         }
     }
 

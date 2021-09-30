@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Ep\Base\Config;
 use Ep\Base\Container;
+use Ep\Base\Env;
 use Ep\Base\Injector;
 use Ep\Console\Application as ConsoleApplication;
 use Ep\Console\CommandLoader;
@@ -60,15 +61,15 @@ use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
-/**
- * @var Config $config 
- * @var string $rootPath
- */
+/** @var string $rootPath */
+
+$config = Ep::getConfig();
 
 return [
     // Base
     ContainerInterface::class => Container::class,
     InjectorInterface::class => Injector::class,
+    Env::class => Ep::getEnv(),
     Config::class => $config,
     Aliases::class => new Aliases([
         '@root' => $rootPath,
