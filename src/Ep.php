@@ -49,7 +49,7 @@ final class Ep
 
         AnnotationRegistry::registerLoader('class_exists');
 
-        if (self::$config->rootNamespace !== 'Ep') {
+        if (!self::$config->isEp()) {
             self::bootstrap();
         }
 

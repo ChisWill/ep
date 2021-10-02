@@ -96,7 +96,7 @@ final class Crypt
 
     private function validate(): void
     {
-        if (!$this->config->debug || $this->config->rootNamespace === 'Ep') {
+        if (!$this->config->debug || $this->config->isEp()) {
             return;
         }
 

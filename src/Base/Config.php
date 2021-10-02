@@ -7,6 +7,9 @@ namespace Ep\Base;
 use Closure;
 use InvalidArgumentException;
 
+/**
+ * Do not set the property after instantiation
+ */
 final class Config
 {
     /**
@@ -135,6 +138,19 @@ final class Config
         throw new InvalidArgumentException("The \"{$name}\" configuration is invalid.");
     }
 
+    /**
+     * Call before the application runs
+     */
+    public function switch(array $properties): array
+    {
+        $result = [];
+        foreach ($properties as $key => $value) {
+            $result[$key] = $this->$key;
+            $this->$key = $value;
+        }
+        return $result;
+    }
+
     public function getDi(): array
     {
         return $this->di ? call_user_func($this->di, $this, $this->params) : [];
@@ -143,5 +159,10 @@ final class Config
     public function getRouteRule(): Closure
     {
         return $this->route ?? static fn (): bool => true;
+    }
+
+    public function isEp(string $rootNamespace = null): bool
+    {
+        return ($rootNamespace ?? $this->rootNamespace) === 'Ep';
     }
 }

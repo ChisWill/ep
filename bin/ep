@@ -23,14 +23,13 @@ use Ep\Console\Input;
     $container = Ep::init(realpath($options['rootPath'] ?? './'));
     unset($options['rootPath']);
 
-    $config = Ep::getConfig();
     $options['common'] ??= [];
-    $options['common']['userRootNamespace'] = $config->rootNamespace;
-
-    $config->rootNamespace = 'Ep';
-    $config->commandSuffix = 'Command';
-    $config->actionSuffix = 'Action';
-    $config->defaultAction = 'index';
+    $options['common']['userRootNamespace'] = Ep::getConfig()->switch([
+        'rootNamespace' => 'Ep',
+        'commandSuffix' => 'Command',
+        'actionSuffix' => 'Action',
+        'defaultAction' => 'index',
+    ])['rootNamespace'];
 
     $input = $container->get(Input::class);
     foreach ($options as $name => $value) {

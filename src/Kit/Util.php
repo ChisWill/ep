@@ -50,7 +50,7 @@ final class Util
     {
         $rootNamespace ??= $this->config->rootNamespace;
         if (!isset($this->appPath[$rootNamespace])) {
-            if ($rootNamespace === 'Ep') {
+            if ($this->config->isEp($rootNamespace)) {
                 $this->appPath[$rootNamespace] = $this->aliases->get('@ep/src');
             } else {
                 $this->appPath[$rootNamespace] = $this->getAppPathByComposer($rootNamespace);
