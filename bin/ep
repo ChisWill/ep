@@ -12,12 +12,11 @@ use Ep\Console\Input;
     if (file_exists($cwd . '/ep.json')) {
         $options = json_decode(file_get_contents($cwd . '/ep.json'), true);
     } else {
-        $message = "Could not find a ep.json file in {$cwd}" . PHP_EOL;
-        fwrite(STDERR, $message);
+        fwrite(STDERR, "Could not find a ep.json file in {$cwd}" . PHP_EOL);
         exit(1);
     }
 
-    require($options['bootstrap'] ?? 'vendor/autoload.php');
+    require($options['bootstrap'] ?? './vendor/autoload.php');
     unset($options['bootstrap']);
 
     $container = Ep::init(realpath($options['rootPath'] ?? './'));
