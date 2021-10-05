@@ -42,10 +42,8 @@ abstract class Service
     {
         $new = clone $this;
         $new->request = $request;
-
         $new->initDefaultOptions();
         $new->configure();
-
         return $new;
     }
 

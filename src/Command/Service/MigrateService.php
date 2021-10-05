@@ -44,7 +44,10 @@ final class MigrateService extends Service
     {
         $this->migratePath = $this->request->getOption('path') ?? $this->defaultOptions['path'] ?? 'Migration';
         $this->basePath = $this->getAppPath() . '/' . trim($this->migratePath, '/');
-        $this->builder = new MigrateBuilder($this->getDb(), $this->consoleService);
+
+        if ($this->request->hasOption('db')) {
+            $this->builder = new MigrateBuilder($this->getDb(), $this->consoleService);
+        }
     }
 
     public function create(string $name): void

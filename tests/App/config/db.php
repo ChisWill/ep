@@ -10,8 +10,8 @@ return [
         'port' => 6379,
     ],
     'mysql' => [
-        'dsn' => 'mysql:host=127.0.0.1;dbname=test',
-        'username' => 'root',
-        'password' => '',
+        'dsn' => env('MYSQL_DSN'),
+        'username' => env('MYSQL_USERNAME'),
+        'password' => env('MYSQL_PASSWORD'),
     ]
 ];

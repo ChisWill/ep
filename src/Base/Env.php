@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
+use Ep\Contract\EnvInterface;
 use Dotenv\Dotenv;
 use Dotenv\Repository\RepositoryBuilder;
 use Dotenv\Repository\RepositoryInterface;
 
-final class Env
+final class Env implements EnvInterface
 {
     private string $rootPath;
     private RepositoryInterface $repository;
@@ -21,15 +22,29 @@ final class Env
         Dotenv::create($this->repository, $rootPath)->safeLoad();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getRootPath(): string
     {
         return $this->rootPath;
     }
 
+    private ?Config $config = null;
+
     /**
-     * @param  mixed $default
-     * 
-     * @return mixed
+     * {@inheritDoc}
+     */
+    public function getConfig(): Config
+    {
+        if ($this->config === null) {
+            $this->config = new Config(require($this->rootPath . '/config/main.php'));
+        }
+        return $this->config;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function get(string $key, $default = null)
     {
@@ -40,6 +55,8 @@ final class Env
                 return false;
             case 'null':
                 return null;
+            case 'empty':
+                return '';
             case null:
                 return $default;
             default:

@@ -128,6 +128,13 @@ class TestController extends Controller
         ]);
     }
 
+    public function mysqlAction()
+    {
+        return $this->json([
+            'result' => Query::find()->from('user')->all()
+        ]);
+    }
+
     public function tAction(ServerRequest $serverRequest)
     {
         return $this->success();

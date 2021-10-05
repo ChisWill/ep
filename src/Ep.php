@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Ep\Base\Config;
 use Ep\Base\Constant;
 use Ep\Base\Env;
+use Ep\Contract\EnvInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Kit\Annotate;
 use Ep\Kit\Util;
@@ -31,15 +32,18 @@ final class Ep
 
     private static bool $init = false;
 
-    public static function init(string $rootPath, string $configFile = 'config/main.php'): ContainerInterface
+    /**
+     * @param EnvInterface|string $env
+     */
+    public static function init($env): ContainerInterface
     {
         if (self::$init) {
             return self::$container;
         }
         self::$init = true;
 
-        self::$env = new Env($rootPath);
-        self::$config = new Config(require($rootPath . '/' . $configFile));
+        self::$env = $env instanceof EnvInterface ? $env : new Env($env);
+        self::$config = self::$env->getConfig();
 
         $definitions = self::$config->getDi() + require(dirname(__DIR__) . '/config/definitions.php');
 
