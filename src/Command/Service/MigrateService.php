@@ -257,9 +257,7 @@ final class MigrateService extends Service
 
     private function createFile(string $view, string $className, array $params = []): bool
     {
-        if (!file_exists($this->basePath)) {
-            File::mkdir($this->basePath);
-        }
+        $this->createDir();
 
         $namespace = $this->userRootNamespace . '\\' . trim(str_replace('/', '\\', $this->migratePath), '/');
 
@@ -277,6 +275,8 @@ final class MigrateService extends Service
 
     private function generateClassName(): string
     {
+        $this->createDir();
+
         $baseClassName = sprintf('M%s_', date('Ymd'));
         $files = FileHelper::findFiles($this->basePath, [
             'filter' => (new PathMatcher())->only("**{$baseClassName}*.php")
@@ -290,6 +290,13 @@ final class MigrateService extends Service
         }
 
         return $baseClassName . $suffix;
+    }
+
+    private function createDir(): void
+    {
+        if (!file_exists($this->basePath)) {
+            File::mkdir($this->basePath);
+        }
     }
 
     private function replaceFromClassName(string $className): string
