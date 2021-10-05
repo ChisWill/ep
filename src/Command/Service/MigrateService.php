@@ -250,6 +250,8 @@ final class MigrateService extends Service
 
     private function findMigrations(): array
     {
+        $this->createDir();
+
         return FileHelper::findFiles($this->basePath, [
             'filter' => (new PathMatcher())->only('**.php')
         ]);
