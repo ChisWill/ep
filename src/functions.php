@@ -8,7 +8,7 @@ if (!function_exists('t')) {
     {
         $isCli = PHP_SAPI === 'cli';
         if (!$isCli && !array_filter(headers_list(), fn ($value): bool => strpos(strtolower($value), 'content-type') === 0)) {
-            header('Content-Type:text/html;charset=utf-8');
+            header('Content-Type: text/html; charset=UTF-8');
         }
 
         $filter = function (&$value) use (&$filter): void {

@@ -33,16 +33,16 @@ final class Ep
     private static bool $init = false;
 
     /**
-     * @param EnvInterface|string $env
+     * @param EnvInterface|string $envOrRootPath
      */
-    public static function init($env): ContainerInterface
+    public static function init($envOrRootPath): ContainerInterface
     {
         if (self::$init) {
             return self::$container;
         }
         self::$init = true;
 
-        self::$env = $env instanceof EnvInterface ? $env : new Env($env);
+        self::$env = $envOrRootPath instanceof EnvInterface ? $envOrRootPath : new Env($envOrRootPath);
         self::$config = self::$env->getConfig();
 
         $definitions = self::$config->getDi() + require(dirname(__DIR__) . '/config/definitions.php');
