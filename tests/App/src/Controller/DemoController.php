@@ -23,6 +23,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
+use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
@@ -71,7 +72,7 @@ class DemoController extends Controller
             } elseif ($get) {
                 $return = $get;
             } else {
-                $return = ['hello' => 'world'];
+                $return = [];
             }
         }
         return $this->json($return);
@@ -95,14 +96,14 @@ class DemoController extends Controller
     public function requestAction(ServerRequest $request)
     {
         $result = [
-            'Method' => $request->getMethod(),
-            'All GET' => $request->getQueryParams(),
-            'All POST' => $request->getParsedBody(),
-            'Raw body' => $request->getBody()->getContents(),
-            'Cookies' => $request->getCookieParams(),
-            'Host' => $request->getUri()->getHost(),
-            'Header' => $request->getHeaders(),
-            'Path' => $request->getUri()->getPath()
+            'method' => $request->getMethod(),
+            'get' => $request->getQueryParams(),
+            'post' => $request->getParsedBody(),
+            'raw' => $request->getBody()->getContents(),
+            'cookie' => $request->getCookieParams(),
+            'host' => $request->getUri()->getHost(),
+            'header' => $request->getHeaders(),
+            'path' => $request->getUri()->getPath()
         ];
         return $this->json($result);
     }
