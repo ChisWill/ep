@@ -18,7 +18,7 @@
         "vlucas/phpdotenv": "^5.3",
         "yiisoft/active-record": "dev-master",
         "yiisoft/aliases": "^2.0",
-        "yiisoft/arrays": "^1.0",
+        "yiisoft/arrays": "^2.0",
         "yiisoft/assets": "^1.0",
         "yiisoft/auth": "^3.0",
         "yiisoft/cache-file": "^1.0",
