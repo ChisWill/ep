@@ -43,7 +43,7 @@
         "yiisoft/db-mysql": "dev-master",
         "yiisoft/db-redis": "dev-master",
         "yiisoft/db-sqlite": "dev-master",
-        "yiisoft/log-target-file": "dev-master"
+        "yiisoft/log-target-file": "^1.0"
     },
     "suggest": {
         "ext-openssl": "Allows to encrypt and decrypt"
@@ -58,9 +58,6 @@
         }
     },
     "autoload-dev": {
-        "files": [
-            "tests/App/src/functions.php"
-        ],
         "psr-4": {
             "Ep\\Tests\\": "tests",
             "Ep\\Tests\\App\\": "tests/App/src"

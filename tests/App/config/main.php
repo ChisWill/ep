@@ -16,5 +16,5 @@ return [
     'di' => require('di.php'),
     'route' => require('route.php'),
     'events' => require('events.php'),
-    'params' => import('params')
+    'params' => require('params.php')
 ];
