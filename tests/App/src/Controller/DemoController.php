@@ -6,7 +6,6 @@ namespace Ep\Tests\App\Controller;
 
 use DateInterval;
 use Ep;
-use Ep\Annotation\Configure;
 use Ep\Annotation\Route;
 use Ep\Auth\AuthRepository;
 use Ep\Auth\Method\HttpSession;
@@ -23,7 +22,6 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
-use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
@@ -32,9 +30,6 @@ use Yiisoft\Db\Redis\Connection as RedisConnection;
 use Yiisoft\Http\Method;
 use Yiisoft\Session\SessionInterface;
 
-/**
- * @Configure
- */
 class DemoController extends Controller
 {
     private Connection $db;

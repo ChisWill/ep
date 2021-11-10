@@ -45,10 +45,6 @@ final class Config
      */
     public string $commandSuffix = 'Command';
     /**
-     * Configure annotation handlers
-     */
-    public array $configureHandlers = [];
-    /**
      * Database migration table name
      */
     public string $migrationTableName = 'migration';

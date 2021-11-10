@@ -207,7 +207,7 @@ final class MigrateService extends Service
             }
             $instance = new $className();
             if (!$instance instanceof MigrateInterface) {
-                $this->error("The class {$className} is not implements " . MigrateInterface::class . ".");
+                $this->error(sprintf('The class %s is not implements %s.', $className, MigrateInterface::class));
             }
             $instances[] = $instance;
             $count++;

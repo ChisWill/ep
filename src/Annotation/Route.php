@@ -26,10 +26,8 @@ final class Route extends Configure
         }
     }
 
-    public static function handlers(): array
+    public static function handler(): string
     {
-        return [
-            BaseRoute::class
-        ];
+        return BaseRoute::class;
     }
 }

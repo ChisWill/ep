@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Ep\Base\Config;
 use Ep\Base\Constant;
 use Ep\Base\Env;
+use Ep\Contract\BootstrapInterface;
 use Ep\Contract\EnvInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Kit\Annotate;
@@ -63,8 +64,11 @@ final class Ep
     private static function bootstrap(): void
     {
         foreach (self::getCache()->get(Constant::CACHE_ANNOTATION_CONFIGURE_DATA) ?: [] as $class => $data) {
-            foreach (call_user_func([$class, 'handlers']) as $handler) {
-                self::$container->get($handler)->bootstrap($data);
+            $instance = self::$container->get(call_user_func([$class, 'handler']));
+            if ($instance instanceof BootstrapInterface) {
+                $instance->bootstrap($data);
+            } else {
+                throw new LogicException(sprintf('The class %s is not implements %s.', get_class($instance), BootstrapInterface::class));
             }
         }
     }
