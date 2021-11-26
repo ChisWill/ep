@@ -85,10 +85,6 @@ final class Config
      */
     public string $secretKey = '';
     /**
-     * The algorithm cipher
-     */
-    public string $algoCipher = 'AES-128-CBC';
-    /**
      * Params
      */
     public array $params = [];

@@ -17,5 +17,5 @@ interface EnvInterface
      * 
      * @return mixed
      */
-    public function get(string $key, $default);
+    public function get(string $key, $default = null);
 }

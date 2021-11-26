@@ -6,25 +6,31 @@ namespace Ep\Kit;
 
 use Ep\Base\Config;
 use InvalidArgumentException;
-use JsonException;
 use RuntimeException;
 
 final class Crypt
 {
     private Config $config;
-    private string $key;
-    private string $cipher;
+
+    public function __construct(Config $config)
+    {
+        $this->config = $config;
+    }
+
+    private string $method = 'AES-128-CBC';
 
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(Config $config)
+    public function withMethod(string $method): self
     {
-        $this->config = $config;
-        $this->key = base64_decode($config->secretKey);
-        $this->cipher = $config->algoCipher;
-        $this->validate();
+        $new = clone $this;
+        $new->method = $method;
+        $new->validate();
+        return $new;
     }
+
+    private ?string $key = null;
 
     /**
      * @throws InvalidArgumentException
@@ -37,34 +43,38 @@ final class Crypt
         return $new;
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
-    public function withCipher(string $cipher): self
+    private string $algo = 'sha256';
+
+    public function withHashAlgo(string $algo): self
     {
         $new = clone $this;
-        $new->cipher = $cipher;
-        $new->validate();
+        $new->algo = $algo;
         return $new;
     }
 
+    private function getKey(): string
+    {
+        if ($this->key === null) {
+            $this->key = base64_decode($this->config->secretKey);
+            $this->validate();
+        }
+        return $this->key;
+    }
+
     /**
-     * @throws JsonException
      * @throws RuntimeException
      */
     public function encrypt(string $value): string
     {
-        $length = openssl_cipher_iv_length($this->cipher);
+        $length = openssl_cipher_iv_length($this->method);
         $iv = $length ? random_bytes($length) : '';
 
-        $value = openssl_encrypt($value, $this->cipher, $this->key, 0, $iv);
+        $value = openssl_encrypt($value, $this->method, $this->getKey(), 0, $iv);
         if ($value === false) {
             throw new RuntimeException('Could not encrypt the data.');
         }
 
-        $iv = base64_encode($iv);
-
-        $mac = $this->hash($iv, $value);
+        $mac = $this->hash(base64_encode($iv), $value);
 
         return base64_encode(json_encode(compact('iv', 'value', 'mac'), JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
     }
@@ -76,9 +86,7 @@ final class Crypt
     {
         $payload = $this->getJsonPayload($payload);
 
-        $iv = base64_decode($payload['iv']);
-
-        $decrypted = openssl_decrypt($payload['value'], $this->cipher, $this->key, 0, $iv);
+        $decrypted = openssl_decrypt($payload['value'], $this->method, $this->getKey(), 0, base64_decode($payload['iv']));
 
         if ($decrypted === false) {
             throw new RuntimeException('Could not decrypt the data.');
@@ -89,23 +97,23 @@ final class Crypt
 
     public function generateKey(): string
     {
-        $length = explode('-', $this->cipher)[1] ?? '';
+        $length = explode('-', $this->method)[1] ?? '';
         $length = is_numeric($length) ? (int) $length : 128;
         return random_bytes($length / 8);
     }
 
     private function validate(): void
     {
-        if (!$this->config->debug || $this->config->isEp()) {
+        if (!$this->config->debug) {
             return;
         }
 
-        $cipher = strtolower($this->cipher);
-        if (!in_array($cipher, openssl_get_cipher_methods())) {
-            throw new InvalidArgumentException('Invalid cipher "' . $this->cipher . '".');
+        $method = strtolower($this->method);
+        if (!in_array($method, openssl_get_cipher_methods())) {
+            throw new InvalidArgumentException('Invalid cipher method "' . $this->method . '".');
         }
 
-        $pieces = explode('-', $cipher);
+        $pieces = explode('-', $method);
         if (count($pieces) <= 2) {
             return;
         }
@@ -114,7 +122,7 @@ final class Crypt
             throw new InvalidArgumentException('The supported cipher modes are CBC, CFB, CTR, ECB and OFB.');
         }
 
-        if (strlen($this->key) !== intval($pieces[1]) / 8) {
+        if (strlen($this->getKey()) !== intval($pieces[1]) / 8) {
             throw new InvalidArgumentException('The secret key length is not correct.');
         }
     }
@@ -152,6 +160,6 @@ final class Crypt
 
     private function hash(string $iv, string $value): string
     {
-        return hash_hmac('sha256', $iv . $value, $this->key);
+        return hash_hmac($this->algo, $iv . $value, $this->getKey());
     }
 }

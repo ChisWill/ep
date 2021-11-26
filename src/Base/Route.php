@@ -18,12 +18,6 @@ use function FastRoute\cachedDispatcher;
 
 final class Route implements BootstrapInterface
 {
-    private const DEFAULT_ROUTE_RULE = [
-        Method::ALL,
-        '{prefix:[\w/-]*?}{controller:/?[a-zA-Z][\w-]*|}{action:/?[a-zA-Z][\w-]*|}',
-        '<prefix>/<controller>/<action>'
-    ];
-
     private Config $config;
     private Aliases $aliases;
 
@@ -61,21 +55,34 @@ final class Route implements BootstrapInterface
         }
     }
 
+    private bool $enableDefaultRule = true;
+
+    public function withEnableDefaultRule(bool $enableDefaultRule): self
+    {
+        $new = clone $this;
+        $new->enableDefaultRule = $enableDefaultRule;
+        return $new;
+    }
+
+    private array $defaultRule = [
+        Method::ALL,
+        '{prefix:[\w/-]*?}{controller:/?[a-zA-Z][\w-]*|}{action:/?[a-zA-Z][\w-]*|}',
+        '<prefix>/<controller>/<action>'
+    ];
+
+    public function withDefaultRule(array $rule): self
+    {
+        $new = clone $this;
+        $new->defaultRule = $rule;
+        return $new;
+    }
+
     private string $baseUrl = '';
 
     public function withBaseUrl(string $baseUrl): self
     {
         $new = clone $this;
         $new->baseUrl = $baseUrl;
-        return $new;
-    }
-
-    private bool $enableDefaultRoute = true;
-
-    public function withEnableDefaultRoute(bool $enableDefaultRoute): self
-    {
-        $new = clone $this;
-        $new->enableDefaultRoute = $enableDefaultRoute;
         return $new;
     }
 
@@ -101,8 +108,8 @@ final class Route implements BootstrapInterface
 
                 $route->addGroup($this->baseUrl, $this->getAnnotationRule());
 
-                if ($this->enableDefaultRoute) {
-                    $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...self::DEFAULT_ROUTE_RULE));
+                if ($this->enableDefaultRule) {
+                    $route->addGroup($this->baseUrl, fn (RouteCollector $r) => $r->addRoute(...$this->defaultRule));
                 }
             }, [
                 'cacheFile' => $this->aliases->get($this->config->runtimeDir . '/route.cache'),
