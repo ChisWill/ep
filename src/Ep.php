@@ -60,7 +60,7 @@ final class Ep
 
         AnnotationRegistry::registerLoader('class_exists');
 
-        if (!self::$config->isEp()) {
+        if (!self::isSelf()) {
             self::bootstrap();
         }
 
@@ -128,5 +128,10 @@ final class Ep
                     ->get(Util::class)
                     ->getClassList(self::$config->rootNamespace)
             );
+    }
+
+    public static function isSelf(string $rootNamespace = null): bool
+    {
+        return ($rootNamespace ?? self::$config->rootNamespace) === 'Ep';
     }
 }

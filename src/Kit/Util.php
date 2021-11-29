@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Kit;
 
+use Ep;
 use Ep\Base\Config;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Files\FileHelper;
@@ -50,7 +51,7 @@ final class Util
     {
         $rootNamespace ??= $this->config->rootNamespace;
         if (!isset($this->appPath[$rootNamespace])) {
-            if ($this->config->isEp($rootNamespace)) {
+            if (Ep::isSelf($rootNamespace)) {
                 $this->appPath[$rootNamespace] = $this->aliases->get('@ep/src');
             } else {
                 $this->appPath[$rootNamespace] = $this->getAppPathByComposer($rootNamespace);

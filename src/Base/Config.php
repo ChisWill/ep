@@ -152,9 +152,4 @@ final class Config
     {
         return $this->route ?? static fn (): bool => true;
     }
-
-    public function isEp(string $rootNamespace = null): bool
-    {
-        return ($rootNamespace ?? $this->rootNamespace) === 'Ep';
-    }
 }
