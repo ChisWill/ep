@@ -13,6 +13,7 @@ use Ep\Kit\Util;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Di\Container as YiiContainer;
+use Yiisoft\Di\ContainerConfig;
 use Yiisoft\Factory\Factory;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -48,7 +49,12 @@ final class Ep
 
         $definitions = self::$config->getDi() + require(dirname(__DIR__) . '/config/definitions.php');
 
-        self::$container = (new YiiContainer($definitions, [], [], self::$config->debug))->get(ContainerInterface::class);
+        self::$container = (new YiiContainer(
+            ContainerConfig::create()
+                ->withDefinitions($definitions)
+                ->withValidate(self::$config->debug)
+        ))
+            ->get(ContainerInterface::class);
         self::$factory = self::$container->get(Factory::class);
         self::$factory->setMultiple($definitions);
 

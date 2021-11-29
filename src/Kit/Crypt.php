@@ -74,9 +74,9 @@ final class Crypt
             throw new RuntimeException('Could not encrypt the data.');
         }
 
-        $mac = $this->hash(base64_encode($iv), $value);
+        $mac = $this->hash($iv = base64_encode($iv), $value);
 
-        return base64_encode(json_encode(compact('iv', 'value', 'mac'), JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+        return base64_encode(json_encode(compact('iv', 'value', 'mac'), JSON_UNESCAPED_SLASHES));
     }
 
     /**

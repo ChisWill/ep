@@ -11,6 +11,7 @@ use Yiisoft\Http\Status;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use JsonException;
 use SplFileInfo;
 
 final class Service
@@ -42,13 +43,15 @@ final class Service
 
     /**
      * @param mixed $data
+     * 
+     * @throws JsonException
      */
     public function json($data = []): ResponseInterface
     {
         $response = $this->responseFactory
             ->createResponse(Status::OK)
             ->withHeader(Header::CONTENT_TYPE, 'application/json; charset=UTF-8');
-        $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
         return $response;
     }
 
