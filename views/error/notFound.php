@@ -1,6 +1,6 @@
 <?php
 
-use Ep\Contract\NotFoundException;
+use Ep\Exception\NotFoundException;
 
 /**
  * @var string            $path

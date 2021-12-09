@@ -13,7 +13,7 @@ use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\TableSchema;
 use Yiisoft\Strings\StringHelper;
 use Psr\Container\ContainerInterface;
-use LogicException;
+use InvalidArgumentException;
 
 final class GenerateService extends Service
 {
@@ -125,7 +125,7 @@ final class GenerateService extends Service
     {
         $file = $this->util->rootPath('.env');
         if (!file_exists($file)) {
-            throw new LogicException('The environment file ".env" is not exists.');
+            throw new InvalidArgumentException('The environment file ".env" is not exists.');
         }
 
         $count = 0;
@@ -137,7 +137,7 @@ final class GenerateService extends Service
             $count
         );
         if ($count === 0) {
-            throw new LogicException('The configure "SECRET_KEY" is not exists.');
+            throw new InvalidArgumentException('The configure "SECRET_KEY" is not exists.');
         }
 
         file_put_contents($file, $data);

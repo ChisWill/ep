@@ -8,7 +8,7 @@ use Ep\Helper\Batch;
 use Ep\Widget\Paginator;
 use Yiisoft\ActiveRecord\ActiveQuery as BaseActiveQuery;
 use Yiisoft\Db\Expression\Expression;
-use LogicException;
+use InvalidArgumentException;
 
 class ActiveQuery extends BaseActiveQuery
 {
@@ -32,12 +32,12 @@ class ActiveQuery extends BaseActiveQuery
     }
 
     /**
-     * @throws LogicException
+     * @throws InvalidArgumentException
      */
     public function reduce(int &$startId, callable ...$callbacks): array
     {
         if (count($callbacks) === 0) {
-            throw new LogicException('It must be at least one callback.');
+            throw new InvalidArgumentException('It must be at least one callback.');
         }
 
         return Batch::reduce($this->getBatchProducer($this->getPrimaryKey(), $startId), ...$callbacks);
@@ -49,13 +49,13 @@ class ActiveQuery extends BaseActiveQuery
     }
 
     /**
-     * @throws LogicException
+     * @throws InvalidArgumentException
      */
     private function getPrimaryKey(): string
     {
         $primaryKey = $this->getARClass()::PK;
         if (is_array($primaryKey)) {
-            throw new LogicException('Don\'t support composite primary key.');
+            throw new InvalidArgumentException('Don\'t support composite primary key.');
         }
 
         return $primaryKey;

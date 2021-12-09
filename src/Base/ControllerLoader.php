@@ -6,12 +6,11 @@ namespace Ep\Base;
 
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\ModuleInterface;
-use Ep\Contract\NotFoundException;
+use Ep\Exception\NotFoundException;
 use Ep\Helper\Str;
 use Ep\Result\ControllerLoaderResult;
 use Psr\Container\ContainerInterface;
 use InvalidArgumentException;
-use LogicException;
 
 final class ControllerLoader
 {
@@ -39,7 +38,6 @@ final class ControllerLoader
      * @param  mixed $handler
      * 
      * @throws InvalidArgumentException
-     * @throws LogicException
      * @throws NotFoundException
      */
     public function parse($handler): ControllerLoaderResult
@@ -57,7 +55,6 @@ final class ControllerLoader
      * @param  string|array $handler
      * 
      * @throws InvalidArgumentException
-     * @throws LogicException
      */
     public function parseHandler($handler): array
     {
@@ -67,7 +64,7 @@ final class ControllerLoader
             case 'array':
                 return $this->parseArrayHandler($handler);
             default:
-                throw new LogicException('The route handler is invalid.');
+                throw new InvalidArgumentException('The route handler is invalid.');
         }
     }
 

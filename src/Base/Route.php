@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep\Contract\BootstrapInterface;
-use Ep\Contract\NotFoundException;
+use Ep\Exception\NotFoundException;
 use Ep\Helper\Str;
 use Doctrine\Common\Annotations\Annotation\Target;
 use FastRoute\Dispatcher;

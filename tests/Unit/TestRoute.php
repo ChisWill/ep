@@ -6,7 +6,7 @@ namespace Ep\Tests\Unit;
 
 use Ep;
 use Ep\Base\Route;
-use Ep\Contract\NotFoundException;
+use Ep\Exception\NotFoundException;
 use FastRoute\RouteCollector;
 use PHPUnit\Framework\TestCase;
 

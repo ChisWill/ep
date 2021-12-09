@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ep\Db;
 
 use Ep;
-use Ep\Contract\NotFoundException;
+use Ep\Exception\NotFoundException;
 use Ep\Helper\Date;
 use Ep\Helper\Str;
 use Ep\Helper\System;

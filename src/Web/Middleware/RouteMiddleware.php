@@ -6,7 +6,7 @@ namespace Ep\Web\Middleware;
 
 use Ep\Base\Config;
 use Ep\Base\Route;
-use Ep\Contract\NotFoundException;
+use Ep\Exception\NotFoundException;
 use Ep\Web\ControllerRunner;
 use Ep\Web\Service;
 use Yiisoft\Http\Status;

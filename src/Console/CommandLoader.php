@@ -8,7 +8,7 @@ use Ep\Base\Config;
 use Ep\Base\ControllerLoader;
 use Ep\Base\Route;
 use Ep\Contract\ConsoleFactoryInterface;
-use Ep\Contract\NotFoundException;
+use Ep\Exception\NotFoundException;
 use Ep\Helper\Str;
 use Ep\Kit\Util;
 use Ep\Result\ControllerLoaderResult;
@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Yiisoft\Files\FileHelper;
 use Yiisoft\Files\PathMatcher\PathMatcher;
-use LogicException;
+use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -128,7 +128,7 @@ final class CommandLoader implements CommandLoaderInterface
     private array $commandNames = [];
 
     /**
-     * @throws LogicException
+     * @throws InvalidArgumentException
      * @throws NotFoundException
      */
     private function parse(string $name): string

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ep\Base;
 
 use Ep;
-use LogicException;
+use InvalidArgumentException;
 
 abstract class Facade
 {
@@ -33,7 +33,7 @@ abstract class Facade
 
     protected static function getFacadeAccessor(): string
     {
-        throw new LogicException(sprintf('%s does not implement method %s().', static::class, __FUNCTION__));
+        throw new InvalidArgumentException(sprintf('%s does not implement method %s().', static::class, __FUNCTION__));
     }
 
     private static function getInstance(): object

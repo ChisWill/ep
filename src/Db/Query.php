@@ -10,7 +10,7 @@ use Ep\Widget\Paginator;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\Query as BaseQuery;
-use LogicException;
+use InvalidArgumentException;
 
 class Query extends BaseQuery
 {
@@ -94,13 +94,13 @@ class Query extends BaseQuery
     /**
      * @param  callable[] $callbacks 最后一个参数如果是字符串，表示主键字段名称
      * 
-     * @throws LogicException
+     * @throws InvalidArgumentException
      */
     public function reduce(int &$startId = 0, ...$callbacks): array
     {
         $count = count($callbacks);
         if ($count === 0 || !is_callable($callbacks[0])) {
-            throw new LogicException('It must be at least one callback.');
+            throw new InvalidArgumentException('It must be at least one callback.');
         }
 
         if (is_string($callbacks[$count - 1])) {

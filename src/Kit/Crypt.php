@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Ep\Kit;
 
 use Ep\Base\Config;
+use Ep\Exception\CryptException;
 use InvalidArgumentException;
-use RuntimeException;
 
 final class Crypt
 {
@@ -62,7 +62,7 @@ final class Crypt
     }
 
     /**
-     * @throws RuntimeException
+     * @throws CryptException
      */
     public function encrypt(string $value): string
     {
@@ -71,7 +71,7 @@ final class Crypt
 
         $value = openssl_encrypt($value, $this->method, $this->getKey(), 0, $iv);
         if ($value === false) {
-            throw new RuntimeException('Could not encrypt the data.');
+            throw new CryptException('Could not encrypt the data.');
         }
 
         $mac = $this->hash($iv = base64_encode($iv), $value);
@@ -80,7 +80,7 @@ final class Crypt
     }
 
     /**
-     * @throws RuntimeException
+     * @throws CryptException
      */
     public function decrypt(string $payload): string
     {
@@ -89,7 +89,7 @@ final class Crypt
         $decrypted = openssl_decrypt($payload['value'], $this->method, $this->getKey(), 0, base64_decode($payload['iv']));
 
         if ($decrypted === false) {
-            throw new RuntimeException('Could not decrypt the data.');
+            throw new CryptException('Could not decrypt the data.');
         }
 
         return $decrypted;
@@ -132,11 +132,11 @@ final class Crypt
         $payload = json_decode(base64_decode($payload), true);
 
         if (!$this->validatePayload($payload)) {
-            throw new RuntimeException('The payload is invalid.');
+            throw new CryptException('The payload is invalid.');
         }
 
         if (!$this->validateMac($payload)) {
-            throw new RuntimeException('The MAC is invalid.');
+            throw new CryptException('The MAC is invalid.');
         }
 
         return $payload;
