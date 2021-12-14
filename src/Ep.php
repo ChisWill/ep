@@ -56,7 +56,7 @@ final class Ep
         ))
             ->get(ContainerInterface::class);
         self::$factory = self::$container->get(Factory::class);
-        self::$factory->setMultiple($definitions);
+        self::$factory = self::$factory->withDefinitions($definitions);
 
         AnnotationRegistry::registerLoader('class_exists');
 
