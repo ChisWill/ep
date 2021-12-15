@@ -19,7 +19,7 @@
         "yiisoft/active-record": "dev-master",
         "yiisoft/aliases": "^2.0",
         "yiisoft/arrays": "^2.0",
-        "yiisoft/assets": "^1.0",
+        "yiisoft/assets": "^2.0",
         "yiisoft/auth": "^3.0",
         "yiisoft/cache-file": "^1.0",
         "yiisoft/db": "dev-master",

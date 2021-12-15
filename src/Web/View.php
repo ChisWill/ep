@@ -46,7 +46,7 @@ final class View extends BaseView
 
     public function register(array $bundles = []): void
     {
-        $this->assetManager->register($bundles, self::POSITION_END, self::POSITION_HEAD);
+        $this->assetManager->registerMany($bundles, self::POSITION_END, self::POSITION_HEAD);
 
         $this->registerFiles('JS', $this->assetManager->getJsFiles());
         $this->registerFiles('CSS', $this->assetManager->getCssFiles());

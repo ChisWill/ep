@@ -11,9 +11,7 @@ class CommonAsset extends AssetBundle
 {
     public ?string $baseUrl = '/assets';
 
-    public ?string $basePath = '@root/public/assets';
-
-    public ?string $sourcePath = '@root/static';
+    public ?string $basePath = '@root/static';
 
     public array $js = [
         'js/common.js',
