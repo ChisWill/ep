@@ -7,6 +7,7 @@ use Ep\Base\Constant;
 use Ep\Base\Env;
 use Ep\Contract\BootstrapInterface;
 use Ep\Contract\EnvInterface;
+use Ep\Contract\FactoryInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Kit\Annotate;
 use Ep\Kit\Util;
@@ -14,7 +15,6 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Di\Container as YiiContainer;
 use Yiisoft\Di\ContainerConfig;
-use Yiisoft\Factory\Factory;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -26,7 +26,6 @@ final class Ep
     private static Env $env;
     private static Config $config;
     private static ContainerInterface $container;
-    private static Factory $factory;
 
     private function __construct()
     {
@@ -55,8 +54,8 @@ final class Ep
                 ->withValidate(self::$config->debug)
         ))
             ->get(ContainerInterface::class);
-        self::$factory = self::$container->get(Factory::class);
-        self::$factory = self::$factory->withDefinitions($definitions);
+
+        self::getFactory()->setDefinitions($definitions);
 
         AnnotationRegistry::registerLoader('class_exists');
 
@@ -94,9 +93,9 @@ final class Ep
         return self::$container;
     }
 
-    public static function getFactory(): Factory
+    public static function getFactory(): FactoryInterface
     {
-        return self::$factory;
+        return self::$container->get(FactoryInterface::class);
     }
 
     public static function getInjector(): InjectorInterface

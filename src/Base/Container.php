@@ -19,7 +19,7 @@ final class Container implements ContainerInterface
         $this->annotate = (new Injector($container))->make(Annotate::class, [$this]);
     }
 
-    private array $exists = [];
+    private array $flags = [];
 
     /**
      * {@inheritDoc}
@@ -28,8 +28,8 @@ final class Container implements ContainerInterface
     {
         $instance = $this->container->get($id);
 
-        if (!isset($this->exists[$id])) {
-            $this->exists[$id] = true;
+        if (!isset($this->flags[$id])) {
+            $this->flags[$id] = true;
             $this->annotate->property($instance);
         }
 
