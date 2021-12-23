@@ -5,14 +5,12 @@ declare(strict_types=1);
 use Ep\Base\Config;
 use Ep\Base\Container;
 use Ep\Base\Env;
-use Ep\Base\Factory;
 use Ep\Base\Injector;
 use Ep\Console\Application as ConsoleApplication;
 use Ep\Console\CommandLoader;
 use Ep\Console\EventDispatcher;
 use Ep\Console\Factory as ConsoleFactory;
 use Ep\Contract\ConsoleFactoryInterface;
-use Ep\Contract\FactoryInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Contract\NotFoundHandlerInterface;
 use Ep\Web\NotFoundHandler;
@@ -44,7 +42,6 @@ use Yiisoft\Definitions\Reference;
 use Yiisoft\EventDispatcher\Dispatcher\Dispatcher;
 use Yiisoft\EventDispatcher\Provider\ListenerCollection;
 use Yiisoft\EventDispatcher\Provider\Provider;
-use Yiisoft\Factory\Factory as YiiFactory;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target;
 use Yiisoft\Profiler\Profiler;
@@ -71,7 +68,6 @@ return [
     // Base
     ContainerInterface::class => Container::class,
     InjectorInterface::class => Injector::class,
-    FactoryInterface::class => Factory::class,
     Env::class => $env,
     Config::class => $config,
     Aliases::class => new Aliases([
@@ -79,14 +75,6 @@ return [
         '@vendor' => $config->vendorPath,
         '@ep' => dirname(__DIR__)
     ] + $config->aliases),
-    YiiFactory::class => [
-        'class' => YiiFactory::class,
-        '__construct()' => [
-            Reference::to(ContainerInterface::class),
-            [],
-            $config->debug
-        ]
-    ],
     // Annotation
     Reader::class => static fn (CacheItemPoolInterface $cache): Reader => $config->debug ? new AnnotationReader() : new PsrCachedReader(new AnnotationReader(), $cache, false),
     // Console

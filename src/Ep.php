@@ -7,7 +7,6 @@ use Ep\Base\Constant;
 use Ep\Base\Env;
 use Ep\Contract\BootstrapInterface;
 use Ep\Contract\EnvInterface;
-use Ep\Contract\FactoryInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Kit\Annotate;
 use Ep\Kit\Util;
@@ -15,6 +14,7 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Di\Container as YiiContainer;
 use Yiisoft\Di\ContainerConfig;
+use Yiisoft\Factory\Factory;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -47,15 +47,9 @@ final class Ep
         self::$config = self::$env->getConfig();
 
         $definitions = self::$config->getDi() + require(dirname(__DIR__) . '/config/definitions.php');
+        $definitions[Factory::class] = static fn (ContainerInterface $container) => new Factory($container, $definitions, self::$config->debug);
 
-        self::$container = (new YiiContainer(
-            ContainerConfig::create()
-                ->withDefinitions($definitions)
-                ->withValidate(self::$config->debug)
-        ))
-            ->get(ContainerInterface::class);
-
-        self::getFactory()->setDefinitions($definitions);
+        self::$container = (new YiiContainer(self::createContainerConfig($definitions)))->get(ContainerInterface::class);
 
         AnnotationRegistry::registerLoader('class_exists');
 
@@ -64,6 +58,13 @@ final class Ep
         }
 
         return self::$container;
+    }
+
+    private static function createContainerConfig(array $definitions): ContainerConfig
+    {
+        return ContainerConfig::create()
+            ->withDefinitions($definitions)
+            ->withValidate(self::$config->debug);
     }
 
     private static function bootstrap(): void
@@ -93,9 +94,9 @@ final class Ep
         return self::$container;
     }
 
-    public static function getFactory(): FactoryInterface
+    public static function getFactory(): Factory
     {
-        return self::$container->get(FactoryInterface::class);
+        return self::$container->get(Factory::class);
     }
 
     public static function getInjector(): InjectorInterface

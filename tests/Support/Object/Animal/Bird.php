@@ -4,20 +4,14 @@ declare(strict_types=1);
 
 namespace Ep\Tests\Support\Object\Animal;
 
-use Ep\Annotation\Inject;
 use Ep\Tests\Support\Object\Wing\WingInterface;
 
 class Bird extends Animal
 {
-    /**
-     * @Inject
-     */
-    private WingInterface $wing;
-
-    // public function __construct(WingInterface $wing)
-    // {
-    //     $this->wing = $wing;
-    // }
+    public function __construct(WingInterface $wing)
+    {
+        $this->wing = $wing;
+    }
 
     public function getName(): string
     {

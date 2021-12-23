@@ -17,6 +17,7 @@ use Ep\Tests\App\Facade\Cache as FacadeCache;
 use Ep\Tests\App\Facade\Logger;
 use Ep\Tests\App\Form\TestForm;
 use Ep\Tests\App\Model\Student;
+use Ep\Tests\Support\Object\Animal\Bird;
 use Ep\Web\ServerRequest;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -27,6 +28,7 @@ use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Redis\Connection as RedisConnection;
+use Yiisoft\Factory\Factory;
 use Yiisoft\Http\Method;
 use Yiisoft\Session\SessionInterface;
 
@@ -361,6 +363,19 @@ class DemoController extends Controller
         }
 
         return $this->string('Logined');
+    }
+
+    public function factoryAction(Factory $factory)
+    {
+        $bird1 = $factory->create(Bird::class);
+
+        $bird2 = $factory->create(Bird::class);
+
+        return $this->json([
+            'ref' => $bird1 === $bird2,
+            'name' => get_class($bird1) === Bird::class,
+            'value' => $bird1->getSpeed() === 30
+        ]);
     }
 
     public function testAction()

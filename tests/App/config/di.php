@@ -65,6 +65,11 @@ return static fn (Config $config, array $params): array => [
     ],
 
     // Others
-    WingInterface::class => AngelWing::class,
+    WingInterface::class => [
+        'class' => AngelWing::class,
+        'addSpeed()' => [
+            20
+        ]
+    ],
     EngineInterface::class => SteamEngine::class
 ];

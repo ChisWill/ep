@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Ep\Web;
 
 use Ep\Base\View as BaseView;
-use Ep\Contract\FactoryInterface;
 use Ep\Web\Event\BeginBody;
 use Ep\Web\Event\BeginPage;
 use Ep\Web\Event\EndBody;
 use Ep\Web\Event\EndPage;
 use Ep\Web\Event\Head;
 use Yiisoft\Assets\AssetManager;
+use Yiisoft\Factory\Factory;
 use Yiisoft\Html\Html;
 use Yiisoft\Html\Tag\Script;
 use Yiisoft\Html\Tag\Style;
@@ -35,7 +35,7 @@ final class View extends BaseView
 
     public function __construct(
         ContainerInterface $container,
-        FactoryInterface $factory,
+        Factory $factory,
         EventDispatcherInterface $eventDispatcher
     ) {
         parent::__construct($container);
