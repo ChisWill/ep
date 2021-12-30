@@ -14,6 +14,7 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Di\Container as YiiContainer;
 use Yiisoft\Di\ContainerConfig;
+use Yiisoft\Di\ContainerConfigInterface;
 use Yiisoft\Factory\Factory;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -60,7 +61,7 @@ final class Ep
         return self::$container;
     }
 
-    private static function createContainerConfig(array $definitions): ContainerConfig
+    private static function createContainerConfig(array $definitions): ContainerConfigInterface
     {
         return ContainerConfig::create()
             ->withDefinitions($definitions)

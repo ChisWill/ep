@@ -8,16 +8,16 @@ use Ep\Base\ErrorHandler;
 use Ep\Contract\NotFoundHandlerInterface;
 use Ep\Web\Middleware\InterceptorMiddleware;
 use Ep\Web\Middleware\RouteMiddleware;
+use HttpSoft\Emitter\SapiEmitter;
+use HttpSoft\ServerRequest\ServerRequestCreator;
 use Yiisoft\Http\Method;
 use Yiisoft\Session\SessionMiddleware;
-use Yiisoft\Yii\Web\SapiEmitter;
-use Yiisoft\Yii\Web\ServerRequestFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class Application
 {
-    private ServerRequestFactory $serverRequestFactory;
+    private ServerRequestCreator $serverRequestCreator;
     private RequestHandlerFactory $requestHandlerFactory;
     private SapiEmitter $sapiEmitter;
     private ErrorHandler $errorHandler;
@@ -25,14 +25,14 @@ final class Application
     private NotFoundHandlerInterface $notFoundHandler;
 
     public function __construct(
-        ServerRequestFactory $serverRequestFactory,
+        ServerRequestCreator $serverRequestCreator,
         RequestHandlerFactory $requestHandlerFactory,
         SapiEmitter $sapiEmitter,
         ErrorHandler $errorHandler,
         ErrorRenderer $errorRenderer,
         NotFoundHandlerInterface $notFoundHandler
     ) {
-        $this->serverRequestFactory = $serverRequestFactory;
+        $this->serverRequestCreator = $serverRequestCreator;
         $this->requestHandlerFactory = $requestHandlerFactory;
         $this->sapiEmitter = $sapiEmitter;
         $this->errorHandler = $errorHandler;
@@ -64,7 +64,7 @@ final class Application
 
     public function createRequest(): ServerRequestInterface
     {
-        return new ServerRequest($this->serverRequestFactory->createFromGlobals());
+        return new ServerRequest($this->serverRequestCreator->createFromGlobals());
     }
 
     public function register(ServerRequestInterface $request): void
