@@ -16,20 +16,17 @@ final class Application extends SymfonyApplication
     private InputInterface $input;
     private OutputInterface $output;
     private ConsoleFactoryInterface $factory;
-    private ErrorHandler $errorHandler;
     private ErrorRenderer $errorRenderer;
 
     public function __construct(
         InputInterface $input,
         OutputInterface $output,
         ConsoleFactoryInterface $factory,
-        ErrorHandler $errorHandler,
         ErrorRenderer $errorRenderer
     ) {
         $this->input = $input;
         $this->output = $output;
         $this->factory = $factory;
-        $this->errorHandler = $errorHandler;
         $this->errorRenderer = $errorRenderer;
 
         parent::__construct('Ep', Ep::VERSION);
@@ -43,9 +40,8 @@ final class Application extends SymfonyApplication
         $input ??= $this->input;
         $output ??= $this->output;
 
-        $this->errorHandler->register(
-            $this->factory->createRequest($input),
-            $this->errorRenderer
+        (new ErrorHandler($this->errorRenderer))->register(
+            $this->factory->createRequest($input)
         );
 
         return parent::run($input, $output);

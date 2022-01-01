@@ -12,13 +12,16 @@ final class ErrorHandler
 {
     private ErrorRendererInterface $errorRenderer;
 
+    public function __construct(ErrorRendererInterface $errorRenderer)
+    {
+        $this->errorRenderer = $errorRenderer;
+    }
+
     /**
      * @param mixed $request
      */
-    public function register($request, ErrorRendererInterface $errorRenderer): void
+    public function register($request): void
     {
-        $this->errorRenderer = $errorRenderer;
-
         set_exception_handler(fn (Throwable $e) => $this->handleException($e, $request));
         set_error_handler([$this, 'handleError']);
         register_shutdown_function([$this, 'handleFatalError'], $request);

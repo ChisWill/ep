@@ -20,7 +20,6 @@ final class Application
     private ServerRequestCreator $serverRequestCreator;
     private RequestHandlerFactory $requestHandlerFactory;
     private SapiEmitter $sapiEmitter;
-    private ErrorHandler $errorHandler;
     private ErrorRenderer $errorRenderer;
     private NotFoundHandlerInterface $notFoundHandler;
 
@@ -28,14 +27,12 @@ final class Application
         ServerRequestCreator $serverRequestCreator,
         RequestHandlerFactory $requestHandlerFactory,
         SapiEmitter $sapiEmitter,
-        ErrorHandler $errorHandler,
         ErrorRenderer $errorRenderer,
         NotFoundHandlerInterface $notFoundHandler
     ) {
         $this->serverRequestCreator = $serverRequestCreator;
         $this->requestHandlerFactory = $requestHandlerFactory;
         $this->sapiEmitter = $sapiEmitter;
-        $this->errorHandler = $errorHandler;
         $this->errorRenderer = $errorRenderer;
         $this->notFoundHandler = $notFoundHandler;
     }
@@ -69,7 +66,7 @@ final class Application
 
     public function register(ServerRequestInterface $request): void
     {
-        $this->errorHandler->register($request, $this->errorRenderer);
+        (new ErrorHandler($this->errorRenderer))->register($request);
     }
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
