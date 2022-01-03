@@ -10,8 +10,8 @@ use Ep\Helper\Date;
 use Ep\Helper\Str;
 use Ep\Helper\System;
 use Ep\Widget\FormTrait;
-use Yiisoft\ActiveRecord\ActiveQuery as BaseActiveQuery;
-use Yiisoft\ActiveRecord\ActiveRecord as BaseActiveRecord;
+use Yiisoft\ActiveRecord\ActiveQueryInterface;
+use Yiisoft\ActiveRecord\ActiveRecord as YiiActiveRecord;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Http\Method;
@@ -19,7 +19,7 @@ use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Strings\StringHelper;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
+abstract class ActiveRecord extends YiiActiveRecord implements DataSetInterface
 {
     use FormTrait;
 
@@ -30,14 +30,15 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     public const YES = 1;
     public const NO = -1;
 
-    public function __construct(?ConnectionInterface $db = null)
+    public function __construct(ConnectionInterface $db = null)
     {
-        parent::__construct($db ?: Ep::getDb());
+        parent::__construct($db ?? Ep::getDb());
     }
 
-    public static function find(?ConnectionInterface $db = null): ActiveQuery
+    public static function find(ConnectionInterface $db = null): ActiveQuery
     {
-        return (new ActiveQuery(static::class, $db ?: Ep::getDb()))->alias(static::getAlias());
+        return (new ActiveQuery(static::class, $db ?? Ep::getDb()))
+            ->alias(static::getAlias());
     }
 
     /**
@@ -73,12 +74,14 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
             if (is_scalar($condition) && is_string(static::PK)) {
                 $condition = [static::PK => $condition];
             }
+
             $model = static::find($db)
                 ->where($condition)
                 ->one();
             if ($model === null) {
-                throw new NotFoundException('Data is not found.');
+                throw new NotFoundException('Data does not exists.');
             }
+
             return $model;
         }
     }
@@ -86,7 +89,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     /**
      * {@inheritDoc}
      */
-    public function hasOne($class, array $link): BaseActiveQuery
+    public function hasOne($class, array $link): ActiveQueryInterface
     {
         return parent::hasOne($class, $link)
             ->alias(lcfirst(Str::ltrim(System::getCallerMethod(), 'get')));
@@ -95,7 +98,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     /**
      * {@inheritDoc}
      */
-    public function hasMany($class, array $link): BaseActiveQuery
+    public function hasMany($class, array $link): ActiveQueryInterface
     {
         return parent::hasMany($class, $link)
             ->alias(lcfirst(Str::ltrim(System::getCallerMethod(), 'get')));
@@ -104,7 +107,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     /**
      * {@inheritDoc}
      */
-    public function save(?array $attributeNames = null): bool
+    public function save(array $attributeNames = null): bool
     {
         if ($this->validate()) {
             return parent::save($attributeNames);
@@ -116,7 +119,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     /**
      * {@inheritDoc}
      */
-    public function insert(?array $attributes = null): bool
+    public function insert(array $attributes = null): bool
     {
         foreach (array_intersect($this->attributes(), [static::CREATED_AT, static::UPDATED_AT]) as $field) {
             $this->$field = Date::fromUnix();
@@ -127,7 +130,7 @@ abstract class ActiveRecord extends BaseActiveRecord implements DataSetInterface
     /**
      * {@inheritDoc}
      */
-    public function update(?array $attributeNames = null)
+    public function update(array $attributeNames = null)
     {
         if (in_array(static::UPDATED_AT, $this->attributes())) {
             $this->{static::UPDATED_AT} = Date::fromUnix();

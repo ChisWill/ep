@@ -55,7 +55,7 @@ final class Crypt
     private function getKey(): string
     {
         if ($this->key === null) {
-            $this->key = base64_decode($this->config->secretKey);
+            $this->key = base64_decode($this->config->secretKey ?? '');
             $this->validate();
         }
         return $this->key;

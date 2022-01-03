@@ -9,16 +9,16 @@ use Ep\Helper\Batch;
 use Ep\Widget\Paginator;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Query\Query as BaseQuery;
+use Yiisoft\Db\Query\Query as YiiQuery;
 use InvalidArgumentException;
 
-class Query extends BaseQuery
+final class Query extends YiiQuery
 {
     use QueryTrait;
 
-    public static function find(?ConnectionInterface $db = null): Query
+    public static function find(ConnectionInterface $db = null): Query
     {
-        return new Query($db ?: Ep::getDb());
+        return new Query($db ?? Ep::getDb());
     }
 
     /**

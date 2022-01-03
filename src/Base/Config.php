@@ -83,7 +83,7 @@ final class Config
     /**
      * Application secretKey
      */
-    public string $secretKey = '';
+    public ?string $secretKey = null;
     /**
      * Params
      */

@@ -6,11 +6,11 @@ namespace Ep\Db;
 
 use Ep\Helper\Batch;
 use Ep\Widget\Paginator;
-use Yiisoft\ActiveRecord\ActiveQuery as BaseActiveQuery;
+use Yiisoft\ActiveRecord\ActiveQuery as YiiActiveQuery;
 use Yiisoft\Db\Expression\Expression;
 use InvalidArgumentException;
 
-class ActiveQuery extends BaseActiveQuery
+final class ActiveQuery extends YiiActiveQuery
 {
     use QueryTrait;
 
