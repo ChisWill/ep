@@ -29,7 +29,6 @@ use Yiisoft\Strings\StringHelper;
 use Ep\Annotation\Inject;
 use Ep\Annotation\Route;
 use Ep\Base\Config;
-use Ep\Base\Container as BaseContainer;
 use Ep\Contract\InjectorInterface;
 use Ep\Tests\App\Aspect\ClassAnnotation;
 use Ep\Tests\App\Aspect\EchoIntAspect;
@@ -39,10 +38,16 @@ use Ep\Tests\App\Middleware\TimeMiddleware;
 use Ep\Tests\App\Model\Student;
 use Ep\Tests\App\Objects\Human\Child;
 use Ep\Tests\App\Service\DemoService;
+use Ep\Tests\Support\Object\Animal\AnimalInterface;
 use Ep\Tests\Support\Object\Animal\Bird;
+use Ep\Tests\Support\Object\Animal\LightBird;
 use Ep\Tests\Support\Object\Animal\MegaBird;
+use Ep\Tests\Support\Object\Animal\WarBird;
 use Ep\Tests\Support\Object\Engine\EngineInterface;
+use Ep\Tests\Support\Object\Engine\NuclearEngine;
 use Ep\Tests\Support\Object\Engine\SteamEngine;
+use Ep\Tests\Support\Object\Weapon\Gun;
+use Ep\Tests\Support\Object\Weapon\WeaponInterface;
 use Ep\Tests\Support\Object\Wing\AngelWing;
 use Ep\Tests\Support\Object\Wing\WingInterface;
 use Ep\Web\ErrorRenderer;
@@ -52,6 +57,7 @@ use Psr\SimpleCache\CacheInterface;
 use Yiisoft\Assets\AssetManager;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Definitions\Reference;
+use Yiisoft\Di\ContainerConfig;
 use Yiisoft\Factory\Factory;
 use Yiisoft\Html\Html;
 use Yiisoft\Injector\Injector;
@@ -197,6 +203,36 @@ class TestController extends Controller
                 CheckMiddleware::class,
             ], $handler)
             ->handle($serverRequest);
+    }
+
+    public function pdiAction()
+    {
+        $parent = new CompositeContainer;
+
+        $child1 = new Container(ContainerConfig::create()->withDefinitions([
+            AnimalInterface::class => WarBird::class,
+            WingInterface::class => AngelWing::class,
+            WeaponInterface::class => Gun::class,
+            EngineInterface::class => NuclearEngine::class
+        ]));
+        $child2 = new Container(ContainerConfig::create()->withDefinitions([
+            AnimalInterface::class => LightBird::class,
+            WingInterface::class => AngelWing::class,
+            WeaponInterface::class => Gun::class,
+            EngineInterface::class => NuclearEngine::class
+        ]));
+
+        $parent->attach($child1);
+        $parent->attach($child2);
+
+        $object = $parent->get(AnimalInterface::class);
+
+        return $this->json([
+            'name' => $object->getName(),
+            'speed' => $object->getSpeed(),
+            'damage' => $object->getDamage(),
+            'power' => $object->getPower(),
+        ]);
     }
 
     public function diAction()

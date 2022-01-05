@@ -61,7 +61,7 @@ final class Ep
         return self::$container;
     }
 
-    private static function createContainerConfig(array $definitions): ContainerConfigInterface
+    public static function createContainerConfig(array $definitions): ContainerConfigInterface
     {
         return ContainerConfig::create()
             ->withDefinitions($definitions)

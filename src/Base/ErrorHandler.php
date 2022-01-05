@@ -12,9 +12,14 @@ final class ErrorHandler
 {
     private ErrorRendererInterface $errorRenderer;
 
-    public function __construct(ErrorRendererInterface $errorRenderer)
+    private function __construct(ErrorRendererInterface $errorRenderer)
     {
         $this->errorRenderer = $errorRenderer;
+    }
+
+    public static function create(ErrorRendererInterface $errorRenderer): self
+    {
+        return new self($errorRenderer);
     }
 
     /**

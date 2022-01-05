@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ep\Web;
 
 use Ep\Base\ErrorHandler;
-use Ep\Contract\NotFoundHandlerInterface;
 use Ep\Web\Middleware\InterceptorMiddleware;
 use Ep\Web\Middleware\RouteMiddleware;
 use HttpSoft\Emitter\SapiEmitter;
@@ -14,6 +13,7 @@ use Yiisoft\Http\Method;
 use Yiisoft\Session\SessionMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 final class Application
 {
@@ -21,14 +21,14 @@ final class Application
     private RequestHandlerFactory $requestHandlerFactory;
     private SapiEmitter $sapiEmitter;
     private ErrorRenderer $errorRenderer;
-    private NotFoundHandlerInterface $notFoundHandler;
+    private RequestHandlerInterface $notFoundHandler;
 
     public function __construct(
         ServerRequestCreator $serverRequestCreator,
         RequestHandlerFactory $requestHandlerFactory,
         SapiEmitter $sapiEmitter,
         ErrorRenderer $errorRenderer,
-        NotFoundHandlerInterface $notFoundHandler
+        RequestHandlerInterface $notFoundHandler
     ) {
         $this->serverRequestCreator = $serverRequestCreator;
         $this->requestHandlerFactory = $requestHandlerFactory;
@@ -66,7 +66,7 @@ final class Application
 
     public function register(ServerRequestInterface $request): void
     {
-        (new ErrorHandler($this->errorRenderer))->register($request);
+        ErrorHandler::create($this->errorRenderer)->register($request);
     }
 
     public function handleRequest(ServerRequestInterface $request): ResponseInterface

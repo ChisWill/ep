@@ -12,7 +12,7 @@ use Ep\Console\EventDispatcher;
 use Ep\Console\Factory as ConsoleFactory;
 use Ep\Contract\ConsoleFactoryInterface;
 use Ep\Contract\InjectorInterface;
-use Ep\Contract\NotFoundHandlerInterface;
+use Ep\Web\Application;
 use Ep\Web\NotFoundHandler;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\PsrCachedReader;
@@ -77,6 +77,12 @@ return [
     ] + $config->aliases),
     // Annotation
     Reader::class => static fn (CacheItemPoolInterface $cache): Reader => $config->debug ? new AnnotationReader() : new PsrCachedReader(new AnnotationReader(), $cache, false),
+    // Web
+    Application::class => [
+        '__construct()' => [
+            'notFoundHandler' => Reference::to(NotFoundHandler::class)
+        ]
+    ],
     // Console
     ConsoleFactoryInterface::class => ConsoleFactory::class,
     ConsoleApplication::class => [
@@ -131,6 +137,4 @@ return [
     ListenerCollection::class => static fn (ListenerCollectionFactory $listenerCollectionFactory): ListenerCollection => $listenerCollectionFactory->create($config->events),
     ListenerProviderInterface::class => Provider::class,
     EventDispatcherInterface::class => Dispatcher::class,
-    // Default NotFoundHandler
-    NotFoundHandlerInterface::class => NotFoundHandler::class,
 ];

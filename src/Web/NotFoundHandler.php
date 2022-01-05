@@ -6,12 +6,12 @@ namespace Ep\Web;
 
 use Ep\Contract\ContextTrait;
 use Ep\Contract\ContextInterface;
-use Ep\Contract\NotFoundHandlerInterface;
 use Yiisoft\Http\Status;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-final class NotFoundHandler implements NotFoundHandlerInterface, ContextInterface
+final class NotFoundHandler implements RequestHandlerInterface, ContextInterface
 {
     use ContextTrait;
 

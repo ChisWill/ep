@@ -40,7 +40,7 @@ final class Application extends SymfonyApplication
         $input ??= $this->input;
         $output ??= $this->output;
 
-        (new ErrorHandler($this->errorRenderer))->register(
+        ErrorHandler::create($this->errorRenderer)->register(
             $this->factory->createRequest($input)
         );
 
