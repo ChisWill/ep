@@ -58,7 +58,7 @@ final class Aspect implements AnnotationInterface
 
     private function wrapClosure(Closure $closure): HandlerInterface
     {
-        return new class ($closure) implements HandlerInterface
+        return new class($closure) implements HandlerInterface
         {
             private Closure $closure;
 
@@ -79,7 +79,7 @@ final class Aspect implements AnnotationInterface
 
     private function wrapAspect(AspectInterface $aspect, HandlerInterface $handler): HandlerInterface
     {
-        return new class ($aspect, $handler) implements HandlerInterface
+        return new class($aspect, $handler) implements HandlerInterface
         {
             private AspectInterface $aspect;
             private HandlerInterface $handler;

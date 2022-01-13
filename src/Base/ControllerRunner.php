@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
+use Ep\Base\ControllerLoaderResult;
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\InjectorInterface;
 use Ep\Contract\ModuleInterface;
 use Ep\Event\AfterRequest;
 use Ep\Event\BeforeRequest;
 use Ep\Exception\NotFoundException;
-use Ep\Result\ControllerLoaderResult;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 

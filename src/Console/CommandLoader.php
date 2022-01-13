@@ -6,12 +6,12 @@ namespace Ep\Console;
 
 use Ep\Base\Config;
 use Ep\Base\ControllerLoader;
+use Ep\Base\ControllerLoaderResult;
 use Ep\Base\Route;
 use Ep\Contract\ConsoleFactoryInterface;
 use Ep\Exception\NotFoundException;
 use Ep\Helper\Str;
 use Ep\Kit\Util;
-use Ep\Result\ControllerLoaderResult;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Input\InputInterface;
@@ -58,7 +58,7 @@ final class CommandLoader implements CommandLoaderInterface
     private function wrapCommand(string $name): SymfonyCommand
     {
         $commandName = $this->parse($name);
-        return new class ($this->controllerLoader->parse($commandName), $this->controllerRunner, $this->factory, $commandName, $name) extends SymfonyCommand
+        return new class($this->controllerLoader->parse($commandName), $this->controllerRunner, $this->factory, $commandName, $name) extends SymfonyCommand
         {
             private ControllerLoaderResult $result;
             private ControllerRunner $runner;

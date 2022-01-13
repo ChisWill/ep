@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Ep\Base;
 
+use Ep\Base\ControllerLoaderResult;
 use Ep\Contract\ControllerInterface;
 use Ep\Contract\ModuleInterface;
 use Ep\Exception\NotFoundException;
 use Ep\Helper\Str;
-use Ep\Result\ControllerLoaderResult;
 use Psr\Container\ContainerInterface;
 use InvalidArgumentException;
 

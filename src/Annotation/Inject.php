@@ -27,17 +27,9 @@ final class Inject implements AnnotationInterface
      */
     public function process(object $instance, Reflector $reflector, array $arguments = []): void
     {
-        $reflector->setAccessible(true);
-
         $className = $reflector->getType()->getName();
 
-        foreach ($arguments as $value) {
-            if (is_object($value) && is_subclass_of($value, $className, false)) {
-                $target = $value;
-                break;
-            }
-        }
-        $target ??= Ep::getDi()->get($className);
+        $target = $this->getTargetInstanceFromArguments($arguments, $className) ?? Ep::getDi()->get($className);
 
         if ($this->properties) {
             $target = clone $target;
@@ -46,6 +38,17 @@ final class Inject implements AnnotationInterface
             }
         }
 
+        $reflector->setAccessible(true);
         $reflector->setValue($instance, $target);
+    }
+
+    private function getTargetInstanceFromArguments(array $arguments, string $className): ?object
+    {
+        foreach ($arguments as $value) {
+            if (is_object($value) && is_subclass_of($value, $className, false)) {
+                return $value;
+            }
+        }
+        return null;
     }
 }
