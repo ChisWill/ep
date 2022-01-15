@@ -26,7 +26,7 @@ final class Query extends YiiQuery
      */
     public function insert(string $table, $columns): int
     {
-        if (empty($columns)) {
+        if (!$columns) {
             return 0;
         }
         return $this->createCommand()
@@ -36,6 +36,9 @@ final class Query extends YiiQuery
 
     public function batchInsert(string $table, array $columns, iterable $rows): int
     {
+        if (!$columns || !$rows) {
+            return 0;
+        }
         return $this->createCommand()
             ->batchInsert($table, $columns, $rows)
             ->execute();
@@ -46,7 +49,7 @@ final class Query extends YiiQuery
      */
     public function update(string $table, array $columns, $condition = '', array $params = []): int
     {
-        if (empty($columns)) {
+        if (!$columns || !$condition) {
             return 0;
         }
         return $this->createCommand()
@@ -60,7 +63,7 @@ final class Query extends YiiQuery
      */
     public function upsert(string $table, $insertColumns, $updateColumns = true, array $params = []): int
     {
-        if (empty($insertColumns)) {
+        if (!$insertColumns) {
             return 0;
         }
         return $this->createCommand()
@@ -73,6 +76,9 @@ final class Query extends YiiQuery
      */
     public function delete(string $table, $condition = '', array $params = []): int
     {
+        if (!$condition) {
+            return 0;
+        }
         return $this->createCommand()
             ->delete($table, $condition, $params)
             ->execute();
@@ -83,6 +89,9 @@ final class Query extends YiiQuery
      */
     public function increment(string $table, array $columns, $condition = '', array $params = []): int
     {
+        if (!$columns || !$condition) {
+            return 0;
+        }
         foreach ($columns as $field => &$value) {
             if (is_numeric($value)) {
                 $value = new Expression("`{$field}` + {$value}");

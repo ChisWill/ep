@@ -16,13 +16,19 @@ final class ActiveQuery extends YiiActiveQuery
 
     public function update(array $columns): int
     {
+        if (!$columns || !($where = $this->getWhere())) {
+            return 0;
+        }
         return $this->createCommand()
-            ->update(current($this->getFrom()), $columns, $this->getWhere(), $this->getParams())
+            ->update(current($this->getFrom()), $columns, $where, $this->getParams())
             ->execute();
     }
 
     public function increment(array $columns): int
     {
+        if (!$columns || !$this->getWhere()) {
+            return 0;
+        }
         foreach ($columns as $field => &$value) {
             if (is_numeric($value)) {
                 $value = new Expression("`{$field}` + {$value}");
