@@ -66,7 +66,7 @@ class Student extends ActiveRecord implements IdentityInterface
         $ageRange = array_keys(array_fill(18, 30, 1));
         return [
             'age' => [
-                (Number::rule())->integer()->max(99)->tooBigMessage('最多99岁')->skipOnEmpty(true),
+                (Number::rule())->integer()->max(99)->tooBigMessage('最多99岁'),
                 (InRange::rule($ageRange))->skipOnEmpty(true)->message(sprintf('Range is: %s', implode(', ', $ageRange)))
             ],
             'name' => [(HasLength::rule())->max(8)->min(2)->tooLongMessage('用户名最多8个字')->tooShortMessage('最少2个字')],

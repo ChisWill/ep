@@ -253,6 +253,7 @@ class DemoController extends Controller
     {
         $student = Student::findModel($request->getQueryParams()['id'] ?? 0, $this->db);
         if ($student->load($request)) {
+            $student->class_id = 1;
             $trans = $this->db->beginTransaction();
             if (!$student->validate()) {
                 return $this->error($student->getErrors());

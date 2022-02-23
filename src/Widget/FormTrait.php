@@ -4,26 +4,24 @@ declare(strict_types=1);
 
 namespace Ep\Widget;
 
+use Yiisoft\Validator\Error;
+use Yiisoft\Validator\Result;
 use Yiisoft\Validator\Validator;
 
 trait FormTrait
 {
-    private array $_errors = [];
+    private Result $result;
 
     public function validate(): bool
     {
-        $this->_errors = [];
-        foreach ((new Validator())->validate($this, $this->rules()) as $attribute => $result) {
-            if (!$result->isValid()) {
-                $this->_errors[$attribute] = $result->getErrors();
-            }
-        }
-        return empty($this->_errors);
+        $this->result = (new Validator())->validate($this, $this->rules());
+
+        return $this->result->isValid();
     }
 
     public function getErrors(): array
     {
-        return $this->_errors;
+        return $this->result->getErrorMessages();
     }
 
     abstract protected function rules(): array;
