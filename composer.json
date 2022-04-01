@@ -33,7 +33,6 @@
         "yiisoft/json": "^1.0",
         "yiisoft/session": "^1.0",
         "yiisoft/strings": "^2.0",
-        "yiisoft/validator": "^3.0",
         "yiisoft/yii-event": "^1.0"
     },
     "require-dev": {
@@ -54,7 +53,8 @@
             "src/functions.php"
         ],
         "psr-4": {
-            "Ep\\": "src"
+            "Ep\\": "src",
+            "Yiisoft\\": "src/Yii"
         }
     },
     "autoload-dev": {
