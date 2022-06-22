@@ -171,7 +171,9 @@ final class CommandLoader implements CommandLoaderInterface
         return array_map(static function ($filePath) use ($directory): string {
             return trim(str_replace([$directory, '.php'], '', $filePath), '/');
         }, FileHelper::findFiles($directory, [
-            'filter' => (new PathMatcher())->only('**' . $suffix . '/*' . $suffix . '.php')
+            'filter' => (new PathMatcher())
+                ->only('**' . $suffix . '/*' . $suffix . '.php')
+                ->except('**/Yii/**.php')
         ]));
     }
 
